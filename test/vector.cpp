@@ -35,6 +35,8 @@ TEST_CASE("construction", "[construction]")
         ++itr;
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
     }
 
     SECTION("init list construction")
@@ -59,6 +61,8 @@ TEST_CASE("construction", "[construction]")
         ++itr;
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
     }
 
     SECTION("copy construction")
@@ -90,6 +94,8 @@ TEST_CASE("construction", "[construction]")
         ++itr;
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == copy.end());
     }
 
     SECTION("move construction")
@@ -121,6 +127,8 @@ TEST_CASE("construction", "[construction]")
         ++itr;
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == move.end());
     }
 }
 
@@ -159,6 +167,8 @@ TEST_CASE("assignment", "[assignment]")
         ++itr;
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == copy.end());
     }
 
     SECTION("move assignment")
@@ -194,6 +204,8 @@ TEST_CASE("assignment", "[assignment]")
         ++itr;
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == move.end());
     }
 }
 
