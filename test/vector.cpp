@@ -196,3 +196,36 @@ TEST_CASE("assignment", "[assignment]")
         REQUIRE(itr->second == 7);
     }
 }
+
+TEST_CASE("size", "[size]")
+{
+    SECTION("empty")
+    {
+        flat_map::flat_map<int, int> fm;
+
+        REQUIRE(fm.empty());
+        REQUIRE(fm.size() == 0);
+    }
+
+    SECTION("non empty")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {1, 1},
+        };
+
+        REQUIRE_FALSE(fm.empty());
+        REQUIRE(fm.size() == 1);
+    }
+
+    SECTION("clear")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {1, 1},
+        };
+
+        fm.clear();
+        REQUIRE(fm.empty());
+    }
+}
