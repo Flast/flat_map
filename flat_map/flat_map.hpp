@@ -84,11 +84,18 @@ private:
         } c{_comp()};
         return c;
     }
+    auto _evcomp() const
+    {
+        return [this](value_type const& lhs, value_type const& rhs)
+        {
+            return !_comp()(lhs.first, rhs.first) && !_comp()(rhs.first, lhs.first);
+        };
+    }
 
     void _initialize_container()
     {
         std::sort(_container.begin(), _container.end(), _vcomp());
-        auto itr = std::unique(_container.begin(), _container.end(), _vcomp());
+        auto itr = std::unique(_container.begin(), _container.end(), _evcomp());
         _container.erase(itr, _container.end());
     }
 
