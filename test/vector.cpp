@@ -4,6 +4,7 @@
 #include "flat_map/flat_map.hpp"
 
 #include <catch2/catch.hpp>
+#include <iterator>
 
 TEST_CASE("construction", "[construction]")
 {
@@ -239,5 +240,130 @@ TEST_CASE("size", "[size]")
 
         fm.clear();
         REQUIRE(fm.empty());
+    }
+}
+
+TEST_CASE("equal_range", "[equal_range]")
+{
+    flat_map::flat_map<int, int> const fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("not found")
+    {
+        auto [first, last] = fm.equal_range(3);
+        REQUIRE(first != fm.end());
+        REQUIRE(first == last);
+        REQUIRE(first->first == 4);
+    }
+
+    SECTION("found")
+    {
+        auto [first, last] = fm.equal_range(2);
+        REQUIRE(first != fm.end());
+        REQUIRE(std::next(first) == last);
+        REQUIRE(first->first == 2);
+    }
+}
+
+TEST_CASE("lower_bound", "[lower_bound]")
+{
+    flat_map::flat_map<int, int> const fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("not equal")
+    {
+        auto itr = fm.lower_bound(3);
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 4);
+    }
+
+    SECTION("equal")
+    {
+        auto itr = fm.lower_bound(2);
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 2);
+    }
+
+    SECTION("not found")
+    {
+        auto itr = fm.lower_bound(9);
+        REQUIRE(itr == fm.end());
+    }
+}
+
+TEST_CASE("upper_bound", "[upper_bound]")
+{
+    flat_map::flat_map<int, int> const fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("not equal")
+    {
+        auto itr = fm.upper_bound(3);
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 4);
+    }
+
+    SECTION("equal")
+    {
+        auto itr = fm.upper_bound(2);
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 4);
+    }
+
+    SECTION("not found")
+    {
+        auto itr = fm.upper_bound(9);
+        REQUIRE(itr == fm.end());
+    }
+}
+
+TEST_CASE("accessor", "[accessor]")
+{
+    flat_map::flat_map<int, int> fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("found")
+    {
+        auto itr = fm.find(2);
+        REQUIRE(itr != fm.end());
+        REQUIRE(std::distance(fm.begin(), itr) == 1);
+        REQUIRE(itr->first == 2);
+    }
+
+    SECTION("not found")
+    {
+        auto itr = fm.find(3);
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("found on at")
+    {
+        auto& value = fm.at(2);
+        REQUIRE(value == 3);
+    }
+
+    SECTION("not found on at")
+    {
+        REQUIRE_THROWS_AS(fm.at(3), std::out_of_range);
     }
 }

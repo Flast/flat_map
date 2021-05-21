@@ -73,7 +73,6 @@ public:
     };
 
 private:
-    decltype(auto) _comp() { return *static_cast<Compare*>(this); }
     decltype(auto) _comp() const { return *static_cast<Compare const*>(this); }
 
     auto _vcomp() const
@@ -81,8 +80,20 @@ private:
         struct comparator final : value_compare
         {
             comparator(Compare const& comp) : value_compare{comp} { }
-        } c{_comp()};
-        return c;
+
+            using value_compare::operator();
+
+            auto operator()(value_type const& lhs, key_type const& rhs) const
+            {
+                return this->c(lhs.first, rhs);
+            }
+
+            auto operator()(key_type const& lhs, value_type const& rhs) const
+            {
+                return this->c(lhs, rhs.first);
+            }
+        };
+        return comparator{_comp()};
     }
     auto _evcomp() const
     {
@@ -158,8 +169,7 @@ public:
 
     mapped_type const& at(key_type const& key) const
     {
-        auto comp = [&key, c = _comp()](value_type const& value) { return c(value.first, key); };
-        auto itr = std::lower_bound(_container.begin(), _container.end(), comp);
+        auto itr = lower_bound(key);
         if (itr == _container.end() || _comp()(key, itr->first)) { throw std::out_of_range("no such key"); }
         return itr->second;
     }
@@ -383,7 +393,8 @@ public:
 
     iterator find(key_type const& key)
     {
-        // TODO
+        auto itr = lower_bound(key);
+        return (itr == end() || _comp()(key, itr->first)) ? end() : itr;
     }
 
     const_iterator find(key_type const& key) const { return const_cast<flat_map*>(this)->find(key); }
@@ -405,10 +416,7 @@ public:
     enable_if_transparent<K, bool>
     contains(K const& key) { return count<K>(key) != 0; }
 
-    std::pair<iterator, iterator> equal_range(key_type const& key)
-    {
-        // TODO
-    }
+    std::pair<iterator, iterator> equal_range(key_type const& key) { return std::equal_range(begin(), end(), key, _vcomp()); }
 
     std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<flat_map*>(this)->equal_range(key); }
 
@@ -423,10 +431,7 @@ public:
     enable_if_transparent<K, std::pair<const_iterator, const_iterator>>
     equal_range(K const& key) const { return const_cast<flat_map*>(this)->template equal_range<K>(key); }
 
-    iterator lower_bound(key_type const& key)
-    {
-        // TODO]
-    }
+    iterator lower_bound(key_type const& key) { return std::lower_bound(begin(), end(), key, _vcomp()); }
 
     const_iterator lower_bound(key_type const& key) const { return const_cast<flat_map*>(this)->lower_bound(key); }
 
@@ -441,10 +446,7 @@ public:
     enable_if_transparent<K, const_iterator>
     lower_bound(K const& key) const { return const_cast<flat_map*>(this)->template lower_bound<K>(key); }
 
-    iterator upper_bound(key_type const& key)
-    {
-        // TODO]
-    }
+    iterator upper_bound(key_type const& key) { return std::upper_bound(begin(), end(), key, _vcomp()); }
 
     const_iterator upper_bound(key_type const& key) const { return const_cast<flat_map*>(this)->upper_bound(key); }
 
