@@ -34,7 +34,7 @@ namespace flat_map
 
 template <typename Key, typename T,
           typename Compare = std::less<Key>,
-          typename Container = std::vector<std::pair<Key const, T>>>
+          typename Container = std::vector<std::pair<Key, T>>>
 class flat_map : private Compare
 {
     Container _container;
@@ -42,7 +42,7 @@ class flat_map : private Compare
 public:
     using key_type = Key;
     using mapped_type = T;
-    using value_type = std::pair<Key const, T>;
+    using value_type = std::pair<Key, T>;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using key_compare = Compare;
