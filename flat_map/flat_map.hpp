@@ -459,7 +459,7 @@ public:
 template <typename Key, typename T, typename Compare, typename Container>
 bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
-    // TODO
+    return std::equal(lhs.begin(), lhs.end(), lhs.begin(), rhs.end());
 }
 
 // #if !(defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison))
@@ -472,6 +472,7 @@ bool operator!=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
 template <typename Key, typename T, typename Compare, typename Container>
 bool operator<(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 template <typename Key, typename T, typename Compare, typename Container>
