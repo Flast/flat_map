@@ -12,3 +12,5 @@ macro(add_tests testname)
   target_link_libraries(${testname} flat_map)
   add_dependencies(unit_test ${testname})
 endmacro()
+
+add_tests(vector_test vector.cpp)
