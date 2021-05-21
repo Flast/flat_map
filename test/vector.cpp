@@ -367,3 +367,187 @@ TEST_CASE("accessor", "[accessor]")
         REQUIRE_THROWS_AS(fm.at(3), std::out_of_range);
     }
 }
+
+TEST_CASE("insertion", "[insertion]")
+{
+    SECTION("insert")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        {
+            auto [itr, inserted] = fm.insert({8, 9});
+            REQUIRE(inserted);
+            REQUIRE(itr->first == 8);
+            REQUIRE(itr->second == 9);
+            REQUIRE(std::distance(fm.begin(), itr) == 4);
+        }
+
+        {
+            auto [itr, inserted] = fm.insert({3, 4});
+            REQUIRE(inserted);
+            REQUIRE(fm.size() == 6);
+            REQUIRE(itr->first == 3);
+            REQUIRE(itr->second == 4);
+            REQUIRE(std::distance(fm.begin(), itr) == 2);
+        }
+
+        {
+            auto [itr, inserted] = fm.insert({2, 5});
+            REQUIRE_FALSE(inserted);
+            REQUIRE(itr->first == 2);
+            REQUIRE(itr->second == 3);
+        }
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 4);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr->first == 8);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("insert with helpful hint")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        {
+            auto itr = fm.insert(fm.end(), {8, 9}); // 7
+            REQUIRE(itr->first == 8);
+            REQUIRE(itr->second == 9);
+            REQUIRE(std::distance(fm.begin(), itr) == 4);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 2), {3, 4}); // 1
+            REQUIRE(fm.size() == 6);
+            REQUIRE(itr->first == 3);
+            REQUIRE(itr->second == 4);
+            REQUIRE(std::distance(fm.begin(), itr) == 2);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 1), {2, 5}); // 6
+            REQUIRE(itr->first == 2);
+            REQUIRE(itr->second == 3);
+        }
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 4);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr->first == 8);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("insert with annoying hint")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        {
+            auto itr = fm.insert(std::next(fm.begin()), {5, 6}); // 4
+            REQUIRE(itr->first == 5);
+            REQUIRE(itr->second == 6);
+            REQUIRE(std::distance(fm.begin(), itr) == 3);
+        }
+
+        {
+            auto itr = fm.insert(fm.end(), {3, 4}); // 8
+            REQUIRE(fm.size() == 6);
+            REQUIRE(itr->first == 3);
+            REQUIRE(itr->second == 4);
+            REQUIRE(std::distance(fm.begin(), itr) == 2);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 3), {1, 2}); // 2
+            REQUIRE(fm.size() == 7);
+            REQUIRE(itr->first == 1);
+            REQUIRE(itr->second == 2);
+            REQUIRE(std::distance(fm.begin(), itr) == 1);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 2), {2, 5}); // 3
+            REQUIRE(fm.size() == 7);
+            REQUIRE(itr->first == 2);
+            REQUIRE(itr->second == 3);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin()), {6, 9}); // 5
+            REQUIRE(fm.size() == 7);
+            REQUIRE(itr->first == 6);
+            REQUIRE(itr->second == 7);
+        }
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 1);
+        REQUIRE(itr->second == 2);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 4);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 5);
+        REQUIRE(itr->second == 6);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+}

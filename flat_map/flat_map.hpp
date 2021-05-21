@@ -10,6 +10,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -200,37 +201,89 @@ public:
     size_type max_size() const noexcept { return _container.max_size(); }
     void clear() noexcept { return _container.clear(); }
 
-    std::pair<iterator, bool> insert(value_type const& value)
+private:
+    template <typename V>
+    std::pair<iterator, bool> _insert(V&& value)
     {
-        // TODO
+        auto itr = lower_bound(value.first);
+        if (itr == end() || _comp()(value.first, itr->first))
+        {
+            return {_container.insert(itr, std::forward<V>(value)), true};
+        }
+        return {itr, false};
+    }
+
+public:
+    std::pair<iterator, bool> insert(value_type const& value) { return _insert(value); }
+
+    template <typename V>
+    std::enable_if_t<std::is_constructible_v<value_type, V&&>, std::pair<iterator, bool>>
+    insert(V&& value) { return emplace(std::forward<V>(value)); }
+
+    std::pair<iterator, bool> insert(value_type&& value) { return _insert(std::move(value)); }
+
+private:
+    iterator _mutable(const_iterator itr)
+    {
+        return std::next(_container.begin(), std::distance(_container.cbegin(), itr));
     }
 
     template <typename V>
-    std::pair<iterator, bool> insert(V&& value)
+    iterator _insert(const_iterator hint, V&& value)
     {
-        // TODO
+        if (hint != end())
+        {
+            if (_comp()(value.first, hint->first))
+            {
+                if (hint == begin() || _comp()(std::prev(hint)->first, value.first))
+                {
+                    return _container.insert(hint, std::forward<V>(value)); // 1
+                }
+                auto itr = std::lower_bound(cbegin(), std::prev(hint), value, _vcomp());
+                if (_comp()(value.first, itr->first))
+                {
+                    return _container.insert(itr, std::forward<V>(value)); // 2
+                }
+                return _mutable(itr); // 3
+            }
+            else
+            {
+                if (_comp()(hint->first, value.first))
+                {
+                    auto itr = std::lower_bound(std::next(hint), cend(), value, _vcomp());
+                    if (itr == end() || _comp()(value.first, itr->first))
+                    {
+                        return _container.insert(itr, std::forward<V>(value)); // 4
+                    }
+                    return _mutable(itr); // 5
+                }
+                else
+                {
+                    return _mutable(hint); // 6
+                }
+            }
+        }
+        else
+        {
+            if (hint == begin() || _comp()(std::prev(hint)->first, value.first))
+            {
+                return _container.insert(hint, std::forward<V>(value)); // 7
+            }
+            else
+            {
+                return _insert(std::forward<V>(value)).first; // 8
+            }
+        }
     }
 
-    std::pair<iterator, bool> insert(value_type&& value)
-    {
-        // TODO
-    }
-
-    iterator insert(const_iterator hint, value_type const& value)
-    {
-        // TODO
-    }
+public:
+    iterator insert(const_iterator hint, value_type const&& value) { return _insert(hint, value); }
 
     template <typename V>
-    iterator insert(const_iterator hint, V&& value)
-    {
-        // TODO
-    }
+    std::enable_if_t<std::is_constructible_v<value_type, V&&>, iterator>
+    insert(const_iterator hint, V&& value) { return emplace_hint(hint, std::forward<V>(value)); }
 
-    iterator insert(const_iterator hint, value_type&& value)
-    {
-        // TODO
-    }
+    iterator insert(const_iterator hint, value_type&& value) { return _insert(hint, std::move(value)); }
 
     template <typename InputIterator>
     void insert(InputIterator first, InputIterator last)
