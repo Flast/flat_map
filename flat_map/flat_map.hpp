@@ -365,7 +365,7 @@ public:
 
 private:
     template <typename K, typename U>
-    using enable_if_transparent = std::enable_if_t<sizeof(K*) && sizeof(typename key_compare::is_transparent), U>;
+    using enable_if_transparent = std::enable_if_t<(sizeof(typename std::enable_if_t<(sizeof(K*) > 0), key_compare>::is_transparent*) > 0), U>;
 
 public:
     size_type count(key_type const& key) const { return find(key) == end() ? 0 : 1; }
