@@ -469,7 +469,11 @@ public:
     enable_if_transparent<K, bool>
     contains(K const& key) { return count<K>(key) != 0; }
 
-    std::pair<iterator, iterator> equal_range(key_type const& key) { return std::equal_range(begin(), end(), key, _vcomp()); }
+    std::pair<iterator, iterator> equal_range(key_type const& key)
+    {
+        auto itr = lower_bound(key);
+        return {itr, (itr == end() || _comp()(key, itr->first)) ? itr : std::next(itr)};
+    }
 
     std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<flat_map*>(this)->equal_range(key); }
 
