@@ -752,7 +752,7 @@ TEST_CASE("erase", "[erase]")
     }
 }
 
-TEST_CASE("insert or assign", "[insert_or_assign]")
+TEST_CASE("insert or assign", "[insertion]")
 {
     SECTION("insert or assign")
     {
