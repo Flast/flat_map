@@ -591,6 +591,7 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
         ++itr;
+        REQUIRE(itr == fm.end());
     }
 
     SECTION("insert initializer_list")
@@ -631,6 +632,7 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
         ++itr;
+        REQUIRE(itr == fm.end());
     }
 
     SECTION("insert sorted range")
@@ -673,6 +675,7 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
         ++itr;
+        REQUIRE(itr == fm.end());
     }
 
     SECTION("insert sorted initializer_list")
@@ -713,5 +716,6 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(itr->first == 6);
         REQUIRE(itr->second == 7);
         ++itr;
+        REQUIRE(itr == fm.end());
     }
 }
