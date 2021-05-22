@@ -401,7 +401,10 @@ public:
 
     size_type erase(key_type const& key)
     {
-        // TODO
+        auto itr = lower_bound(key);
+        if (itr == end() || _comp()(key, itr->first)) { return 0; }
+        _container.erase(itr);
+        return 1;
     }
 
     void swap(flat_map& other) noexcept(std::allocator_traits<allocator_type>::is_always_equal::value && std::is_nothrow_swappable<Compare>::value)

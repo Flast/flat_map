@@ -719,3 +719,35 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(itr == fm.end());
     }
 }
+
+TEST_CASE("erase", "[erase]")
+{
+    SECTION("erase by key")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        REQUIRE(fm.erase(5) == 0);
+        REQUIRE(fm.size() == 4);
+
+        REQUIRE(fm.erase(2) == 1);
+        REQUIRE(fm.size() == 3);
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+}
