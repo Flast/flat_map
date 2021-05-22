@@ -366,6 +366,37 @@ TEST_CASE("accessor", "[accessor]")
     {
         REQUIRE_THROWS_AS(fm.at(3), std::out_of_range);
     }
+
+    SECTION("found on op[]")
+    {
+        auto& value = fm[2];
+        REQUIRE(value == 3);
+    }
+
+    SECTION("not found on op[]")
+    {
+        auto& value = fm[3];
+        REQUIRE(fm.size() == 5);
+        REQUIRE(value == int{});
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == int{});
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
 }
 
 TEST_CASE("insertion", "[insertion]")
