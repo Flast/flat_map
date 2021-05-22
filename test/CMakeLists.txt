@@ -1,7 +1,14 @@
 set(GNUCC_COMPAT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" INTERNAL)
 
+set(SANITIZE OFF CACHE STRING "Enable sanitizer")
+
 if(GNUCC_COMPAT)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+
+  if(SANITIZE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZE}")
+    set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fsanitize=${SANITIZE}")
+  endif()
 endif()
 
 include(cmake/catch2)
