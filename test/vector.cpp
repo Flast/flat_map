@@ -452,7 +452,7 @@ TEST_CASE("insertion", "[insertion]")
         }
 
         {
-            auto itr = fm.insert(std::next(fm.begin(), 1), {2, 5}); // 6
+            auto itr = fm.insert(std::next(fm.begin(), 1), {2, 5}); // 4
             REQUIRE(itr->first == 2);
             REQUIRE(itr->second == 3);
         }
@@ -490,7 +490,7 @@ TEST_CASE("insertion", "[insertion]")
         };
 
         {
-            auto itr = fm.insert(std::next(fm.begin()), {5, 6}); // 4
+            auto itr = fm.insert(std::next(fm.begin()), {5, 6}); // 5
             REQUIRE(itr->first == 5);
             REQUIRE(itr->second == 6);
             REQUIRE(std::distance(fm.begin(), itr) == 3);
@@ -520,7 +520,7 @@ TEST_CASE("insertion", "[insertion]")
         }
 
         {
-            auto itr = fm.insert(std::next(fm.begin()), {6, 9}); // 5
+            auto itr = fm.insert(std::next(fm.begin()), {6, 9}); // 6
             REQUIRE(fm.size() == 7);
             REQUIRE(itr->first == 6);
             REQUIRE(itr->second == 7);

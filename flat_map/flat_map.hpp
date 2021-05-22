@@ -235,45 +235,30 @@ private:
         {
             if (_comp()(value.first, hint->first))
             {
-                if (hint == begin() || _comp()(std::prev(hint)->first, value.first))
+                bool insert_here = hint == begin() || _comp()(std::prev(hint)->first, value.first); // 1
+                if (!insert_here)
                 {
-                    return _container.insert(hint, std::forward<V>(value)); // 1
+                    hint = std::lower_bound(cbegin(), std::prev(hint), value, _vcomp());
+                    bool found_insert_point = _comp()(value.first, hint->first); // 2
+                    if (!found_insert_point) { return _mutable(hint); } // 3
                 }
-                auto itr = std::lower_bound(cbegin(), std::prev(hint), value, _vcomp());
-                if (_comp()(value.first, itr->first))
-                {
-                    return _container.insert(itr, std::forward<V>(value)); // 2
-                }
-                return _mutable(itr); // 3
             }
             else
             {
-                if (_comp()(hint->first, value.first))
-                {
-                    auto itr = std::lower_bound(std::next(hint), cend(), value, _vcomp());
-                    if (itr == end() || _comp()(value.first, itr->first))
-                    {
-                        return _container.insert(itr, std::forward<V>(value)); // 4
-                    }
-                    return _mutable(itr); // 5
-                }
-                else
-                {
-                    return _mutable(hint); // 6
-                }
+                bool found_value = !_comp()(hint->first, value.first);
+                if (found_value) { return _mutable(hint); } // 4
+
+                hint = std::lower_bound(std::next(hint), cend(), value, _vcomp());
+                bool found_insert_point = hint == end() || _comp()(value.first, hint->first); // 5
+                if (!found_insert_point) { return _mutable(hint); } // 6
             }
         }
         else
         {
-            if (hint == begin() || _comp()(std::prev(hint)->first, value.first))
-            {
-                return _container.insert(hint, std::forward<V>(value)); // 7
-            }
-            else
-            {
-                return _insert(std::forward<V>(value)).first; // 8
-            }
+            bool insert_here = hint == begin() || _comp()(std::prev(hint)->first, value.first); // 7
+            if (!insert_here) { return _insert(std::forward<V>(value)).first; } // 8
         }
+        return _container.insert(hint, std::forward<V>(value));
     }
 
 public:
