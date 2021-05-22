@@ -1,0 +1,58 @@
+name: default CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  asan:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends g++ cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=address ..
+
+    - name: Build
+      working-directory: build
+      run: make -j2 unit_test
+
+    - name: Run unit test
+      working-directory: build
+      run: ctest -j2 --output-on-failure
+
+  ubsan:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends g++ cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=undefined ..
+
+    - name: Build
+      working-directory: build
+      run: make -j2 unit_test
+
+    - name: Run unit test
+      working-directory: build
+      run: ctest -j2 --output-on-failure
