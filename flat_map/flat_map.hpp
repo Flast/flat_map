@@ -202,15 +202,18 @@ public:
     void clear() noexcept { return _container.clear(); }
 
 private:
+    std::pair<iterator, bool> _find(key_type const& key)
+    {
+        auto itr = lower_bound(key);
+        return {itr, !(itr == end() || _comp()(key, itr->first))};
+    }
+
     template <typename V>
     std::pair<iterator, bool> _insert(V&& value)
     {
-        auto itr = lower_bound(value.first);
-        if (itr == end() || _comp()(value.first, itr->first))
-        {
-            return {_container.insert(itr, std::forward<V>(value)), true};
-        }
-        return {itr, false};
+        auto [itr, found] = _find(value.first);
+        if (!found) { itr = _container.insert(itr, std::forward<V>(value)); }
+        return {itr, !found};
     }
 
 public:
@@ -228,37 +231,44 @@ private:
         return std::next(_container.begin(), std::distance(_container.cbegin(), itr));
     }
 
-    template <typename V>
-    iterator _insert(const_iterator hint, V&& value)
+    std::pair<iterator, bool> _find(const_iterator hint, key_type const& key)
     {
         if (hint != end())
         {
-            if (_comp()(value.first, hint->first))
+            if (_comp()(key, hint->first))
             {
-                bool insert_here = hint == begin() || _comp()(std::prev(hint)->first, value.first); // 1
+                bool insert_here = hint == begin() || _comp()(std::prev(hint)->first, key); // 1
                 if (!insert_here)
                 {
-                    hint = std::lower_bound(cbegin(), std::prev(hint), value, _vcomp());
-                    bool found_insert_point = _comp()(value.first, hint->first); // 2
-                    if (!found_insert_point) { return _mutable(hint); } // 3
+                    hint = std::lower_bound(cbegin(), std::prev(hint), key, _vcomp());
+                    bool found_insert_point = _comp()(key, hint->first); // 2
+                    if (!found_insert_point) { return {_mutable(hint), true}; } // 3
                 }
             }
             else
             {
-                bool found_value = !_comp()(hint->first, value.first);
-                if (found_value) { return _mutable(hint); } // 4
+                bool found_value = !_comp()(hint->first, key);
+                if (found_value) { return {_mutable(hint), true}; } // 4
 
-                hint = std::lower_bound(std::next(hint), cend(), value, _vcomp());
-                bool found_insert_point = hint == end() || _comp()(value.first, hint->first); // 5
-                if (!found_insert_point) { return _mutable(hint); } // 6
+                hint = std::lower_bound(std::next(hint), cend(), key, _vcomp());
+                bool found_insert_point = hint == end() || _comp()(key, hint->first); // 5
+                if (!found_insert_point) { return {_mutable(hint), true}; } // 6
             }
         }
         else
         {
-            bool insert_here = hint == begin() || _comp()(std::prev(hint)->first, value.first); // 7
-            if (!insert_here) { return _insert(std::forward<V>(value)).first; } // 8
+            bool insert_here = hint == begin() || _comp()(std::prev(hint)->first, key); // 7
+            if (!insert_here) { return _find(key); } // 8
         }
-        return _container.insert(hint, std::forward<V>(value));
+        return {_mutable(hint), false};
+    }
+
+    template <typename V>
+    iterator _insert(const_iterator hint, V&& value)
+    {
+        auto [itr, found] = _find(hint, value.first);
+        if (!found) { itr = _container.insert(itr, std::forward<V>(value)); }
+        return itr;
     }
 
 public:
@@ -336,29 +346,38 @@ public:
     //     // TODO
     // }
 
-    template <typename M>
-    std::pair<iterator, bool> insert_or_assign(key_type const& key, M&& obj)
+private:
+    template <typename K, typename M>
+    std::pair<iterator, bool> _insert_or_assign(K&& key, M&& obj)
     {
-        // TODO
+        static_assert(std::is_assignable_v<mapped_type&, M&&>);
+        auto [itr, found] = _find(key);
+        if (!found) { itr = _container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
+        else { itr->second = std::forward<M>(obj); }
+        return {itr, !found};
     }
 
-    template <typename M>
-    std::pair<iterator, bool> insert_or_assign(key_type&& key, M&& obj)
+    template <typename K, typename M>
+    iterator _insert_or_assign(const_iterator hint, K&& key, M&& obj)
     {
-        // TODO
+        auto [itr, found] = _find(hint, key);
+        if (!found) { itr = _container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
+        else { itr->second = std::forward<M>(obj); }
+        return itr;
     }
 
+public:
     template <typename M>
-    iterator insert_or_assign(const_iterator hint, key_type const& key, M&& obj)
-    {
-        // TODO
-    }
+    std::pair<iterator, bool> insert_or_assign(key_type const& key, M&& obj) { return _insert_or_assign(key, std::forward<M>(obj)); }
 
     template <typename M>
-    iterator insert_or_assign(const_iterator hint, key_type&& key, M&& obj)
-    {
-        // TODO
-    }
+    std::pair<iterator, bool> insert_or_assign(key_type&& key, M&& obj) { return _insert_or_assign(std::move(key), std::forward<M>(obj)); }
+
+    template <typename M>
+    iterator insert_or_assign(const_iterator hint, key_type const& key, M&& obj) { return _insert_or_assign(hint, key, std::forward<M>(obj)); }
+
+    template <typename M>
+    iterator insert_or_assign(const_iterator hint, key_type&& key, M&& obj) { return _insert_or_assign(hint, std::move(key), std::forward<M>(obj)); }
 
     template <typename... Args>
     std::pair<iterator, bool> emplace(Args&&... args)
@@ -478,8 +497,8 @@ public:
 
     iterator find(key_type const& key)
     {
-        auto itr = lower_bound(key);
-        return (itr == end() || _comp()(key, itr->first)) ? end() : itr;
+        auto [itr, found] = _find(key);
+        return found ? itr : end();
     }
 
     const_iterator find(key_type const& key) const { return const_cast<flat_map*>(this)->find(key); }
