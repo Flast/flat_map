@@ -1331,3 +1331,42 @@ TEST_CASE("emplace insertion", "[insertion]")
         REQUIRE(itr == fm.end());
     }
 }
+
+TEST_CASE("swap", "[swap]")
+{
+    SECTION("member method")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        flat_map::flat_map<int, int> dst;
+
+        fm.swap(dst);
+
+        REQUIRE(fm.empty());
+        REQUIRE(dst.size() == 4);
+    }
+
+    SECTION("free function")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        flat_map::flat_map<int, int> dst;
+
+        swap(fm, dst);
+
+        REQUIRE(fm.empty());
+        REQUIRE(dst.size() == 4);
+    }
+}

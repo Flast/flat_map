@@ -76,6 +76,7 @@ public:
 
 private:
     decltype(auto) _comp() const { return *static_cast<Compare const*>(this); }
+    decltype(auto) _comp() { return *static_cast<Compare*>(this); }
 
     auto _vcomp() const
     {
