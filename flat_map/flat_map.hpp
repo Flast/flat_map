@@ -10,6 +10,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -380,40 +381,52 @@ public:
     iterator insert_or_assign(const_iterator hint, key_type&& key, M&& obj) { return _insert_or_assign(hint, std::move(key), std::forward<M>(obj)); }
 
     template <typename... Args>
-    std::pair<iterator, bool> emplace(Args&&... args)
-    {
-        // TODO
-    }
+    std::pair<iterator, bool> emplace(Args&&... args) { return _insert(value_type(std::forward<Args>(args)...)); }
 
     template <typename... Args>
-    iterator emplace_hint(const_iterator hint, Args&&... args)
+    iterator emplace_hint(const_iterator hint, Args&&... args) { return _insert(hint, value_type(std::forward<Args>(args)...)); }
+
+private:
+    template <typename K, typename... Args>
+    std::pair<iterator, bool> _try_emplace(K&& key, Args&&... args)
     {
-        // TODO
+        auto [itr, found] = _find(key);
+        if (!found)
+        {
+            itr = _container.emplace(itr,
+                                     std::piecewise_construct,
+                                     std::forward_as_tuple(std::forward<K>(key)),
+                                     std::forward_as_tuple(std::forward<Args>(args)...));
+        }
+        return {itr, !found};
     }
 
-    template <typename... Args>
-    std::pair<iterator, bool> try_emplace(key_type const& key, Args&&... args)
+    template <typename K, typename... Args>
+    iterator _try_emplace(const_iterator hint, K&& key, Args&&... args)
     {
-        // TODO
+        auto [itr, found] = _find(hint, key);
+        if (!found)
+        {
+            itr = _container.emplace(itr,
+                                     std::piecewise_construct,
+                                     std::forward_as_tuple(std::forward<K>(key)),
+                                     std::forward_as_tuple(std::forward<Args>(args)...));
+        }
+        return itr;
     }
 
+public:
     template <typename... Args>
-    std::pair<iterator, bool> try_emplace(key_type&& key, Args&&... args)
-    {
-        // TODO
-    }
+    std::pair<iterator, bool> try_emplace(key_type const& key, Args&&... args) { return _try_emplace(key, std::forward<Args>(args)...); }
 
     template <typename... Args>
-    iterator try_emplace(const_iterator hint, key_type const& key, Args&&... args)
-    {
-        // TODO
-    }
+    std::pair<iterator, bool> try_emplace(key_type&& key, Args&&... args) { return _try_emplace(std::move(key), std::forward<Args>(args)...); }
 
     template <typename... Args>
-    iterator try_emplace(const_iterator hint, key_type&& key, Args&&... args)
-    {
-        // TODO
-    }
+    iterator try_emplace(const_iterator hint, key_type const& key, Args&&... args) { return _try_emplace(hint, key, std::forward<Args>(args)...); }
+
+    template <typename... Args>
+    iterator try_emplace(const_iterator hint, key_type&& key, Args&&... args) { return _try_emplace(hint, std::move(key), std::forward<Args>(args)...); }
 
     iterator erase(iterator pos) { return _container.erase(pos); }
     iterator erase(const_iterator first, const_iterator last) { return _container.erase(first, last); }
