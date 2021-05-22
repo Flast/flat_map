@@ -273,13 +273,57 @@ public:
     template <typename InputIterator>
     void insert(InputIterator first, InputIterator last)
     {
-        // TODO
+        while (first != last) { _insert(*first++); }
     }
 
-    void insert(std::initializer_list<value_type> ilist)
+    void insert(std::initializer_list<value_type> ilist) { insert(ilist.begin(), ilist.end()); }
+
+private:
+    template <typename ForwardIterator>
+    void _insert_sorted(ForwardIterator first, ForwardIterator last, std::forward_iterator_tag)
     {
-        // TODO
+        for (auto itr = begin(); first != last && itr != end(); )
+        {
+            while (_comp()(itr->first, first->first)) { ++itr; }
+
+            auto orig = first++; // declare here to advance first anyway
+            if (_comp()(orig->first, itr->first))
+            {
+                // find unique range
+                for (; first != last && _comp()(std::prev(first)->first, first->first) && _comp()(first->first, itr->first); ++first);
+
+                itr = _container.insert(itr, orig, first);
+                std::advance(itr, std::distance(orig, first) - 1); // sub 1 to compare *--first and *first (to skip duplicated)
+            }
+        }
+        _container.insert(end(), first, last); // insert remainings
     }
+
+    template <typename InputIterator>
+    void _insert_sorted(InputIterator first, InputIterator last, std::input_iterator_tag)
+    {
+        for (auto itr = begin(); first != last && itr != end(); ++first)
+        {
+            while (_comp()(itr->first, first->first)) { ++itr; }
+            if (_comp()(first->first, itr->first))
+            {
+                itr = _container.insert(itr, *first);
+                // Don't advance iterator to compare *first and *++first (to skip duplicated).
+            }
+        }
+        _container.insert(end(), first, last); // insert remainings
+    }
+
+public:
+    // extension
+    template <typename InputIterator>
+    void insert_sorted(InputIterator first, InputIterator last)
+    {
+        _insert_sorted(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
+    }
+
+    // extension
+    void insert_sorted(std::initializer_list<value_type> ilist) { insert_sorted(ilist.begin(), ilist.end()); }
 
     // TODO
     // insert_return_type insert(node_type&& node)

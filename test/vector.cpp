@@ -550,4 +550,168 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(itr == fm.end());
     }
+
+    SECTION("insert range")
+    {
+        std::vector<std::pair<int, int>> v =
+        {
+            {3, 9},
+            {1, 3},
+            {6, 4},
+            {1, 2},
+        };
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        fm.insert(v.begin(), v.end());
+
+        REQUIRE(fm.size() == 6);
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 1);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+    }
+
+    SECTION("insert initializer_list")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        fm.insert({
+            {3, 9},
+            {1, 3},
+            {6, 4},
+            {1, 2},
+        });
+
+        REQUIRE(fm.size() == 6);
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 1);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+    }
+
+    SECTION("insert sorted range")
+    {
+        std::vector<std::pair<int, int>> v =
+        {
+            {1, 3},
+            {1, 2},
+            {3, 9},
+            {6, 4},
+        };
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        fm.insert_sorted(v.begin(), v.end());
+
+        REQUIRE(fm.size() == 6);
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 1);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+    }
+
+    SECTION("insert sorted initializer_list")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        fm.insert_sorted({
+            {1, 3},
+            {1, 2},
+            {3, 9},
+            {6, 4},
+        });
+
+        REQUIRE(fm.size() == 6);
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 1);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+    }
 }
