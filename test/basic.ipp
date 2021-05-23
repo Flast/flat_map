@@ -1409,3 +1409,51 @@ TEST_CASE("erase_if", "[erase_if]")
     ++itr;
     REQUIRE(itr == fm.end());
 }
+
+TEST_CASE("comparison", "[comparison]")
+{
+    SECTION("traditional comparator")
+    {
+        FLAT_MAP<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        REQUIRE(fm == FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm != FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}});
+
+        REQUIRE_FALSE(fm == FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}});
+        REQUIRE(fm != FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}});
+
+        REQUIRE_FALSE(fm == FLAT_MAP<int, int>{{0, 1}, {1, 3}, {4, 5}, {6, 7}});
+        REQUIRE(fm != FLAT_MAP<int, int>{{0, 1}, {1, 3}, {4, 5}, {6, 7}});
+
+        REQUIRE_FALSE(fm < FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm > FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}});
+        REQUIRE(fm <= FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}});
+        REQUIRE(fm >= FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}});
+
+        REQUIRE(fm < FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm > FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}});
+        REQUIRE(fm <= FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm >= FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}});
+
+        REQUIRE_FALSE(fm < FLAT_MAP<int, int>{{0, 1}, {2, 2}, {4, 5}, {6, 7}});
+        REQUIRE(fm > FLAT_MAP<int, int>{{0, 1}, {2, 2}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm <= FLAT_MAP<int, int>{{0, 1}, {2, 2}, {4, 5}, {6, 7}});
+        REQUIRE(fm >= FLAT_MAP<int, int>{{0, 1}, {2, 2}, {4, 5}, {6, 7}});
+
+        REQUIRE_FALSE(fm < FLAT_MAP<int, int>{{0, 1}, {1, 3}, {4, 5}, {6, 7}});
+        REQUIRE(fm > FLAT_MAP<int, int>{{0, 1}, {1, 3}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm <= FLAT_MAP<int, int>{{0, 1}, {1, 3}, {4, 5}, {6, 7}});
+        REQUIRE(fm >= FLAT_MAP<int, int>{{0, 1}, {1, 3}, {4, 5}, {6, 7}});
+
+        REQUIRE(fm < FLAT_MAP<int, int>{{0, 1}, {3, 3}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm > FLAT_MAP<int, int>{{0, 1}, {3, 3}, {4, 5}, {6, 7}});
+        REQUIRE(fm <= FLAT_MAP<int, int>{{0, 1}, {3, 3}, {4, 5}, {6, 7}});
+        REQUIRE_FALSE(fm >= FLAT_MAP<int, int>{{0, 1}, {3, 3}, {4, 5}, {6, 7}});
+    }
+}
