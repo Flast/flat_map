@@ -578,12 +578,11 @@ public:
 
     const_iterator find(key_type const& key) const { return const_cast<flat_map*>(this)->find(key); }
 
-    template <typename K>
-    enable_if_transparent<K, iterator>
-    find(K const& key)
-    {
-        // TODO
-    }
+    //template <typename K>
+    //enable_if_transparent<K, iterator> find(K const& key)
+    //{
+    //    // TODO
+    //}
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
@@ -603,12 +602,11 @@ public:
 
     std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<flat_map*>(this)->equal_range(key); }
 
-    template <typename K>
-    enable_if_transparent<K, std::pair<iterator, iterator>>
-    equal_range(K const& key)
-    {
-        // TODO
-    }
+    // template <typename K>
+    // enable_if_transparent<K, std::pair<iterator, iterator>> equal_range(K const& key)
+    // {
+    //     // TODO
+    // }
 
     template <typename K>
     enable_if_transparent<K, std::pair<const_iterator, const_iterator>>
@@ -618,12 +616,11 @@ public:
 
     const_iterator lower_bound(key_type const& key) const { return const_cast<flat_map*>(this)->lower_bound(key); }
 
-    template <typename K>
-    enable_if_transparent<K, iterator>
-    lower_bound(K const& key)
-    {
-        // TODO
-    }
+    // template <typename K>
+    // enable_if_transparent<K, iterator> lower_bound(K const& key)
+    // {
+    //     // TODO
+    // }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
@@ -633,12 +630,11 @@ public:
 
     const_iterator upper_bound(key_type const& key) const { return const_cast<flat_map*>(this)->upper_bound(key); }
 
-    template <typename K>
-    enable_if_transparent<K, iterator>
-    upper_bound(K const& key)
-    {
-        // TODO
-    }
+    // template <typename K>
+    // enable_if_transparent<K, iterator> upper_bound(K const& key)
+    // {
+    //     // TODO
+    // }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
