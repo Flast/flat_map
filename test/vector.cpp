@@ -16,6 +16,10 @@ struct stateful_allocator : public std::allocator<T>
 {
     std::string state;
 
+    // Hide std::allocator::rebind for C++17 mode.
+    template <typename U>
+    struct rebind { using other = stateful_allocator<U>; };
+
     stateful_allocator(char const* state) : state{state} {};
 };
 
