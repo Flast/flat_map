@@ -7,8 +7,8 @@
 #ifdef __has_include
 #if __has_include(<__config>)
 #   include <__config>
-#elif __has_include(<bits/c++config>)
-#   include <bits/c++config>
+#elif __has_include(<bits/c++config.h>)
+#   include <bits/c++config.h>
 #endif
 #endif
 
