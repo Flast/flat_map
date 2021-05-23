@@ -15,21 +15,7 @@
 #include <utility>
 #include <vector>
 
-#if defined(_LIBCPP_VERSION) && _LIBCPP_VERSION
-#   define FLATMAP_BEGIN_STD _LIBCPP_BEGIN_NAMESPACE_STD
-#   define FLATMAP_END_STD _LIBCPP_END_NAMESPACE_STD
-#else
-#   define FLATMAP_BEGIN_STD namespace std {
-#   define FLATMAP_END_STD }
-#endif
-
-FLATMAP_BEGIN_STD
-template <typename Key, typename T, typename Compare, typename Allocator> class map;
-template <typename Key, typename T, typename Compare, typename Allocator> class multimap;
-FLATMAP_END_STD
-
-#undef FLATMAP_BEGIN_STD
-#undef FLATMAP_END_STD
+#include "flat_map/__fwd.hpp"
 
 namespace flat_map
 {
