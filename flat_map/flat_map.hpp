@@ -444,10 +444,9 @@ public:
     // }
 
 private:
-    // Specialization for same order, but it's invalid with stateful comparator
-#if 0
+    // Specialization for same order with stateless comparator
     template <typename Allocator>
-    void _merge(std::map<key_type, mapped_type, key_compare, Allocator>& source)
+    std::enable_if_t<std::is_empty_v<key_compare>> _merge(std::map<key_type, mapped_type, key_compare, Allocator>& source)
     {
         auto first = source.begin();
         auto last = source.end();
@@ -469,7 +468,7 @@ private:
     }
 
     template <typename Allocator>
-    void _merge(std::multimap<key_type, mapped_type, key_compare, Allocator>& source)
+    std::enable_if_t<std::is_empty_v<key_compare>> _merge(std::multimap<key_type, mapped_type, key_compare, Allocator>& source)
     {
         auto itr = begin();
         for (auto first = source.begin(); first != source.end(); )
@@ -487,7 +486,6 @@ private:
             }
         }
     }
-#endif
 
     template <typename Comp, typename Allocator>
     void _merge(std::map<key_type, mapped_type, Comp, Allocator>& source)
