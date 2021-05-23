@@ -1385,3 +1385,27 @@ TEST_CASE("swap", "[swap]")
         REQUIRE(dst.size() == 4);
     }
 }
+
+TEST_CASE("erase_if", "[erase_if]")
+{
+    FLAT_MAP<int, int> fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    auto n = erase_if(fm, [](auto& kvp) { return kvp.first < 4; });
+    REQUIRE(n == 2);
+    REQUIRE(fm.size() == 2);
+
+    auto itr = fm.begin();
+    REQUIRE(itr->first == 4);
+    REQUIRE(itr->second == 5);
+    ++itr;
+    REQUIRE(itr->first == 6);
+    REQUIRE(itr->second == 7);
+    ++itr;
+    REQUIRE(itr == fm.end());
+}

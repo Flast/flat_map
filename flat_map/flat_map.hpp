@@ -702,7 +702,8 @@ void swap(flat_map<Key, T, Compare, Container>& lhs, flat_map<Key, T, Compare, C
 }
 
 template <typename Key, typename T, typename Compare, typename Container, typename Pred>
-constexpr auto erase_if(flat_map<Key, T, Compare, Container>& c, Pred pred) -> typename decltype(c)::size_type
+constexpr typename flat_map<Key, T, Compare, Container>::size_type
+erase_if(flat_map<Key, T, Compare, Container>& c, Pred pred)
 {
     auto itr = std::remove_if(c.begin(), c.end(), std::forward<Pred>(pred));
     auto r = std::distance(itr, c.end());
