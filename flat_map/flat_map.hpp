@@ -24,8 +24,8 @@
 #endif
 
 FLATMAP_BEGIN_STD
-template <typename Key, typename T, typename Compare, typename Container> class map;
-template <typename Key, typename T, typename Compare, typename Container> class multimap;
+template <typename Key, typename T, typename Compare, typename Allocator> class map;
+template <typename Key, typename T, typename Compare, typename Allocator> class multimap;
 FLATMAP_END_STD
 
 #undef FLATMAP_BEGIN_STD
