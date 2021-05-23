@@ -710,4 +710,54 @@ constexpr auto erase_if(flat_map<Key, T, Compare, Container>& c, Pred pred) -> t
     return r;
 }
 
+namespace detail
+{
+
+template <typename InputIterator>
+using iter_key_t = std::remove_const_t<typename std::iterator_traits<InputIterator>::value_type::first_type>;
+
+template <typename InputIterator>
+using iter_val_t = typename std::iterator_traits<InputIterator>::value_type::second_type;
+
+// Use variadics for deducing defaulted allocator
+template <typename InputIterator, typename... Args>
+using iter_cont_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Args...>;
+
+template <typename T, typename = void>
+struct is_allocator : public std::false_type {};
+
+template <typename T>
+struct is_allocator<T, std::void_t<typename T::value_type, decltype(std::declval<T&>().allocate(std::size_t{}))>> : public std::true_type {};
+
+template <typename T>
+inline constexpr bool is_allocator_v = is_allocator<T>{};
+
+} // namespace flat_map::detail
+
+template <typename InputIterator,
+          typename Compare = std::less<detail::iter_key_t<InputIterator>>,
+          typename Allocator = typename detail::iter_cont_t<InputIterator>::allocator_type,
+          typename = std::enable_if_t<!detail::is_allocator_v<Compare>>,
+          typename = std::enable_if_t<detail::is_allocator_v<Allocator>>>
+flat_map(InputIterator, InputIterator, Compare = Compare(), Allocator = Allocator())
+  -> flat_map<detail::iter_key_t<InputIterator>, detail::iter_val_t<InputIterator>, Compare, detail::iter_cont_t<InputIterator, Allocator>>;
+
+template <typename Key, typename T,
+          typename Compare = std::less<Key>,
+          typename Allocator = typename std::vector<std::pair<Key, T>>::allocator_type,
+          typename = std::enable_if_t<!detail::is_allocator_v<Compare>>,
+          typename = std::enable_if_t<detail::is_allocator_v<Allocator>>>
+flat_map(std::initializer_list<std::pair<Key, T>>, Compare = Compare(), Allocator = Allocator())
+  -> flat_map<Key, T, Compare, std::vector<std::pair<Key, T>, Allocator>>;
+
+template <typename InputIterator, typename Allocator,
+          typename = std::enable_if_t<detail::is_allocator_v<Allocator>>>
+flat_map(InputIterator, InputIterator, Allocator)
+  -> flat_map<detail::iter_key_t<InputIterator>, detail::iter_val_t<InputIterator>, std::less<detail::iter_key_t<InputIterator>>, detail::iter_cont_t<InputIterator, Allocator>>;
+
+template <typename Key, typename T, typename Allocator,
+          typename = std::enable_if_t<detail::is_allocator_v<Allocator>>>
+flat_map(std::initializer_list<std::pair<Key, T>>, Allocator)
+  -> flat_map<Key, T, std::less<Key>, std::vector<std::pair<Key, T>, Allocator>>;
+
 } // namespace flat_map
