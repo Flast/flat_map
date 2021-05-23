@@ -356,6 +356,34 @@ TEST_CASE("accessor", "[accessor]")
         REQUIRE(itr == fm.end());
     }
 
+    SECTION("counting")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        REQUIRE(fm.count(2) == 1);
+        REQUIRE(fm.count(3) == 0);
+    }
+
+    SECTION("contains")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        REQUIRE(fm.contains(4));
+        REQUIRE_FALSE(fm.contains(5));
+    }
+
     SECTION("found on at")
     {
         auto& value = fm.at(2);
