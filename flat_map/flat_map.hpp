@@ -149,17 +149,9 @@ public:
         _initialize_container();
     }
 
-    flat_map& operator=(flat_map const& other)
-    {
-        _container = other._container;
-        return *this;
-    }
+    flat_map& operator=(flat_map const& other) = default;
 
-    flat_map& operator=(flat_map&& other) noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>)
-    {
-        _container = std::move(other._container);
-        return *this;
-    }
+    flat_map& operator=(flat_map&& other) noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>) = default;
 
     flat_map& operator=(std::initializer_list<value_type> ilist)
     {
