@@ -23,3 +23,4 @@ macro(add_tests testname)
 endmacro()
 
 add_tests(vector_test vector.cpp)
+add_tests(map_test map.cpp)

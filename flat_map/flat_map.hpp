@@ -458,42 +458,111 @@ public:
     //     // TODO
     // }
 
-    template <typename Comp>
-    void merge(std::map<key_type, mapped_type, Comp, allocator_type>& source)
+private:
+    // Specialization for same order, but it's invalid with stateful comparator
+#if 0
+    template <typename Allocator>
+    void _merge(std::map<key_type, mapped_type, key_compare, Allocator>& source)
     {
-        // TODO
+        auto first = source.begin();
+        auto last = source.end();
+        for (auto itr = begin(); first != last && itr != end(); )
+        {
+            while (_comp()(itr->first, first->first)) { ++itr; }
+            if (_comp()(first->first, itr->first))
+            {
+                itr = std::next(_container.insert(itr, std::move(*first)));
+                first = source.erase(first);
+            }
+            else
+            {
+                ++first;
+            }
+        }
+        _container.insert(end(), std::make_move_iterator(first), std::make_move_iterator(last)); // insert remainings
+        source.erase(first, last);
     }
 
-    template <typename Comp>
-    void merge(std::map<key_type, mapped_type, Comp, allocator_type&>& source)
+    template <typename Allocator>
+    void _merge(std::multimap<key_type, mapped_type, key_compare, Allocator>& source)
     {
-        // TODO
+        auto itr = begin();
+        for (auto first = source.begin(); first != source.end(); )
+        {
+            while (itr != end() && _comp()(itr->first, first->first)) { ++itr; }
+            if (_comp()(first->first, itr->first))
+            {
+                itr = std::next(_container.insert(itr, std::move(*first)));
+                first = source.erase(first);
+                while (first != source.end() && !_comp()(itr->first, first->first)) { ++first; } // skip duplicated
+            }
+            else
+            {
+                ++first;
+            }
+        }
+    }
+#endif
+
+    template <typename Comp, typename Allocator>
+    void _merge(std::map<key_type, mapped_type, Comp, Allocator>& source)
+    {
+        for (auto first = source.begin(); first != source.end(); )
+        {
+            if (auto [itr, found] = _find(first->first); !found)
+            {
+                _container.insert(itr, std::move(*first));
+                first = source.erase(first);
+            }
+            else
+            {
+                ++first;
+            }
+        }
     }
 
-    template <typename Comp>
-    void merge(std::multimap<key_type, mapped_type, Comp, allocator_type>& source)
+    template <typename Comp, typename Allocator>
+    void _merge(std::multimap<key_type, mapped_type, Comp, Allocator>& source)
     {
-        // TODO
+        auto comp = source.key_comp();
+        for (auto first = source.begin(); first != source.end(); )
+        {
+            if (auto [itr, found] = _find(first->first); !found)
+            {
+                itr = _container.insert(itr, std::move(*first));
+                first = source.erase(first);
+                while (first != source.end() && !comp(itr->first, first->first)) { ++first; } // skip duplicated
+            }
+            else
+            {
+                ++first;
+            }
+        }
     }
 
-    template <typename Comp>
-    void merge(std::multimap<key_type, mapped_type, Comp, allocator_type&>& source)
-    {
-        // TODO
-    }
+public:
+    template <typename Comp, typename Allocator>
+    void merge(std::map<key_type, mapped_type, Comp, Allocator>& source) { _merge(source); }
+
+    template <typename Comp, typename Allocator>
+    void merge(std::map<key_type, mapped_type, Comp, Allocator>&& source) { _merge(source); }
+
+    template <typename Comp, typename Allocator>
+    void merge(std::multimap<key_type, mapped_type, Comp, Allocator>& source) { _merge(source); }
+
+    template <typename Comp, typename Allocator>
+    void merge(std::multimap<key_type, mapped_type, Comp, Allocator>&& source) { _merge(source); }
 
     // // extension
-    // template <typename Comp, typename Container,
-    //           typename = std::enable_if_t<std::is_same<allocator_type, typename flat_map<key_type, mapped_type, Comp, Container>::allocator_type>>
+    // template <typename Comp, typename Container>
     // void merge(flat_map<key_type, mapped_type, Comp, Container>& source)
     // {
     //     // TODO
     // }
 
     // // extension
-    // template <typename Comp, typename Container,
-    //           typename = std::enable_if_t<std::is_same<allocator_type, typename flat_map<key_type, mapped_type, Comp, Container>::allocator_type>>
-    // void merge(flat_map<key_type, mapped_type, Comp, Container&>& source)
+    // template <typename Comp, typename Container>
+    // void merge(flat_map<key_type, mapped_type, Comp, Container>&& source)
     // {
     //     // TODO
     // }
@@ -590,7 +659,7 @@ public:
 template <typename Key, typename T, typename Compare, typename Container>
 bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
-    return std::equal(lhs.begin(), lhs.end(), lhs.begin(), rhs.end());
+    return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 // #if !(defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison))
