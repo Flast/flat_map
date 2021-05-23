@@ -129,6 +129,13 @@ public:
         _initialize_container();
     }
 
+    template <typename InputIterator>
+    flat_map(InputIterator first, InputIterator last, allocator_type const& alloc)
+      : _container{first, last, alloc}
+    {
+        _initialize_container();
+    }
+
     flat_map(flat_map const& other) = default;
     flat_map(flat_map const& other, allocator_type const& alloc)
       : Compare{other._comp()}, _container{other._container, alloc} { }
