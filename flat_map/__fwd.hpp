@@ -7,7 +7,7 @@
 #ifdef __has_include
 #if __has_include(<__config>)
 #   include <__config>
-#elif __has_include(<bits/c++config.h>)
+#elif __has_include(<bits/c++config.h>) || defined(__GLIBCXX__)
 #   include <bits/c++config.h>
 #endif
 #endif
