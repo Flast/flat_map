@@ -474,11 +474,12 @@ private:
         for (auto first = source.begin(); first != source.end(); )
         {
             while (itr != end() && _comp()(itr->first, first->first)) { ++itr; }
-            if (_comp()(first->first, itr->first))
+            if (itr == end() || _comp()(first->first, itr->first))
             {
-                itr = std::next(_container.insert(itr, std::move(*first)));
+                itr = _container.insert(itr, std::move(*first));
                 first = source.erase(first);
                 while (first != source.end() && !_comp()(itr->first, first->first)) { ++first; } // skip duplicated
+                ++itr;
             }
             else
             {
