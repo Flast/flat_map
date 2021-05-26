@@ -16,6 +16,10 @@
 #include <utility>
 #include <vector>
 
+#if __has_include(<compare>)
+#include <compare>
+#endif
+
 #include "flat_map/__fwd.hpp"
 
 namespace flat_map
@@ -690,7 +694,7 @@ bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
     return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
-// #if !(defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison))
+#if !(defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison))
 template <typename Key, typename T, typename Compare, typename Container>
 bool operator!=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
@@ -720,13 +724,13 @@ bool operator>=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
 {
     return !(lhs < rhs);
 }
-// #else
-// template <typename Key, typename T, typename Compare, typename Container>
-// TBD operator<=>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
-// {
-//     // TODO
-// }
-// #endif
+#else
+template <typename Key, typename T, typename Compare, typename Container>
+auto operator<=>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
+{
+    return std::lexicographical_compare_three_way(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+#endif
 
 template <typename Key, typename T, typename Compare, typename Container>
 void swap(flat_map<Key, T, Compare, Container>& lhs, flat_map<Key, T, Compare, Container>& rhs) noexcept(noexcept(lhs.swap(rhs)))
