@@ -23,7 +23,7 @@ jobs:
 
     - name: Configure cmake
       working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=address ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=address -DCXX_STANDARD_UPTO=20 ..
 
     - name: Build
       working-directory: build
@@ -47,7 +47,7 @@ jobs:
 
     - name: Configure cmake
       working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=undefined ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=undefined -DCXX_STANDARD_UPTO=20 ..
 
     - name: Build
       working-directory: build
