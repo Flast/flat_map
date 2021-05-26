@@ -934,6 +934,229 @@ TEST_CASE("erase", "[erase]")
     }
 }
 
+TEST_CASE("node", "[insertion][erase]")
+{
+    SECTION("extract")
+    {
+        FLAT_MAP<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        auto node = fm.extract(5);
+        REQUIRE(fm.size() == 4);
+        REQUIRE_FALSE(node.value.has_value());
+
+        node = fm.extract(2);
+        REQUIRE(fm.size() == 3);
+        REQUIRE(node.value.has_value());
+        REQUIRE(node.value->first == 2);
+        REQUIRE(node.value->second == 3);
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+
+    using node_type = FLAT_MAP<int, int>::node_type;
+
+    SECTION("insert")
+    {
+        FLAT_MAP<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        {
+            auto [itr, inserted, node] = fm.insert(node_type{{8, 9}});
+            REQUIRE(inserted);
+            REQUIRE_FALSE(node.value.has_value());
+            REQUIRE(itr->first == 8);
+            REQUIRE(itr->second == 9);
+            REQUIRE(std::distance(fm.begin(), itr) == 4);
+        }
+
+        {
+            auto [itr, inserted, node] = fm.insert(node_type{{3, 4}});
+            REQUIRE(inserted);
+            REQUIRE_FALSE(node.value.has_value());
+            REQUIRE(fm.size() == 6);
+            REQUIRE(itr->first == 3);
+            REQUIRE(itr->second == 4);
+            REQUIRE(std::distance(fm.begin(), itr) == 2);
+        }
+
+        {
+            auto [itr, inserted, node] = fm.insert(node_type{{2, 5}});
+            REQUIRE_FALSE(inserted);
+            REQUIRE(node.value->first == 2);
+            REQUIRE(node.value->second == 5);
+            REQUIRE(itr->first == 2);
+            REQUIRE(itr->second == 3);
+        }
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 4);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr->first == 8);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("insert with helpful hint")
+    {
+        FLAT_MAP<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        {
+            auto itr = fm.insert(fm.end(), node_type{{8, 9}}); // 7
+            REQUIRE(itr->first == 8);
+            REQUIRE(itr->second == 9);
+            REQUIRE(std::distance(fm.begin(), itr) == 4);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 2), node_type{{3, 4}}); // 1
+            REQUIRE(fm.size() == 6);
+            REQUIRE(itr->first == 3);
+            REQUIRE(itr->second == 4);
+            REQUIRE(std::distance(fm.begin(), itr) == 2);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 1), node_type{{2, 5}}); // 4
+            REQUIRE(itr->first == 2);
+            REQUIRE(itr->second == 3);
+        }
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 4);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr->first == 8);
+        REQUIRE(itr->second == 9);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("insert with annoying hint")
+    {
+        FLAT_MAP<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        {
+            auto itr = fm.insert(std::next(fm.begin()), node_type{{5, 6}}); // 5
+            REQUIRE(itr->first == 5);
+            REQUIRE(itr->second == 6);
+            REQUIRE(std::distance(fm.begin(), itr) == 3);
+        }
+
+        {
+            auto itr = fm.insert(fm.end(), node_type{{3, 4}}); // 8
+            REQUIRE(fm.size() == 6);
+            REQUIRE(itr->first == 3);
+            REQUIRE(itr->second == 4);
+            REQUIRE(std::distance(fm.begin(), itr) == 2);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 3), node_type{{1, 2}}); // 2
+            REQUIRE(fm.size() == 7);
+            REQUIRE(itr->first == 1);
+            REQUIRE(itr->second == 2);
+            REQUIRE(std::distance(fm.begin(), itr) == 1);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin(), 2), node_type{{2, 5}}); // 3
+            REQUIRE(fm.size() == 7);
+            REQUIRE(itr->first == 2);
+            REQUIRE(itr->second == 3);
+        }
+
+        {
+            auto itr = fm.insert(std::next(fm.begin()), node_type{{6, 9}}); // 6
+            REQUIRE(fm.size() == 7);
+            REQUIRE(itr->first == 6);
+            REQUIRE(itr->second == 7);
+        }
+
+        auto itr = fm.begin();
+        REQUIRE(itr->first == 0);
+        REQUIRE(itr->second == 1);
+        ++itr;
+        REQUIRE(itr->first == 1);
+        REQUIRE(itr->second == 2);
+        ++itr;
+        REQUIRE(itr->first == 2);
+        REQUIRE(itr->second == 3);
+        ++itr;
+        REQUIRE(itr->first == 3);
+        REQUIRE(itr->second == 4);
+        ++itr;
+        REQUIRE(itr->first == 4);
+        REQUIRE(itr->second == 5);
+        ++itr;
+        REQUIRE(itr->first == 5);
+        REQUIRE(itr->second == 6);
+        ++itr;
+        REQUIRE(itr->first == 6);
+        REQUIRE(itr->second == 7);
+        ++itr;
+        REQUIRE(itr == fm.end());
+    }
+}
+
 TEST_CASE("insert or assign", "[insertion]")
 {
     SECTION("insert or assign")

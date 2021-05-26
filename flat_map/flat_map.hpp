@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -43,8 +44,19 @@ public:
     using const_iterator = typename Container::const_iterator;
     using reverse_iterator = typename Container::reverse_iterator;
     using const_reverse_iterator = typename Container::const_reverse_iterator;
-    // TODO: node_type
-    // TODO: insert_return_type
+    struct node_type
+    {
+        std::optional<value_type> value;
+
+        node_type() = default;
+        node_type(value_type&& value) : value{std::move(value)} {}
+    };
+    struct insert_return_type
+    {
+        iterator position;
+        bool inserted;
+        node_type node;
+    };
 
     struct value_compare
     {
@@ -196,6 +208,7 @@ private:
         return {itr, !(itr == end() || _comp()(key, itr->first))};
     }
 
+    // It should be guaranteed that the value isn't changed when found
     template <typename V>
     std::pair<iterator, bool> _insert(V&& value)
     {
@@ -323,16 +336,24 @@ public:
     // extension
     void insert_sorted(std::initializer_list<value_type> ilist) { insert_sorted(ilist.begin(), ilist.end()); }
 
-    // TODO
-    // insert_return_type insert(node_type&& node)
-    // {
-    //     // TODO
-    // }
+    insert_return_type insert(node_type&& node)
+    {
+        if (!node.value.has_value()) { return insert_return_type{end(), false, {}}; }
+        if (auto [itr, inserted] = _insert(std::move(*node.value)); inserted)
+        {
+            return insert_return_type{itr, true, {}};
+        }
+        else
+        {
+            return insert_return_type{itr, false, std::move(node)};
+        }
+    }
 
-    // iterator insert(const_iterator hint, node_type&& node)
-    // {
-    //     // TODO
-    // }
+    iterator insert(const_iterator hint, node_type&& node)
+    {
+        if (!node.value.has_value()) { return end(); }
+        return _insert(hint, std::move(*node.value));
+    }
 
 private:
     template <typename K, typename M>
@@ -433,16 +454,26 @@ public:
         swap(_container, other._container);
     }
 
-    // TODO
-    // node_type extract(const_iterator position)
-    // {
-    //     // TODO
-    // }
+    node_type extract(const_iterator position)
+    {
+        // standard requires `valid dereferenceable constant iterator`
+        assert(position != cend());
 
-    // node_type extract(key_type const& key)
-    // {
-    //     // TODO
-    // }
+        node_type node{std::move(*_mutable(position))};
+        erase(position);
+        return node;
+    }
+
+    node_type extract(key_type const& key)
+    {
+        if (auto [itr, found] = _find(key); found)
+        {
+            node_type node{std::move(*itr)};
+            erase(itr);
+            return node;
+        }
+        return {};
+    }
 
 private:
     template <typename Comp, typename Allocator>
