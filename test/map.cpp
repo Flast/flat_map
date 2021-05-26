@@ -157,4 +157,76 @@ TEST_CASE("merge", "[merge]")
         REQUIRE(fm == ans);
         REQUIRE(m == std::multimap<int, int, std::greater<int>>{{1, 2}, {4, 9}, {4, 8}, {7, 2}});
     }
+
+    SECTION("from flat_map with same order")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        flat_map::flat_map<int, int> m =
+        {
+            {1, 2},
+            {4, 9},
+            {7, 8},
+        };
+
+        fm.merge(m);
+
+        REQUIRE(fm.size() == 6);
+        REQUIRE(m.size() == 1);
+
+        flat_map::flat_map<int, int> ans =
+        {
+            {0, 1},
+            {1, 2},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+            {7, 8},
+        };
+
+        REQUIRE(fm == ans);
+        REQUIRE(m == flat_map::flat_map<int, int>{{4, 9}});
+    }
+
+    SECTION("from flat_map with reversed order")
+    {
+        flat_map::flat_map<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        flat_map::flat_map<int, int, std::greater<int>> m =
+        {
+            {1, 2},
+            {4, 9},
+            {7, 8},
+        };
+
+        fm.merge(m);
+
+        REQUIRE(fm.size() == 6);
+        REQUIRE(m.size() == 1);
+
+        flat_map::flat_map<int, int> ans =
+        {
+            {0, 1},
+            {1, 2},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+            {7, 8},
+        };
+
+        REQUIRE(fm == ans);
+        REQUIRE(m == flat_map::flat_map<int, int, std::greater<int>>{{4, 9}});
+    }
 }
