@@ -64,26 +64,26 @@ private:
     decltype(auto) _comp() const { return *static_cast<Compare const*>(this); }
     decltype(auto) _comp() { return *static_cast<Compare*>(this); }
 
-    auto _vcomp() const
+    struct _comparator final : value_compare
     {
-        struct comparator final : value_compare
+        _comparator(Compare const& comp) : value_compare{comp} { }
+
+        using value_compare::operator();
+
+        template <typename K>
+        auto operator()(value_type const& lhs, K const& rhs) const
         {
-            comparator(Compare const& comp) : value_compare{comp} { }
+            return this->c(lhs.first, rhs);
+        }
 
-            using value_compare::operator();
+        template <typename K>
+        auto operator()(K const& lhs, value_type const& rhs) const
+        {
+            return this->c(lhs, rhs.first);
+        }
+    };
 
-            auto operator()(value_type const& lhs, key_type const& rhs) const
-            {
-                return this->c(lhs.first, rhs);
-            }
-
-            auto operator()(key_type const& lhs, value_type const& rhs) const
-            {
-                return this->c(lhs, rhs.first);
-            }
-        };
-        return comparator{_comp()};
-    }
+    auto _vcomp() const { return _comparator{_comp()}; }
     auto _evcomp() const
     {
         return [this](value_type const& lhs, value_type const& rhs)
@@ -189,7 +189,8 @@ public:
     void clear() noexcept { return _container.clear(); }
 
 private:
-    std::pair<iterator, bool> _find(key_type const& key)
+    template <typename K>
+    std::pair<iterator, bool> _find(K const& key)
     {
         auto itr = lower_bound(key);
         return {itr, !(itr == end() || _comp()(key, itr->first))};
@@ -590,11 +591,12 @@ public:
 
     const_iterator find(key_type const& key) const { return const_cast<flat_map*>(this)->find(key); }
 
-    //template <typename K>
-    //enable_if_transparent<K, iterator> find(K const& key)
-    //{
-    //    // TODO
-    //}
+    template <typename K>
+    enable_if_transparent<K, iterator> find(K const& key)
+    {
+        auto [itr, found] = _find(key);
+        return found ? itr : end();
+    }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
@@ -614,11 +616,12 @@ public:
 
     std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<flat_map*>(this)->equal_range(key); }
 
-    // template <typename K>
-    // enable_if_transparent<K, std::pair<iterator, iterator>> equal_range(K const& key)
-    // {
-    //     // TODO
-    // }
+    template <typename K>
+    enable_if_transparent<K, std::pair<iterator, iterator>> equal_range(K const& key)
+    {
+        auto itr = lower_bound(key);
+        return {itr, (itr == end() || _comp()(key, itr->first)) ? itr : std::next(itr)};
+    }
 
     template <typename K>
     enable_if_transparent<K, std::pair<const_iterator, const_iterator>>
@@ -628,11 +631,8 @@ public:
 
     const_iterator lower_bound(key_type const& key) const { return const_cast<flat_map*>(this)->lower_bound(key); }
 
-    // template <typename K>
-    // enable_if_transparent<K, iterator> lower_bound(K const& key)
-    // {
-    //     // TODO
-    // }
+    template <typename K>
+    enable_if_transparent<K, iterator> lower_bound(K const& key) { return std::lower_bound(begin(), end(), key, _vcomp()); }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
@@ -642,11 +642,8 @@ public:
 
     const_iterator upper_bound(key_type const& key) const { return const_cast<flat_map*>(this)->upper_bound(key); }
 
-    // template <typename K>
-    // enable_if_transparent<K, iterator> upper_bound(K const& key)
-    // {
-    //     // TODO
-    // }
+    template <typename K>
+    enable_if_transparent<K, iterator> upper_bound(K const& key) { return std::upper_bound(begin(), end(), key, _vcomp()); }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>

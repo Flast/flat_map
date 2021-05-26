@@ -9,6 +9,16 @@
 template <typename Key, typename T, typename Compare = std::less<Key>>
 using FLAT_MAP = flat_map::flat_map<Key, T, Compare, CONTAINER<std::pair<Key, T>>>;
 
+template <typename T>
+struct wrap
+{
+    T value;
+    wrap(T value) : value(value) {}
+};
+
+template <typename T> bool operator<(T lhs, wrap<T> rhs) { return lhs < rhs.value; }
+template <typename T> bool operator<(wrap<T> lhs, T rhs) { return lhs.value < rhs; }
+
 TEST_CASE("construction", "[construction]")
 {
     SECTION("default construction")
@@ -273,6 +283,33 @@ TEST_CASE("equal_range", "[equal_range]")
     }
 }
 
+TEST_CASE("equal_range with transparent", "[equal_range]")
+{
+    FLAT_MAP<int, int, std::less<>> const fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("not found")
+    {
+        auto [first, last] = fm.equal_range(wrap{3});
+        REQUIRE(first != fm.end());
+        REQUIRE(first == last);
+        REQUIRE(first->first == 4);
+    }
+
+    SECTION("found")
+    {
+        auto [first, last] = fm.equal_range(wrap{2});
+        REQUIRE(first != fm.end());
+        REQUIRE(std::next(first) == last);
+        REQUIRE(first->first == 2);
+    }
+}
+
 TEST_CASE("lower_bound", "[lower_bound]")
 {
     FLAT_MAP<int, int> const fm =
@@ -304,6 +341,37 @@ TEST_CASE("lower_bound", "[lower_bound]")
     }
 }
 
+TEST_CASE("lower_bound with transparent", "[lower_bound]")
+{
+    FLAT_MAP<int, int, std::less<>> const fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("not equal")
+    {
+        auto itr = fm.lower_bound(wrap{3});
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 4);
+    }
+
+    SECTION("equal")
+    {
+        auto itr = fm.lower_bound(wrap{2});
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 2);
+    }
+
+    SECTION("not found")
+    {
+        auto itr = fm.lower_bound(wrap{9});
+        REQUIRE(itr == fm.end());
+    }
+}
+
 TEST_CASE("upper_bound", "[upper_bound]")
 {
     FLAT_MAP<int, int> const fm =
@@ -331,6 +399,37 @@ TEST_CASE("upper_bound", "[upper_bound]")
     SECTION("not found")
     {
         auto itr = fm.upper_bound(9);
+        REQUIRE(itr == fm.end());
+    }
+}
+
+TEST_CASE("upper_bound with transparent", "[upper_bound]")
+{
+    FLAT_MAP<int, int, std::less<>> const fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("not equal")
+    {
+        auto itr = fm.upper_bound(wrap{3});
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 4);
+    }
+
+    SECTION("equal")
+    {
+        auto itr = fm.upper_bound(wrap{2});
+        REQUIRE(itr != fm.end());
+        REQUIRE(itr->first == 4);
+    }
+
+    SECTION("not found")
+    {
+        auto itr = fm.upper_bound(wrap{9});
         REQUIRE(itr == fm.end());
     }
 }
@@ -411,6 +510,43 @@ TEST_CASE("accessor", "[accessor]")
         REQUIRE(itr->second == 7);
         ++itr;
         REQUIRE(itr == fm.end());
+    }
+}
+
+TEST_CASE("accessor with transparent", "[accessor]")
+{
+    FLAT_MAP<int, int, std::less<>> fm =
+    {
+        {0, 1},
+        {2, 3},
+        {4, 5},
+        {6, 7},
+    };
+
+    SECTION("found")
+    {
+        auto itr = fm.find(wrap{2});
+        REQUIRE(itr != fm.end());
+        REQUIRE(std::distance(fm.begin(), itr) == 1);
+        REQUIRE(itr->first == 2);
+    }
+
+    SECTION("not found")
+    {
+        auto itr = fm.find(wrap{3});
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("counting")
+    {
+        REQUIRE(fm.count(2) == 1);
+        REQUIRE(fm.count(3) == 0);
+    }
+
+    SECTION("contains")
+    {
+        REQUIRE(fm.contains(wrap{4}));
+        REQUIRE_FALSE(fm.contains(wrap{5}));
     }
 }
 
