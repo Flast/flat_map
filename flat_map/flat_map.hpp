@@ -450,9 +450,10 @@ private:
     {
         auto first = source.begin();
         auto last = source.end();
-        for (auto itr = begin(); first != last && itr != end(); )
+        if (empty()) { goto out; }
+        for (auto itr = begin(); first != last; )
         {
-            while (_comp()(itr->first, first->first)) { ++itr; }
+            while (_comp()(itr->first, first->first)) { if (++itr == end()) { goto out; } }
             if (_comp()(first->first, itr->first))
             {
                 itr = std::next(_container.insert(itr, std::move(*first)));
@@ -463,6 +464,7 @@ private:
                 ++first;
             }
         }
+    out:
         _container.insert(end(), std::make_move_iterator(first), std::make_move_iterator(last)); // insert remainings
         source.erase(first, last);
     }
