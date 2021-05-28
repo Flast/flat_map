@@ -25,10 +25,39 @@
 namespace flat_map
 {
 
+namespace detail
+{
+
+template <typename Compare, typename = void>
+struct comparator_store
+{
+    Compare _compare;
+
+    comparator_store() = default;
+    comparator_store(Compare const& comp) : _compare{comp} {}
+    comparator_store(Compare&& comp) : _compare{std::move(comp)} {}
+
+    auto& _comp() const { return _compare; }
+    auto& _comp() { return _compare; }
+};
+
+template <typename Compare>
+struct comparator_store<Compare, std::enable_if_t<std::is_class_v<Compare> && !std::is_final_v<Compare>>> : public Compare
+{
+    comparator_store() = default;
+    comparator_store(Compare const& comp) : Compare{comp} {}
+    comparator_store(Compare&& comp) : Compare{std::move(comp)} {}
+
+    auto& _comp() const { return *static_cast<Compare const*>(this); }
+    auto& _comp() { return *static_cast<Compare*>(this); }
+};
+
+} // namespace detail
+
 template <typename Key, typename T,
           typename Compare = std::less<Key>,
           typename Container = std::vector<std::pair<Key, T>>>
-class flat_map : private Compare
+class flat_map : private detail::comparator_store<Compare>
 {
     Container _container;
 
@@ -77,8 +106,7 @@ public:
     };
 
 private:
-    decltype(auto) _comp() const { return *static_cast<Compare const*>(this); }
-    decltype(auto) _comp() { return *static_cast<Compare*>(this); }
+    using detail::comparator_store<Compare>::_comp;
 
     struct _comparator final : value_compare
     {
@@ -119,14 +147,14 @@ public:
     flat_map() = default;
 
     explicit flat_map(Compare const& comp, allocator_type const& alloc = allocator_type())
-      : Compare{comp}, _container{alloc} { }
+      : detail::comparator_store<Compare>{comp}, _container{alloc} { }
 
     explicit flat_map(allocator_type const& alloc)
       : _container{alloc} { }
 
     template <typename InputIterator>
     flat_map(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : Compare{comp}, _container{first, last, alloc}
+      : detail::comparator_store<Compare>{comp}, _container{first, last, alloc}
     {
         _initialize_container();
     }
@@ -140,14 +168,14 @@ public:
 
     flat_map(flat_map const& other) = default;
     flat_map(flat_map const& other, allocator_type const& alloc)
-      : Compare{other._comp()}, _container{other._container, alloc} { }
+      : detail::comparator_store<Compare>{other._comp()}, _container{other._container, alloc} { }
 
     flat_map(flat_map&& other) = default;
     flat_map(flat_map&& other, allocator_type const& alloc)
-      : Compare{std::move(other._comp())}, _container{std::move(other._container), alloc} { }
+      : detail::comparator_store<Compare>{std::move(other._comp())}, _container{std::move(other._container), alloc} { }
 
     flat_map(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : Compare{comp}, _container{init, alloc}
+      : detail::comparator_store<Compare>{comp}, _container{init, alloc}
     {
         _initialize_container();
     }
