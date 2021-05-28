@@ -80,7 +80,7 @@ Construct container from `[first, last)`.
 
 ```cpp
 flat_map(flat_map const& other);
-``
+
 flat_map(flat_map const& other, allocator_type const& alloc);
 ```
 
