@@ -136,7 +136,7 @@ mapped_type& at(key_type const& key);
 Throws `std::out_of_range` only if `key` is not found.
 
 **Complexity**
-`O(log N).
+`O(log N)`.
 
 ```
 mapped_type& operator[](key_type const& key);
@@ -144,7 +144,7 @@ mapped_type& operator[](key_type&& key);
 ```
 
 **Complexity**
-`O(log N).
+`O(log N)`.
 
 ## Iterators
 
