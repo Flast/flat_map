@@ -218,13 +218,13 @@ public:
     const_iterator begin() const noexcept { return _container.begin(); }
     const_iterator cbegin() const noexcept { return _container.cbegin(); }
     iterator end() noexcept { return _container.end(); }
-    iterator end() const noexcept { return _container.end(); }
+    const_iterator end() const noexcept { return _container.end(); }
     const_iterator cend() const noexcept { return _container.cend(); }
     reverse_iterator rbegin() noexcept { return _container.rbegin(); }
-    reverse_iterator rbegin() const noexcept { return _container.rbegin(); }
+    const_reverse_iterator rbegin() const noexcept { return _container.rbegin(); }
     const_reverse_iterator crbegin() const noexcept { return _container.crbegin(); }
     reverse_iterator rend() noexcept { return _container.rend(); }
-    reverse_iterator rend() const noexcept { return _container.rend(); }
+    const_reverse_iterator rend() const noexcept { return _container.rend(); }
     const_reverse_iterator crend() const noexcept { return _container.crend(); }
 
     [[nodiscard]] bool empty() const noexcept { return _container.empty(); }
