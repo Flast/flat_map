@@ -1815,4 +1815,21 @@ TEST_CASE("comparison", "[comparison]")
         REQUIRE(fm <= FLAT_MAP<int, int>{{0, 1}, {3, 3}, {4, 5}, {6, 7}});
         REQUIRE_FALSE(fm >= FLAT_MAP<int, int>{{0, 1}, {3, 3}, {4, 5}, {6, 7}});
     }
+
+#ifdef FLAT_MAP_HAS_THREE_WAY_COMPARISON
+    SECTION("three way comparison")
+    {
+        FLAT_MAP<int, int> fm =
+        {
+            {0, 1},
+            {2, 3},
+            {4, 5},
+            {6, 7},
+        };
+
+        REQUIRE((fm <=> FLAT_MAP<int, int>{{0, 1}, {2, 3}, {4, 5}, {6, 7}}) == std::weak_ordering::equivalent);
+        REQUIRE((fm <=> FLAT_MAP<int, int>{{0, 1}, {2, 4}, {4, 5}, {6, 7}}) == std::weak_ordering::less);
+        REQUIRE((fm <=> FLAT_MAP<int, int>{{0, 1}, {2, 2}, {4, 5}, {6, 7}}) == std::weak_ordering::greater);
+    }
+#endif
 }

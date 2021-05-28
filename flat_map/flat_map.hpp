@@ -725,6 +725,7 @@ bool operator>=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
     return !(lhs < rhs);
 }
 #else
+#define FLAT_MAP_HAS_THREE_WAY_COMPARISON 1
 template <typename Key, typename T, typename Compare, typename Container>
 auto operator<=>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
