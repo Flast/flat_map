@@ -214,39 +214,39 @@ public:
     mapped_type& operator[](key_type const& key) { return try_emplace(key).first->second; }
     mapped_type& operator[](key_type&& key) { return try_emplace(std::move(key)).first->second; }
 
-    auto begin() noexcept { return _container.begin(); }
-    auto begin() const noexcept { return _container.begin(); }
-    auto cbegin() const noexcept { return _container.cbegin(); }
-    auto end() noexcept { return _container.end(); }
-    auto end() const noexcept { return _container.end(); }
-    auto cend() const noexcept { return _container.cend(); }
-    auto rbegin() noexcept { return _container.rbegin(); }
-    auto rbegin() const noexcept { return _container.rbegin(); }
-    auto crbegin() const noexcept { return _container.crbegin(); }
-    auto rend() noexcept { return _container.rend(); }
-    auto rend() const noexcept { return _container.rend(); }
-    auto crend() const noexcept { return _container.crend(); }
+    iterator begin() noexcept { return _container.begin(); }
+    const_iterator begin() const noexcept { return _container.begin(); }
+    const_iterator cbegin() const noexcept { return _container.cbegin(); }
+    iterator end() noexcept { return _container.end(); }
+    iterator end() const noexcept { return _container.end(); }
+    const_iterator cend() const noexcept { return _container.cend(); }
+    reverse_iterator rbegin() noexcept { return _container.rbegin(); }
+    reverse_iterator rbegin() const noexcept { return _container.rbegin(); }
+    const_reverse_iterator crbegin() const noexcept { return _container.crbegin(); }
+    reverse_iterator rend() noexcept { return _container.rend(); }
+    reverse_iterator rend() const noexcept { return _container.rend(); }
+    const_reverse_iterator crend() const noexcept { return _container.crend(); }
 
     [[nodiscard]] bool empty() const noexcept { return _container.empty(); }
     size_type size() const noexcept { return _container.size(); }
     size_type max_size() const noexcept { return _container.max_size(); }
     // extension
     template <typename... ShouldBeEmpty, typename Dummy = Container>
-    auto reserve(size_type new_cap) -> decltype(std::declval<Dummy>().reserve(new_cap))
+    auto reserve(size_type new_cap) -> std::void_t<decltype(std::declval<Dummy>().reserve(new_cap))>
     {
         static_assert(sizeof...(ShouldBeEmpty) == 0);
         _container.reserve(new_cap);
     }
     // extension
     template <typename... ShouldBeEmpty, typename Dummy = Container>
-    auto capacity() const noexcept -> decltype(std::declval<Dummy>().capacity())
+    auto capacity() const noexcept -> decltype(std::declval<Dummy>().capacity(), size_type{})
     {
         static_assert(sizeof...(ShouldBeEmpty) == 0);
         return _container.capacity();
     }
     // extension
     template <typename... ShouldBeEmpty, typename Dummy = Container>
-    auto shrink_to_fit() -> decltype(std::declval<Dummy>().shrink_to_fit())
+    auto shrink_to_fit() -> std::void_t<decltype(std::declval<Dummy>().shrink_to_fit())>
     {
         static_assert(sizeof...(ShouldBeEmpty) == 0);
         _container.shrink_to_fit();
