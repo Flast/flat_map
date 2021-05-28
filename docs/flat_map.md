@@ -1,6 +1,6 @@
 # flat\_map
 
-```
+```cpp
 template <typename Key,
           typename T,
           typename Compare = std::less<Key>,
@@ -13,7 +13,7 @@ class flat_map;
 
 ## Member types
 
-```
+```cpp
 using key_type = Key;
 using mapped_type = T;
 using value_type = std::pair<Key, T>;
@@ -40,20 +40,20 @@ using insert_return_type = struct /* unspecified */
 
 ## Member classes
 
-```
+```cpp
 struct value_compare;
 ```
 
 ### Constructor
 
-```
+```cpp
 protected:
 value_type(Compare c);
 ```
 
 ### Operator
 
-```
+```cpp
 bool operator()(value_type const& lhs, value_type const& rhs);
 ```
 
@@ -62,13 +62,13 @@ bool operator()(value_type const& lhs, value_type const& rhs);
 
 ## Constructors
 
-```
+```cpp
 flat_map();
 
 explicit flat_map(Compare const& comp, allocator_type const& alloc = allocator_type());
 ```
 
-```
+```cpp
 template <typename InputIterator>
 flat_map(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type());
 
@@ -78,7 +78,7 @@ flat_map(InputIterator first, InputIterator last, allocator_type const& alloc);
 
 Construct container from `[first, last)`.
 
-```
+```cpp
 flat_map(flat_map const& other);
 ``
 flat_map(flat_map const& other, allocator_type const& alloc);
@@ -86,7 +86,7 @@ flat_map(flat_map const& other, allocator_type const& alloc);
 
 Copy from other.
 
-```
+```cpp
 flat_map(flat_map&& other);
 
 flat_map(flat_map&& other, allocator_type const& alloc);
@@ -94,7 +94,7 @@ flat_map(flat_map&& other, allocator_type const& alloc);
 
 Move entire elements from other.
 
-```
+```cpp
 flat_map(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type());
 
 flat_map(std::initializer_list<value_type> init, allocator_type const& alloc);
@@ -104,13 +104,13 @@ Construct from init.
 
 ## Assignments
 
-```
+```cpp
 flat_map& operator=(flat_map const& other);
 ```
 
 Copy from other.
 
-```
+```cpp
 flat_map& operator=(flat_map&& other) noexcept(/* see below */);
 ```
 
@@ -121,13 +121,13 @@ No except only if it meets all of
 - `std::is_nothrow_move_assignable_v<Container> == true` and
 - `std::is_nothrow_move_assignable_v<Compare> == true`
 
-```
+```cpp
 flat_map& operator=(std::initializer_list<value_type> ilist);
 ```
 
 ## Element access
 
-```
+```cpp
 mapped_type const& at(key_type const& key) const;
 mapped_type& at(key_type const& key);
 ```
@@ -138,7 +138,7 @@ Throws `std::out_of_range` only if `key` is not found.
 **Complexity**
 `O(log N)`.
 
-```
+```cpp
 mapped_type& operator[](key_type const& key);
 mapped_type& operator[](key_type&& key);
 ```
@@ -148,7 +148,7 @@ mapped_type& operator[](key_type&& key);
 
 ## Iterators
 
-```
+```cpp
 iterator begin() noexcept;
 iterator begin() const noexcept;
 const_iterator cbegin() const noexcept;
@@ -165,24 +165,24 @@ const_reference crend() const noexcept;
 
 ## Capacity
 
-```
+```cpp
 bool empty() const noexcept;
 size_type size() const noexcept;
 size_type max_size() const noexcept;
 ```
 
-```
+```cpp
 void reserve(size_type new_cap);
 ```
 
 **Postcondition**
 - `capacity() == new_cap`
 
-```
+```cpp
 size_type capacity() const noexcept;
 ```
 
-```
+```cpp
 void shrink_to_fit();
 ```
 
@@ -191,7 +191,7 @@ void shrink_to_fit();
 
 ## Modifiers
 
-```
+```cpp
 void clear();
 ```
 
@@ -203,7 +203,7 @@ Clear container.
 **Invalidation**
 Invalidates every interators and references.
 
-```
+```cpp
 std::pair<iterator, bool> insert(value_type const& value);
 
 template <typename V>
@@ -225,7 +225,7 @@ Amortized `O(N)`.
 **Invalidation**
 Same as `Container::insert`.
 
-```
+```cpp
 iterator insert(const_iterator hint, value_type const&& value);
 
 template <typename V>
@@ -248,7 +248,7 @@ Amortized `O(N)`.
 **Invalidation**
 Same as `Container::insert`.
 
-```
+```cpp
 template <typename InputIterator>
 void insert(InputIterator first, InputIterator last);
 
@@ -266,7 +266,7 @@ Amortized `O(N logN)`.
 **Invalidation**
 Same as `Container::insert`.
 
-```
+```cpp
 insert_return_type insert(node_type&& node)
 
 iterator insert(const_iterator hint, node_type&& node)
@@ -284,7 +284,7 @@ Amortized `O(N)`.
 **Invalidation**
 Same as `Container::insert`.
 
-```
+```cpp
 template <typename InputIterator>
 void insert_sorted(InputIterator first, InputIterator last);
 
@@ -302,7 +302,7 @@ Amortized `O(N^2)`.
 **Invalidation**
 Same as `Container::insert`.
 
-```
+```cpp
 template <typename M>
 std::pair<iterator, bool> insert_or_assign(key_type const& key, M&& obj);
 
@@ -318,7 +318,7 @@ iterator insert_or_assign(const_iterator hint, key_type&& key, M&& obj);
 
 Same as `insert()` except replace with obj if key is always exists.
 
-```
+```cpp
 template <typename... Args>
 std::pair<iterator, bool> emplace(Args&&... args);
 
@@ -328,7 +328,7 @@ iterator emplace_hint(const_iterator hint, Args&&... args);
 
 Equivalent to `insert(value_type(std::forward<Args>(args)...))`.
 
-```
+```cpp
 template <typename... Args>
 std::pair<iterator, bool> try_emplace(key_type const& key, Args&&... args);
 
@@ -344,7 +344,7 @@ iterator try_emplace(const_iterator hint, key_type&& key, Args&&... args);
 
 Equivalent to `insert(value_type(key, std::forward<Args>(args)...))`.
 
-```
+```cpp
 iterator erase(iterator pos);
 
 iterator erase(const_iterator first, const_iterator last);
@@ -360,7 +360,7 @@ An iterator that next to erased elements.
 **Complexity**
 `O(N)`
 
-```
+```cpp
 void swap(flat_map& other) noexcept(/* see below */);
 ```
 
@@ -371,7 +371,7 @@ No except only if it meets all of
 - `std::allocator_traits<allocator_type>::is_always_equal::value` and
 - `std::is_nothrow_swappable<Compare>::value`
 
-```
+```cpp
 node_type extract(const_iterator position);
 
 node_type extract(key_type const& key);
@@ -386,7 +386,7 @@ Extracted node handle.
 **Complexity**
 `O(N)`
 
-```
+```cpp
 template <typename Comp, typename Allocator>
 void merge(std::map<key_type, mapped_type, Comp, Allocator>& source);
 
@@ -413,7 +413,7 @@ Amortized `O(N)` if comparators are same, otherwise amortized `O(N^2)`.
 
 ### Lookup
 
-```
+```cpp
 size_type count(key_type const& key) const;
 
 template <typename K>
@@ -427,7 +427,7 @@ The second form is only participants in overload resolution if the `Compare::is_
 **Complexity**
 `O(logN)`
 
-```
+```cpp
 iterator find(key_type const& key)
 
 const_iterator find(key_type const& key) const;
@@ -446,7 +446,7 @@ The third and fourth form are only participants in overload resolution if the `C
 **Complexity**
 `O(logN)`
 
-```
+```cpp
 bool contains(key_type const& key) const;
 
 template <typename K>
@@ -458,7 +458,7 @@ The second form are only participants in overload resolution if the `Compare::is
 **Complexity**
 `O(logN)`
 
-```
+```cpp
 std::pair<iterator, iterator> equal_range(key_type const& key);
 
 std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const;
@@ -477,7 +477,7 @@ The third and fourth form are only participants in overload resolution if the `C
 **Complexity**
 `O(logN)`
 
-```
+```cpp
 iterator lower_bound(key_type const& key);
 
 const_iterator lower_bound(key_type const& key) const;
@@ -496,7 +496,7 @@ The third and fourth form are only participants in overload resolution if the `C
 **Complexity**
 `O(logN)`
 
-```
+```cpp
 iterator upper_bound(key_type const& key);
 
 const_iterator upper_bound(key_type const& key) const;
@@ -517,7 +517,7 @@ The third and fourth form are only participants in overload resolution if the `C
 
 ### Observers
 
-```
+```cpp
 key_compare key_comp() const;
 
 value_compare value_comp() const;
