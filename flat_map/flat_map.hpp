@@ -230,6 +230,27 @@ public:
     [[nodiscard]] bool empty() const noexcept { return _container.empty(); }
     size_type size() const noexcept { return _container.size(); }
     size_type max_size() const noexcept { return _container.max_size(); }
+    // extension
+    template <typename... ShouldBeEmpty, typename Dummy = Container>
+    auto reserve(size_type new_cap) -> decltype(std::declval<Dummy>().reserve(new_cap))
+    {
+        static_assert(sizeof...(ShouldBeEmpty) == 0);
+        _container.reserve(new_cap);
+    }
+    // extension
+    template <typename... ShouldBeEmpty, typename Dummy = Container>
+    auto capacity() const noexcept -> decltype(std::declval<Dummy>().capacity())
+    {
+        static_assert(sizeof...(ShouldBeEmpty) == 0);
+        return _container.capacity();
+    }
+    // extension
+    template <typename... ShouldBeEmpty, typename Dummy = Container>
+    auto shrink_to_fit() -> decltype(std::declval<Dummy>().shrink_to_fit())
+    {
+        static_assert(sizeof...(ShouldBeEmpty) == 0);
+        _container.shrink_to_fit();
+    }
     void clear() noexcept { return _container.clear(); }
 
 private:
