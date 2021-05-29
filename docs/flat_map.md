@@ -587,7 +587,7 @@ std::pair<iterator, iterator> equal_range(key_type const& key);
 std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const;
 
 template <typename K>
-enable_if_transparent<K, std::pair<iterator, iterator>> equal_range(K const& key);
+std::pair<iterator, iterator> equal_range(K const& key);
 
 template <typename K>
 std::pair<const_iterator, const_iterator> equal_range(K const& key) const;
@@ -608,7 +608,7 @@ iterator lower_bound(key_type const& key);
 const_iterator lower_bound(key_type const& key) const;
 
 template <typename K>
-enable_if_transparent<K, iterator> lower_bound(K const& key);
+iterator lower_bound(K const& key);
 
 template <typename K>
 const_iterator lower_bound(K const& key) const;
@@ -629,7 +629,7 @@ iterator upper_bound(key_type const& key);
 const_iterator upper_bound(key_type const& key) const;
 
 template <typename K>
-enable_if_transparent<K, iterator> upper_bound(K const& key);
+iterator upper_bound(K const& key);
 
 template <typename K>
 const_iterator upper_bound(K const& key) const;
