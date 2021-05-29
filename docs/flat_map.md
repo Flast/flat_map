@@ -385,7 +385,6 @@ Range insertion with sorted range.
 
 **Pre requirements**
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
-
 The ranges should be sorted in `Compare` order, otherwise the behaviour is undefined (Note that it doesn't require deduplication).
 
 **Complexity**
@@ -525,7 +524,7 @@ void merge(flat_map<key_type, mapped_type, Comp, Cont>&& source);
 Merge `source` container into self.
 
 **Complexity**
-Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise amortized `O(E log(N))`.
+Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise `O(E log(N))`.
 
 ## Lookup
 
