@@ -1,6 +1,8 @@
 # flat\_map
 
 ```cpp
+#include <flat_map/flat_map.hpp>
+
 template <typename Key,
           typename T,
           typename Compare = std::less<Key>,
@@ -10,6 +12,11 @@ class flat_map;
 
 **Requirements**
 - `Container` should meets [*Container*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
+
+**Complexity**
+- `N` denotes number of elements that stored in the container.
+- `M` denotes number of elements that shifted by insert/erase.
+- `E` denotes number of target elements that inserted or erased.
 
 ## Member types
 
@@ -78,6 +85,12 @@ flat_map(InputIterator first, InputIterator last, allocator_type const& alloc);
 
 Construct container from `[first, last)`.
 
+**Pre requirements**
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
+
+**Complexity**
+`O(E log(E))`
+
 ```cpp
 flat_map(flat_map const& other);
 
@@ -101,6 +114,9 @@ flat_map(std::initializer_list<value_type> init, allocator_type const& alloc);
 ```
 
 Construct from init.
+
+**Complexity**
+`O(E log(E))`
 
 ## Assignments
 
@@ -127,6 +143,8 @@ flat_map& operator=(std::initializer_list<value_type> ilist);
 
 ## Element access
 
+### at
+
 ```cpp
 mapped_type const& at(key_type const& key) const;
 mapped_type& at(key_type const& key);
@@ -136,7 +154,9 @@ mapped_type& at(key_type const& key);
 Throws `std::out_of_range` only if `key` is not found.
 
 **Complexity**
-`O(log N)`.
+`O(log(N))`.
+
+### operator[]
 
 ```cpp
 mapped_type& operator[](key_type const& key);
@@ -144,52 +164,118 @@ mapped_type& operator[](key_type&& key);
 ```
 
 **Complexity**
-`O(log N)`.
+Amortized `O(log(N))`.
 
 ## Iterators
 
+### begin
+
 ```cpp
 iterator begin() noexcept;
-iterator begin() const noexcept;
+const_iterator begin() const noexcept;
+```
+
+### cbegin
+
+```cpp
 const_iterator cbegin() const noexcept;
+```
+
+### end
+
+```cpp
 iterator end() noexcept;
-iterator end() const noexcept;
+const_iterator end() const noexcept;
+```
+
+### cend
+
+```cpp
 const_iterator cend() const noexcept;
+```
+
+### rbegin
+
+```cpp
 reverse_iterator rbegin() noexcept;
-reverse_iterator rbegin() const noexcept;
+const_reverse_iterator rbegin() const noexcept;
+```
+
+### crbegin
+
+```cpp
 const_reference crbegin() const noexcept;
+```
+
+### rend
+
+```cpp
 reverse_iterator rend() noexcept;
-reverse_iterator rend() const noexcept;
+const_reverse_iterator rend() const noexcept;
+```
+
+### crend
+
+```cpp
 const_reference crend() const noexcept;
 ```
 
 ## Capacity
 
+### empty
+
 ```cpp
 bool empty() const noexcept;
+```
+
+### size
+
+```cpp
 size_type size() const noexcept;
+```
+
+### max_size
+
+```cpp
 size_type max_size() const noexcept;
 ```
+
+### reserve
 
 ```cpp
 void reserve(size_type new_cap);
 ```
 
+This function is provided only if `Container::reserve()` is provided.
+
 **Postcondition**
 - `capacity() == new_cap`
+
+### capacity
 
 ```cpp
 size_type capacity() const noexcept;
 ```
 
+This function is provided only if `Container::capacity()` is provided.
+
+### shrink_to_fit
+
 ```cpp
 void shrink_to_fit();
 ```
 
+This function is provided only if `Container::shrink_to_fit()` is provided.
+
 **Postcondition**
 - `capacity() == size()`
 
+**Complexity**
+`O(N)`.
+
 ## Modifiers
+
+### clear
 
 ```cpp
 void clear();
@@ -203,6 +289,8 @@ Clear container.
 **Invalidation**
 Invalidates every interators and references.
 
+### insert
+
 ```cpp
 std::pair<iterator, bool> insert(value_type const& value);
 
@@ -212,7 +300,7 @@ std::pair<iterator, bool> insert(V&& value);
 std::pair<iterator, bool> insert(value_type&& value);
 ```
 
-Insert `value`.
+Insert a `value`.
 
 The second form only participants in overload resolution if `std::is_constructible_v<value_type, V&&> == true`.
 
@@ -220,7 +308,7 @@ The second form only participants in overload resolution if `std::is_constructib
 An iterator to inserted value or the element which has same key, `bool` denotes whether the insertion is succeeded.
 
 **Complexity**
-Amortized `O(N)`.
+Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
 
 **Invalidation**
 Same as `Container::insert`.
@@ -234,8 +322,8 @@ iterator insert(const_iterator hint, V&& value);
 iterator insert(const_iterator hint, value_type&& value);
 ```
 
-Insert `value`.
-The `hint` is used for looking up insertion position.
+Insert a `value`.
+The `hint` is used for looking up insertion point.
 
 The second form only participants in overload resolution if `std::is_constructible_v<value_type, V&&> == true`.
 
@@ -243,7 +331,7 @@ The second form only participants in overload resolution if `std::is_constructib
 An iterator to inserted value or the element which has same key.
 
 **Complexity**
-Amortized `O(N)`.
+Amortized `O(M)` for insertion, `O(1)` for searching insertion point with valid `hint` otherwise `O(log(N))`.
 
 **Invalidation**
 Same as `Container::insert`.
@@ -258,10 +346,10 @@ void insert(std::initializer_list<value_type> ilist);
 Range insertion.
 
 **Pre requirements**
-`InputIterator` should meet *InputIterator*.
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
 
 **Complexity**
-Amortized `O(N logN)`.
+Amortized `O(M E)` for insertion, `O(E log(N))` for searching insertion point.
 
 **Invalidation**
 Same as `Container::insert`.
@@ -279,10 +367,12 @@ The `hint` is used in same way as other `insert()`.
 An iterator to inserted value or the element which has same key.
 
 **Complexity**
-Amortized `O(N)`.
+Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
 
 **Invalidation**
 Same as `Container::insert`.
+
+### insert_sorted
 
 ```cpp
 template <typename InputIterator>
@@ -294,13 +384,17 @@ void insert_sorted(std::initializer_list<value_type> ilist);
 Range insertion with sorted range.
 
 **Pre requirements**
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
+
 The ranges should be sorted in `Compare` order, otherwise the behaviour is undefined (Note that it doesn't require deduplication).
 
 **Complexity**
-Amortized `O(N^2)`.
+Amortized `O(M E)` for insertion, `O(N+E)` for searching insertion point.
 
 **Invalidation**
 Same as `Container::insert`.
+
+### insert_or_assign
 
 ```cpp
 template <typename M>
@@ -318,15 +412,24 @@ iterator insert_or_assign(const_iterator hint, key_type&& key, M&& obj);
 
 Same as `insert()` except replace with obj if key is always exists.
 
+### emplace
+
 ```cpp
 template <typename... Args>
 std::pair<iterator, bool> emplace(Args&&... args);
+```
+Equivalent to `insert(value_type(std::forward<Args>(args)...))`.
 
+### emplace_hint
+
+```cpp
 template <typename... Args>
 iterator emplace_hint(const_iterator hint, Args&&... args);
 ```
 
-Equivalent to `insert(value_type(std::forward<Args>(args)...))`.
+Equivalent to `insert(hint, value_type(std::forward<Args>(args)...))`.
+
+### try_emplace
 
 ```cpp
 template <typename... Args>
@@ -342,7 +445,10 @@ template <typename... Args>
 iterator try_emplace(const_iterator hint, key_type&& key, Args&&... args);
 ```
 
-Equivalent to `insert(value_type(key, std::forward<Args>(args)...))`.
+Equivalent to `insert(value_type(key, std::forward<Args>(args)...))` in first and second form.
+Equivalent to `insert(hint, value_type(key, std::forward<Args>(args)...))` in third and fourth form.
+
+### erase
 
 ```cpp
 iterator erase(iterator pos);
@@ -352,13 +458,18 @@ iterator erase(const_iterator first, const_iterator last);
 size_type erase(key_type const& key)
 ```
 
-Erase elements.
-
 **Return value**
 An iterator that next to erased elements.
 
 **Complexity**
-`O(N)`
+`O(M)`in first form.
+`O(M E)` in second form.
+`O(M)` for erasing, `O(log(N))` for searching target element in third form.
+
+**Invalidation**
+Same as `Container::erase`.
+
+### swap
 
 ```cpp
 void swap(flat_map& other) noexcept(/* see below */);
@@ -370,6 +481,8 @@ Swap elements, allocator, and comparator.
 No except only if it meets all of
 - `std::allocator_traits<allocator_type>::is_always_equal::value` and
 - `std::is_nothrow_swappable<Compare>::value`
+
+#### extract
 
 ```cpp
 node_type extract(const_iterator position);
@@ -384,7 +497,10 @@ Unlike `std::map::extract`, move element.
 Extracted node handle.
 
 **Complexity**
-`O(N)`
+`O(M)` in first form.
+`O(M)` for extraction, `O(log(N))` for searching target element in second form.
+
+### merge
 
 ```cpp
 template <typename Comp, typename Allocator>
@@ -409,9 +525,11 @@ void merge(flat_map<key_type, mapped_type, Comp, Cont>&& source);
 Merge `source` container into self.
 
 **Complexity**
-Amortized `O(N)` if comparators are same, otherwise amortized `O(N^2)`.
+Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise amortized `O(E log(N))`.
 
-### Lookup
+## Lookup
+
+### count
 
 ```cpp
 size_type count(key_type const& key) const;
@@ -425,7 +543,9 @@ Count number of elements.
 The second form is only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
-`O(logN)`
+`O(log(N))`.
+
+### find
 
 ```cpp
 iterator find(key_type const& key)
@@ -444,7 +564,9 @@ Find an element.
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
-`O(logN)`
+`O(log(N))`.
+
+### contains
 
 ```cpp
 bool contains(key_type const& key) const;
@@ -456,7 +578,9 @@ bool contains(K const& key);
 The second form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
-`O(logN)`
+`O(log(N))`.
+
+### equal_range
 
 ```cpp
 std::pair<iterator, iterator> equal_range(key_type const& key);
@@ -475,7 +599,9 @@ Returns a range that contains elements with specified key.
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
-`O(logN)`
+`O(log(N))`.
+
+### lower_bound
 
 ```cpp
 iterator lower_bound(key_type const& key);
@@ -494,7 +620,9 @@ Returns an iterator that points to first element which is *not less* than specif
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
-`O(logN)`
+`O(log(N))`.
+
+### upper_bound
 
 ```cpp
 iterator upper_bound(key_type const& key);
@@ -513,9 +641,9 @@ Returns an iterator that points to first element which is *greater* than specifi
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
-`O(logN)`
+`O(log(N))`.
 
-### Observers
+## Observers
 
 ```cpp
 key_compare key_comp() const;
