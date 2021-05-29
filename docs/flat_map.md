@@ -649,3 +649,177 @@ key_compare key_comp() const;
 
 value_compare value_comp() const;
 ```
+
+## Non member functions
+
+### operator==
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Complexity**
+`O(N)`.
+
+### operator!=
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+bool operator!=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Complexity**
+`O(N)`.
+
+**Standard**
+This function is removed if
+- `__cpp_impl_three_way_comparison` is defined, and
+- `__cpp_lib_three_way_comparison` is defined.
+
+### operator<
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+bool operator<(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Complexity**
+`O(N)`.
+
+**Standard**
+This function is removed if
+- `__cpp_impl_three_way_comparison` is defined, and
+- `__cpp_lib_three_way_comparison` is defined.
+
+### operator<=
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+bool operator<=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Complexity**
+`O(N)`.
+
+**Standard**
+This function is removed if
+- `__cpp_impl_three_way_comparison` is defined, and
+- `__cpp_lib_three_way_comparison` is defined.
+
+### operator>
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+bool operator>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Complexity**
+`O(N)`.
+
+**Standard**
+This function is removed if
+- `__cpp_impl_three_way_comparison` is defined, and
+- `__cpp_lib_three_way_comparison` is defined.
+
+### operator>=
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+bool operator>=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Complexity**
+`O(N)`.
+
+**Standard**
+This function is removed if
+- `__cpp_impl_three_way_comparison` is defined, and
+- `__cpp_lib_three_way_comparison` is defined.
+
+### operator<=>
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+/* see below */ operator<=>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+```
+
+**Return value**
+`std::lexicographical_compare_three_way(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())`
+
+**Complexity**
+`O(N)`.
+
+**Standard**
+This function is defined only if
+- `__cpp_impl_three_way_comparison` is defined, and
+- `__cpp_lib_three_way_comparison` is defined.
+
+### swap
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container>
+void swap(flat_map<Key, T, Compare, Container>& lhs, flat_map<Key, T, Compare, Container>& rhs) noexcept(/* see below */);
+```
+
+**Exceptions**
+No except only if `noexcept(lhs.swap(rhs))` is true.
+
+### erase_if
+
+```cpp
+template <typename Key, typename T, typename Compare, typename Container, typename Pred>
+std::size_t erase_if(flat_map<Key, T, Compare, Container>& c, Pred pred);
+```
+
+Erase every elements which `pred` returned true.
+
+**Return value**
+Number of erased elements.
+
+**Complexity**
+`O(N)`.
+
+## Deduction guides
+
+```cpp
+template <typename InputIterator,
+          typename Compare = std::less<iter_key_t<InputIterator>>,
+          typename Allocator = iter_to_alloc_t<InputIterator>>
+flat_map(InputIterator, InputIterator, Compare = Compare(), Allocator = Allocator())
+  -> flat_map<iter_key_t<InputIterator>, iter_val_t<InputIterator>, Compare, iter_to_container_t<InputIterator, Allocator>>;
+
+template <typename Key, typename T,
+          typename Compare = std::less<Key>,
+          typename Allocator = typename std::vector<std::pair<Key, T>>::allocator_type>
+flat_map(std::initializer_list<std::pair<Key, T>>, Compare = Compare(), Allocator = Allocator())
+  -> flat_map<Key, T, Compare, std::vector<std::pair<Key, T>, Allocator>>;
+
+template <typename InputIterator, typename Allocator>
+flat_map(InputIterator, InputIterator, Allocator)
+  -> flat_map<iter_key_t<InputIterator>, iter_val_t<InputIterator>, std::less<iter_key_t<InputIterator>>, iter_to_container_t<InputIterator, Allocator>>;
+
+template <typename Key, typename T, typename Allocator>
+flat_map(std::initializer_list<std::pair<Key, T>>, Allocator)
+  -> flat_map<Key, T, std::less<Key>, std::vector<std::pair<Key, T>, Allocator>>;
+```
+
+Where the exposition only type aliases are defined as
+
+```cpp
+template <typename InputIterator>
+using iter_key_t = std::remove_const_t<typename std::iterator_traits<InputIterator>::value_type::first_type>;
+
+template <typename InputIterator>
+using iter_val_t = typename std::iterator_traits<InputIterator>::value_type::second_type;
+
+template <typename InputIterator>
+using iter_to_alloc_t = std::allocator<iter_key_t<InputIterator>, iter_val_t<InputIterator>>;
+
+template <typename InputIterator, typename Allocator>
+using iter_to_container_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Allocator>;
+```
+
+First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
+Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
+
