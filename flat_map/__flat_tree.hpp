@@ -12,8 +12,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "flat_map/__fwd.hpp"
-
 namespace flat_map::detail
 {
 
