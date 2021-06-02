@@ -28,7 +28,7 @@ template <typename Key, typename T,
           typename Container = std::vector<std::pair<Key, T>>>
 class flat_map : private detail::flat_tree<flat_map<Key, T, Compare, Container>, Key, std::pair<Key, T>, Compare, Container>
 {
-    using _super = detail::flat_tree<flat_map, Key, std::pair<Key, T>, Compare, Container>;
+    using _super = typename flat_map::flat_tree;
 
     // To lookup private comparator
     friend _super;
