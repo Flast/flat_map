@@ -18,6 +18,7 @@
 #endif
 
 #include "flat_map/__fwd.hpp"
+#include "flat_map/__config.hpp"
 #include "flat_map/__flat_tree.hpp"
 
 namespace flat_map
@@ -120,7 +121,15 @@ public:
 
     flat_map& operator=(flat_map const& other) = default;
 
-    flat_map& operator=(flat_map&& other) noexcept(std::is_nothrow_move_assignable_v<_super>) = default;
+    flat_map& operator=(flat_map&& other) noexcept(std::is_nothrow_move_assignable_v<_super>)
+#if FLAT_MAP_COMPILER_VERSION(10,0,0) <= FLAT_MAP_COMPILER_GCC
+      = default;
+#else
+    {
+        _super::operator=(std::move(other));
+        return *this;
+    }
+#endif
 
     flat_map& operator=(std::initializer_list<value_type> ilist)
     {
