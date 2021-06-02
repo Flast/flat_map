@@ -609,16 +609,17 @@ private:
         auto comp = source.key_comp();
         for (auto first = source.begin(); first != source.end(); )
         {
-            if (auto [itr, found] = _find(first->first); !found)
+            auto [itr, found] = _find(first->first);
+            if (!found)
             {
                 itr = _container.insert(itr, std::move(*first));
                 first = source.erase(first);
-                while (first != source.end() && !comp(itr->first, first->first)) { ++first; } // skip duplicated
             }
             else
             {
                 ++first;
             }
+            while (first != source.end() && !comp(itr->first, first->first)) { ++first; } // skip duplicated
         }
     }
 
