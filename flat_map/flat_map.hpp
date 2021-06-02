@@ -245,7 +245,7 @@ public:
 
     using _super::erase;
 
-    void swap(flat_map& other) noexcept(noexcept(_super::swap(other))) { _super::swap(other); }
+    void swap(flat_map& other) noexcept(noexcept(this->_super::swap(other))) { _super::swap(other); }
 
     using _super::extract;
 
