@@ -2,9 +2,13 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include "flat_map/flat_set.hpp"
+
 #include <deque>
 
 template <typename T>
 using CONTAINER = std::deque<T>;
 
-#include "set_basic.ipp"
+#define FLAT_MAP 0
+#include "test_case/basic.ipp"
+#include "test_case/stateful_comparison.ipp"
+#include "test_case/std.ipp"
