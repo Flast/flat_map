@@ -15,6 +15,7 @@
 
 #include "flat_map/__fwd.hpp"
 #include "flat_map/__config.hpp"
+#include "flat_map/__type_traits.hpp"
 #include "flat_map/__flat_tree.hpp"
 
 namespace flat_map
@@ -370,15 +371,6 @@ using iter_val_t = typename std::iterator_traits<InputIterator>::value_type::sec
 // Use variadics for deducing defaulted allocator
 template <typename InputIterator, typename... Args>
 using iter_cont_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Args...>;
-
-template <typename T, typename = void>
-struct is_allocator : public std::false_type {};
-
-template <typename T>
-struct is_allocator<T, std::void_t<typename T::value_type, decltype(std::declval<T&>().allocate(std::size_t{}))>> : public std::true_type {};
-
-template <typename T>
-inline constexpr bool is_allocator_v = is_allocator<T>{};
 
 } // namespace flat_map::detail
 
