@@ -13,10 +13,6 @@
 #include <utility>
 #include <vector>
 
-#if __has_include(<compare>)
-#include <compare>
-#endif
-
 #include "flat_map/__fwd.hpp"
 #include "flat_map/__config.hpp"
 #include "flat_map/__flat_tree.hpp"
@@ -308,7 +304,7 @@ bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
     return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
-#if !(defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison))
+#ifndef FLAT_MAP_HAS_THREE_WAY_COMPARISON
 template <typename Key, typename T, typename Compare, typename Container>
 bool operator!=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
@@ -339,7 +335,6 @@ bool operator>=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
     return !(lhs < rhs);
 }
 #else
-#define FLAT_MAP_HAS_THREE_WAY_COMPARISON 1
 template <typename Key, typename T, typename Compare, typename Container>
 auto operator<=>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs)
 {
