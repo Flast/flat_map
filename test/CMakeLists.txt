@@ -39,3 +39,8 @@ add_tests(map_vector_test map_vector.cpp)
 add_tests(map_deque_test map_deque.cpp)
 add_tests(std_map_test std_map.cpp)
 add_tests(map_stateful_comparison map_stateful_comparison.cpp)
+
+add_tests(set_vector_test set_vector.cpp)
+add_tests(set_deque_test set_deque.cpp)
+add_tests(std_set_test std_set.cpp)
+add_tests(set_stateful_comparison set_stateful_comparison.cpp)

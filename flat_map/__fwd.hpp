@@ -26,6 +26,8 @@
 FLATMAP_BEGIN_STD
 template <typename Key, typename T, typename Compare, typename Allocator> class map;
 template <typename Key, typename T, typename Compare, typename Allocator> class multimap;
+template <typename Key, typename Compare, typename Allocator> class set;
+template <typename Key, typename Compare, typename Allocator> class multiset;
 FLATMAP_END_STD
 
 #undef FLATMAP_BEGIN_STD
