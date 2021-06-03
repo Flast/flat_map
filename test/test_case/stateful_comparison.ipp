@@ -132,7 +132,7 @@ TEST_CASE("construction fp", "[construction][fp]")
     }
 }
 
-TEST_CASE("assignment", "[assignment][fp]")
+TEST_CASE("assignment fp", "[assignment][fp]")
 {
     SECTION("copy assignment")
     {
@@ -221,7 +221,7 @@ TEST_CASE("assignment", "[assignment][fp]")
     }
 }
 
-TEST_CASE("swap", "[swap][fp]")
+TEST_CASE("swap fp", "[swap][fp]")
 {
     SECTION("swap comparator")
     {
