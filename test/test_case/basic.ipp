@@ -510,8 +510,8 @@ TEST_CASE("accessor with transparent", "[accessor]")
 
     SECTION("counting")
     {
-        REQUIRE(fm.count(2) == 1);
-        REQUIRE(fm.count(3) == 0);
+        REQUIRE(fm.count(wrap{2}) == 1);
+        REQUIRE(fm.count(wrap{3}) == 0);
     }
 
     SECTION("contains")
