@@ -91,7 +91,7 @@ private:
 
     void _initialize_container()
     {
-        std::sort(_container.begin(), _container.end(), _vcomp());
+        std::stable_sort(_container.begin(), _container.end(), _vcomp());
         auto itr = std::unique(_container.begin(), _container.end(), _equality());
         _container.erase(itr, _container.end());
     }
