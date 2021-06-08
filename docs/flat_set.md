@@ -699,10 +699,10 @@ Number of erased elements.
 
 ```cpp
 template <typename InputIterator,
-          typename Compare = std::less<typename std::iterator_traits<InputIterator>::value_type>,
-          typename Allocator = typename std::vector<typename std::iterator_traits<InputIterator>::value_type>::allocator_type>
+          typename Compare = std::less<iter_val_t<InputIterator>>,
+          typename Allocator = typename std::vector<iter_val_t<InputIterator>>::allocator_type>
 flat_set(InputIterator, InputIterator, Compare = Compare(), Allocator = Allocator())
-  -> flat_set<typename std::iterator_traits<InputIterator>::value_type, Compare, std::vector<typename std::iterator_traits<InputIterator>::value_type, Allocator>>;
+  -> flat_set<iter_val_t<InputIterator>, Compare, std::vector<iter_val_t<InputIterator>, Allocator>>;
 
 template <typename Key,
           typename Compare = std::less<Key>,
@@ -712,13 +712,18 @@ flat_set(std::initializer_list<Key>, Compare = Compare(), Allocator = Allocator(
 
 template <typename InputIterator, typename Allocator>
 flat_set(InputIterator, InputIterator, Allocator)
-  -> flat_set<typename std::iterator_traits<InputIterator>::value_type,
-              std::less<typename std::iterator_traits<InputIterator>::value_type>,
-              std::vector<typename std::iterator_traits<InputIterator>::value_type, Allocator>>;
+  -> flat_set<iter_val_t<InputIterator>, std::less<iter_val_t<InputIterator>>, std::vector<iter_val_t<InputIterator>, Allocator>>;
 
 template <typename Key, typename Allocator>
 flat_set(std::initializer_list<Key>, Allocator)
   -> flat_set<Key, std::less<Key>, std::vector<Key, Allocator>>;
+```
+
+Where the exposition only type aliases are defined as
+
+```cpp
+template <typename InputIterator>
+using iter_val_t = typename std::iterator_traits<InputIterator>::value_type;
 ```
 
 First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
