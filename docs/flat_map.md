@@ -492,6 +492,9 @@ node_type extract(key_type const& key);
 Extract an element and returns it.
 Unlike `std::map::extract`, move element.
 
+**Pre requirements**
+`position` should be valid dereferenceable iterator in first form.
+
 **Return value**
 Extracted node handle.
 
