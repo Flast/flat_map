@@ -31,6 +31,7 @@ TEST_CASE("construction", "[construction]")
             MAKE_PAIR(6, 7),
             MAKE_PAIR(4, 5),
             MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 5),
             MAKE_PAIR(0, 1),
         };
         FLAT_CONTAINER<int, int> fm{v.begin(), v.end()};
@@ -54,6 +55,7 @@ TEST_CASE("construction", "[construction]")
             MAKE_PAIR(6, 7),
             MAKE_PAIR(4, 5),
             MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 5),
             MAKE_PAIR(0, 1),
         };
 
@@ -236,6 +238,7 @@ TEST_CASE("equal_range", "[equal_range]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -263,6 +266,7 @@ TEST_CASE("equal_range with transparent", "[equal_range]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -290,6 +294,7 @@ TEST_CASE("lower_bound", "[lower_bound]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -321,6 +326,7 @@ TEST_CASE("lower_bound with transparent", "[lower_bound]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -352,6 +358,7 @@ TEST_CASE("upper_bound", "[upper_bound]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -383,6 +390,7 @@ TEST_CASE("upper_bound with transparent", "[upper_bound]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -414,6 +422,7 @@ TEST_CASE("accessor", "[accessor]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -490,6 +499,7 @@ TEST_CASE("accessor with transparent", "[accessor]")
     {
         MAKE_PAIR(0, 1),
         MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
         MAKE_PAIR(4, 5),
         MAKE_PAIR(6, 7),
     };
@@ -754,6 +764,8 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(1, 2),
             MAKE_PAIR(3, 9),
             MAKE_PAIR(6, 4),
+            MAKE_PAIR(7, 8),
+            MAKE_PAIR(7, 9),
         };
         FLAT_CONTAINER<int, int> fm =
         {
@@ -765,7 +777,7 @@ TEST_CASE("insertion", "[insertion]")
 
         fm.insert_sorted(v.begin(), v.end());
 
-        REQUIRE(fm.size() == 6);
+        REQUIRE(fm.size() == 7);
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
@@ -779,6 +791,8 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(*itr == MAKE_PAIR(4, 5));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
+        ++itr;
+        REQUIRE(*itr == MAKE_PAIR(7, 8));
         ++itr;
         REQUIRE(itr == fm.end());
     }
@@ -791,6 +805,8 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(2, 3),
             MAKE_PAIR(4, 5),
             MAKE_PAIR(6, 7),
+            MAKE_PAIR(7, 8),
+            MAKE_PAIR(7, 9),
         };
 
         fm.insert_sorted({
@@ -800,7 +816,7 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(6, 4),
         });
 
-        REQUIRE(fm.size() == 6);
+        REQUIRE(fm.size() == 7);
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
@@ -814,6 +830,8 @@ TEST_CASE("insertion", "[insertion]")
         REQUIRE(*itr == MAKE_PAIR(4, 5));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
+        ++itr;
+        REQUIRE(*itr == MAKE_PAIR(7, 8));
         ++itr;
         REQUIRE(itr == fm.end());
     }
@@ -856,6 +874,7 @@ TEST_CASE("node", "[insertion][erase]")
         {
             MAKE_PAIR(0, 1),
             MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 1),
             MAKE_PAIR(4, 5),
             MAKE_PAIR(6, 7),
         };
