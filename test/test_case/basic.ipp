@@ -37,18 +37,13 @@ TEST_CASE("construction", "[construction]")
         FLAT_CONTAINER<int, int> fm{v.begin(), v.end()};
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -64,18 +59,13 @@ TEST_CASE("construction", "[construction]")
         };
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -97,14 +87,10 @@ TEST_CASE("construction", "[construction]")
         REQUIRE(copy.begin() != fm.begin());
 
         auto itr = copy.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == copy.end());
     }
 
@@ -126,14 +112,10 @@ TEST_CASE("construction", "[construction]")
         REQUIRE(fm.begin() == fm.end());
 
         auto itr = move.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == move.end());
     }
 }
@@ -162,14 +144,10 @@ TEST_CASE("assignment", "[assignment]")
         REQUIRE(copy.begin() != fm.begin());
 
         auto itr = copy.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == copy.end());
     }
 
@@ -195,14 +173,10 @@ TEST_CASE("assignment", "[assignment]")
         REQUIRE(fm.begin() == fm.end());
 
         auto itr = move.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == move.end());
     }
 }
@@ -502,16 +476,11 @@ TEST_CASE("accessor", "[accessor]")
         REQUIRE(value == int{});
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, int{}));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, int{}));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 #endif
@@ -597,22 +566,15 @@ TEST_CASE("insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -649,22 +611,15 @@ TEST_CASE("insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -721,28 +676,19 @@ TEST_CASE("insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(5, 6));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(5, 6));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 9));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -772,25 +718,17 @@ TEST_CASE("insertion", "[insertion]")
 #endif
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 9));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 9));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 4));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 4));
 #endif
         REQUIRE(itr == fm.end());
     }
@@ -819,25 +757,17 @@ TEST_CASE("insertion", "[insertion]")
 #endif
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 9));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 9));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 4));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 4));
 #endif
         REQUIRE(itr == fm.end());
     }
@@ -870,31 +800,21 @@ TEST_CASE("insertion", "[insertion]")
 #endif
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 9));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 9));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 4));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 4));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(7, 8));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(7, 8));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(7, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(7, 9));
 #endif
         REQUIRE(itr == fm.end());
     }
@@ -925,31 +845,21 @@ TEST_CASE("insertion", "[insertion]")
 #endif
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 9));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 9));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 4));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 4));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(7, 8));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(7, 8));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(7, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(7, 9));
 #endif
         REQUIRE(itr == fm.end());
     }
@@ -974,12 +884,9 @@ TEST_CASE("erase", "[erase]")
         REQUIRE(fm.size() == 3);
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 }
@@ -1008,16 +915,12 @@ TEST_CASE("node", "[insertion][erase]")
         REQUIRE(*node.value == MAKE_PAIR(2, 3));
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 1));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 1));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -1066,22 +969,15 @@ TEST_CASE("node", "[insertion][erase]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1118,22 +1014,15 @@ TEST_CASE("node", "[insertion][erase]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1190,28 +1079,19 @@ TEST_CASE("node", "[insertion][erase]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(5, 6));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(5, 6));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 9));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 }
@@ -1251,18 +1131,12 @@ TEST_CASE("insert or assign", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1295,18 +1169,12 @@ TEST_CASE("insert or assign", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1353,20 +1221,13 @@ TEST_CASE("insert or assign", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(5, 6));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(5, 6));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 9));
         REQUIRE(itr == fm.end());
     }
 }
@@ -1410,22 +1271,15 @@ TEST_CASE("emplace insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1462,22 +1316,15 @@ TEST_CASE("emplace insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1534,28 +1381,19 @@ TEST_CASE("emplace insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(2, 5));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(5, 6));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(5, 6));
 #if MULTI_CONTAINER
-        REQUIRE(*itr == MAKE_PAIR(6, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 9));
 #endif
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -1592,18 +1430,12 @@ TEST_CASE("emplace insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1636,18 +1468,12 @@ TEST_CASE("emplace insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(8, 9));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(*itr++ == MAKE_PAIR(8, 9));
         REQUIRE(itr == fm.end());
     }
 
@@ -1694,20 +1520,13 @@ TEST_CASE("emplace insertion", "[insertion]")
         }
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(5, 6));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(5, 6));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 #endif
@@ -1767,10 +1586,8 @@ TEST_CASE("erase_if", "[erase_if]")
     REQUIRE(fm.size() == 2);
 
     auto itr = fm.begin();
-    REQUIRE(*itr == MAKE_PAIR(4, 5));
-    ++itr;
-    REQUIRE(*itr == MAKE_PAIR(6, 7));
-    ++itr;
+    REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+    REQUIRE(*itr++ == MAKE_PAIR(6, 7));
     REQUIRE(itr == fm.end());
 }
 
