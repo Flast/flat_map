@@ -281,36 +281,41 @@ public:
     template <typename ForwardIterator>
     void _insert_sorted(ForwardIterator first, ForwardIterator last, std::forward_iterator_tag)
     {
-        for (auto itr = begin(); first != last && itr != end(); )
+        for (auto itr = begin(); first != last; )
         {
-            while (_vcomp()(*itr, *first)) { ++itr; }
+            while (itr != end() && _vcomp()(*itr, *first)) { ++itr; }
 
             auto orig = first++; // declare here to advance first anyway
-            if (_vcomp()(*orig, *itr))
+            if (itr != end())
             {
+                if (!_vcomp()(*orig, *itr)) { continue; } // orig == itr
+
                 // find unique range
                 for (; first != last && _vcomp()(*std::prev(first), *first) && _vcomp()(*first, *itr); ++first);
 
                 itr = _container.insert(itr, orig, first);
                 std::advance(itr, std::distance(orig, first) - 1); // sub 1 to compare *--first and *first (to skip duplicated)
             }
+            else
+            {
+                for (; first != last && _vcomp()(*std::prev(first), *first); ++first);
+                itr = _container.insert(end(), orig, first);
+            }
         }
-        _container.insert(end(), first, last); // insert remainings
     }
 
     template <typename InputIterator>
     void _insert_sorted(InputIterator first, InputIterator last, std::input_iterator_tag)
     {
-        for (auto itr = begin(); first != last && itr != end(); ++first)
+        for (auto itr = begin(); first != last; ++first)
         {
-            while (_vcomp()(*itr, *first)) { ++itr; }
-            if (_vcomp()(*first, *itr))
+            while (itr != end() && _vcomp()(*itr, *first)) { ++itr; }
+            if (itr == end() || _vcomp()(*first, *itr))
             {
                 itr = _container.insert(itr, *first);
                 // Don't advance iterator to compare *first and *++first (to skip duplicated).
             }
         }
-        _container.insert(end(), first, last); // insert remainings
     }
 
     // extension
