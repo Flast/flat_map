@@ -66,7 +66,7 @@ Construct container from `[first, last)`.
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
 
 **Complexity**
-`O(E log(E))`
+`O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ```cpp
 flat_set(flat_set const& other);
@@ -93,7 +93,7 @@ flat_set(std::initializer_list<value_type> init, allocator_type const& alloc);
 Construct from init.
 
 **Complexity**
-`O(E log(E))`
+`O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ## Assignments
 
@@ -117,6 +117,9 @@ No except only if it meets all of
 ```cpp
 flat_set& operator=(std::initializer_list<value_type> ilist);
 ```
+
+**Complexity**
+`O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ## Iterators
 
