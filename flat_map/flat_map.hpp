@@ -24,12 +24,14 @@ namespace flat_map
 template <typename Key, typename T,
           typename Compare = std::less<Key>,
           typename Container = std::vector<std::pair<Key, T>>>
-class flat_map : private detail::flat_tree<flat_map<Key, T, Compare, Container>, Key, std::pair<Key, T>, Compare, Container>
+class flat_map : private detail::_flat_tree_base<flat_map<Key, T, Compare, Container>, Key, std::pair<Key, T>, Compare, Container>
 {
-    using _super = typename flat_map::flat_tree;
+    using _super = typename flat_map::_flat_tree_base;
 
     // To lookup private comparator
     friend _super;
+
+    static constexpr bool _is_uniq = true;
 
 public:
     using key_type = typename _super::key_type;
@@ -96,11 +98,17 @@ public:
 
     template <typename InputIterator>
     flat_map(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : _super{first, last, comp, alloc} { }
+      : _super{comp, alloc}
+    {
+        this->_initialize_container_uniq(first, last);
+    }
 
     template <typename InputIterator>
     flat_map(InputIterator first, InputIterator last, allocator_type const& alloc)
-      : _super{first, last, alloc} { }
+      : _super{alloc}
+    {
+        this->_initialize_container_uniq(first, last);
+    }
 
     flat_map(flat_map const& other) = default;
     flat_map(flat_map const& other, allocator_type const& alloc)
@@ -111,10 +119,16 @@ public:
       : _super{std::move(other), alloc} { }
 
     flat_map(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : _super{init, comp, alloc} { }
+      : _super{comp, alloc}
+    {
+        this->_initialize_container_uniq(init.begin(), init.end());
+    }
 
     flat_map(std::initializer_list<value_type> init, allocator_type const& alloc)
-      : _super{init, alloc} { }
+      : _super{alloc}
+    {
+        this->_initialize_container_uniq(init.begin(), init.end());
+    }
 
     flat_map& operator=(flat_map const& other) = default;
 
@@ -130,7 +144,7 @@ public:
 
     flat_map& operator=(std::initializer_list<value_type> ilist)
     {
-        _super::operator=(ilist);
+        this->_initialize_container_uniq(ilist.begin(), ilist.end());
         return *this;
     }
 
@@ -177,7 +191,7 @@ private:
     {
         static_assert(std::is_assignable_v<mapped_type&, M&&>);
         auto [itr, found] = this->_find(key);
-        if (!found) { itr = this->_container_emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
+        if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
         else { itr->second = std::forward<M>(obj); }
         return {itr, !found};
     }
@@ -185,8 +199,8 @@ private:
     template <typename K, typename M>
     iterator _insert_or_assign(const_iterator hint, K&& key, M&& obj)
     {
-        auto [itr, found] = this->_find(hint, key);
-        if (!found) { itr = this->_container_emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
+        auto [itr, found] = this->_insert_point(hint, key);
+        if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
         else { itr->second = std::forward<M>(obj); }
         return itr;
     }
@@ -214,7 +228,7 @@ private:
         auto [itr, found] = this->_find(key);
         if (!found)
         {
-            itr = this->_container_emplace(itr,
+            itr = this->_container.emplace(itr,
                                            std::piecewise_construct,
                                            std::forward_as_tuple(std::forward<K>(key)),
                                            std::forward_as_tuple(std::forward<Args>(args)...));
@@ -225,10 +239,10 @@ private:
     template <typename K, typename... Args>
     iterator _try_emplace(const_iterator hint, K&& key, Args&&... args)
     {
-        auto [itr, found] = this->_find(hint, key);
+        auto [itr, found] = this->_insert_point(hint, key);
         if (!found)
         {
-            itr = this->_container_emplace(itr,
+            itr = this->_container.emplace(itr,
                                            std::piecewise_construct,
                                            std::forward_as_tuple(std::forward<K>(key)),
                                            std::forward_as_tuple(std::forward<Args>(args)...));
@@ -267,6 +281,10 @@ private:
     template <typename Comp, typename Cont>
     std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
     _same_order(flat_map<key_type, mapped_type, Comp, Cont>&);
+
+    template <typename Comp, typename Cont>
+    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
+    _same_order(flat_multimap<key_type, mapped_type, Comp, Cont>&);
 
 public:
     template <typename Comp, typename Allocator>

@@ -22,12 +22,14 @@ namespace flat_map
 template <typename Key,
           typename Compare = std::less<Key>,
           typename Container = std::vector<Key>>
-class flat_multiset : private detail::flat_multitree<flat_multiset<Key, Compare, Container>, Key, Key, Compare, Container>
+class flat_multiset : private detail::_flat_tree_base<flat_multiset<Key, Compare, Container>, Key, Key, Compare, Container>
 {
-    using _super = typename flat_multiset::flat_multitree;
+    using _super = typename flat_multiset::_flat_tree_base;
 
     // To lookup private comparator
     friend _super;
+
+    static constexpr bool _is_uniq = false;
 
 public:
     using key_type = typename _super::key_type;
@@ -63,11 +65,17 @@ public:
 
     template <typename InputIterator>
     flat_multiset(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : _super{first, last, comp, alloc} { }
+      : _super{comp, alloc}
+    {
+        this->_initialize_container_multi(first, last);
+    }
 
     template <typename InputIterator>
     flat_multiset(InputIterator first, InputIterator last, allocator_type const& alloc)
-      : _super{first, last, alloc} { }
+      : _super{alloc}
+    {
+        this->_initialize_container_multi(first, last);
+    }
 
     flat_multiset(flat_multiset const& other) = default;
     flat_multiset(flat_multiset const& other, allocator_type const& alloc)
@@ -78,10 +86,16 @@ public:
       : _super{std::move(other), alloc} { }
 
     flat_multiset(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : _super{init, comp, alloc} { }
+      : _super{comp, alloc}
+    {
+        this->_initialize_container_multi(init.begin(), init.end());
+    }
 
     flat_multiset(std::initializer_list<value_type> init, allocator_type const& alloc)
-      : _super{init, alloc} { }
+      : _super{alloc}
+    {
+        this->_initialize_container_multi(init.begin(), init.end());
+    }
 
     flat_multiset& operator=(flat_multiset const& other) = default;
 
@@ -97,7 +111,7 @@ public:
 
     flat_multiset& operator=(std::initializer_list<value_type> ilist)
     {
-        _super::operator=(ilist);
+        this->_initialize_container_multi(ilist.begin(), ilist.end());
         return *this;
     }
 
@@ -142,36 +156,40 @@ private:
 
     template <typename Comp, typename Cont>
     std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
+    _same_order(flat_set<key_type, Comp, Cont>&);
+
+    template <typename Comp, typename Cont>
+    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
     _same_order(flat_multiset<key_type, Comp, Cont>&);
 
 public:
     template <typename Comp, typename Allocator>
-    void merge(std::set<key_type, Comp, Allocator>& source) { this->_merge(source); }
+    void merge(std::set<key_type, Comp, Allocator>& source) { this->_merge(source, std::false_type{}); }
 
     template <typename Comp, typename Allocator>
-    void merge(std::set<key_type, Comp, Allocator>&& source) { this->_merge(source); }
+    void merge(std::set<key_type, Comp, Allocator>&& source) { this->_merge(source, std::false_type{}); }
 
     template <typename Comp, typename Allocator>
-    void merge(std::multiset<key_type, Comp, Allocator>& source) { this->_merge(source); }
+    void merge(std::multiset<key_type, Comp, Allocator>& source) { this->_merge(source, std::true_type{}); }
 
     template <typename Comp, typename Allocator>
-    void merge(std::multiset<key_type, Comp, Allocator>&& source) { this->_merge(source); }
+    void merge(std::multiset<key_type, Comp, Allocator>&& source) { this->_merge(source, std::true_type{}); }
 
     // extension
     template <typename Comp, typename Cont>
-    void merge(flat_set<key_type, Comp, Cont>& source) { this->_merge(source); }
+    void merge(flat_set<key_type, Comp, Cont>& source) { this->_merge(source, std::false_type{}); }
 
     // extension
     template <typename Comp, typename Cont>
-    void merge(flat_set<key_type, Comp, Cont>&& source) { this->_merge(source); }
+    void merge(flat_set<key_type, Comp, Cont>&& source) { this->_merge(source, std::false_type{}); }
 
     // extension
     template <typename Comp, typename Cont>
-    void merge(flat_multiset<key_type, Comp, Cont>& source) { this->_merge(source); }
+    void merge(flat_multiset<key_type, Comp, Cont>& source) { this->_merge(source, std::true_type{}); }
 
     // extension
     template <typename Comp, typename Cont>
-    void merge(flat_multiset<key_type, Comp, Cont>&& source) { this->_merge(source); }
+    void merge(flat_multiset<key_type, Comp, Cont>&& source) { this->_merge(source, std::true_type{}); }
 
     using _super::count;
     using _super::find;
