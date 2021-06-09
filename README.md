@@ -13,6 +13,8 @@ It compliants C++17/20 standard associative container requirements except comple
 - references
   - [flat\_map](./docs/flat\_map.md)
   - [flat\_set](./docs/flat\_set.md)
+  - [flat\_multimap](./docs/flat\_multimap.md)
+  - [flat\_multiset](./docs/flat\_multiset.md)
 
 ## Other implementations
 
