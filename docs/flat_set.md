@@ -376,8 +376,7 @@ size_type erase(key_type const& key)
 An iterator that next to erased elements.
 
 **Complexity**
-`O(M)`in first form.
-`O(M E)` in second form.
+`O(M)`in first and second form.
 `O(M)` for erasing, `O(log(N))` for searching target element in third form.
 
 **Invalidation**
@@ -437,6 +436,12 @@ void merge(flat_set<key_type, Comp, Cont>& source);
 
 template <typename Comp, typename Cont>
 void merge(flat_set<key_type, Comp, Cont>&& source);
+
+template <typename Comp, typename Cont>
+void merge(flat_multiset<key_type, Comp, Cont>& source);
+
+template <typename Comp, typename Cont>
+void merge(flat_multiset<key_type, Comp, Cont>&& source);
 ```
 
 Merge `source` container into self.
