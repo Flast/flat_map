@@ -41,6 +41,10 @@ TEST_CASE("construction", "[construction]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(4, 5));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
@@ -64,6 +68,10 @@ TEST_CASE("construction", "[construction]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(4, 5));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
@@ -255,8 +263,14 @@ TEST_CASE("equal_range", "[equal_range]")
     {
         auto [first, last] = fm.equal_range(2);
         REQUIRE(first != fm.end());
+#if MULTI_CONTAINER
+        REQUIRE(std::distance(first, last) == 2);
+        REQUIRE(*first == MAKE_PAIR(2, 3));
+        REQUIRE(*std::next(first) == MAKE_PAIR(2, 9));
+#else
         REQUIRE(std::next(first) == last);
         REQUIRE(*first == MAKE_PAIR(2, 3));
+#endif
     }
 }
 
@@ -283,8 +297,14 @@ TEST_CASE("equal_range with transparent", "[equal_range]")
     {
         auto [first, last] = fm.equal_range(wrap{2});
         REQUIRE(first != fm.end());
+#if MULTI_CONTAINER
+        REQUIRE(std::distance(first, last) == 2);
+        REQUIRE(*first == MAKE_PAIR(2, 3));
+        REQUIRE(*std::next(first) == MAKE_PAIR(2, 9));
+#else
         REQUIRE(std::next(first) == last);
         REQUIRE(*first == MAKE_PAIR(2, 3));
+#endif
     }
 }
 
@@ -443,7 +463,11 @@ TEST_CASE("accessor", "[accessor]")
 
     SECTION("counting")
     {
+#if MULTI_CONTAINER
+        REQUIRE(fm.count(2) == 2);
+#else
         REQUIRE(fm.count(2) == 1);
+#endif
         REQUIRE(fm.count(3) == 0);
     }
 
@@ -453,7 +477,7 @@ TEST_CASE("accessor", "[accessor]")
         REQUIRE_FALSE(fm.contains(5));
     }
 
-#if FLAT_MAP
+#if FLAT_MAP == 1 && MULTI_CONTAINER == 0
     SECTION("found on at")
     {
         auto& value = fm.at(2);
@@ -520,7 +544,11 @@ TEST_CASE("accessor with transparent", "[accessor]")
 
     SECTION("counting")
     {
+#if MULTI_CONTAINER
+        REQUIRE(fm.count(wrap{2}) == 2);
+#else
         REQUIRE(fm.count(wrap{2}) == 1);
+#endif
         REQUIRE(fm.count(wrap{3}) == 0);
     }
 
@@ -544,24 +572,28 @@ TEST_CASE("insertion", "[insertion]")
         };
 
         {
-            auto [itr, inserted] = fm.insert(MAKE_PAIR(8, 9));
-            REQUIRE(inserted);
-            REQUIRE(*itr == MAKE_PAIR(8, 9));
-            REQUIRE(std::distance(fm.begin(), itr) == 4);
+            auto res = fm.insert(MAKE_PAIR(8, 9));
+            REQUIRE_INSERTED(res);
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(8, 9));
+            REQUIRE(std::distance(fm.begin(), INSERT_ITR(res)) == 4);
         }
 
         {
-            auto [itr, inserted] = fm.insert(MAKE_PAIR(3, 4));
-            REQUIRE(inserted);
+            auto res = fm.insert(MAKE_PAIR(3, 4));
+            REQUIRE_INSERTED(res);
             REQUIRE(fm.size() == 6);
-            REQUIRE(*itr == MAKE_PAIR(3, 4));
-            REQUIRE(std::distance(fm.begin(), itr) == 2);
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(3, 4));
+            REQUIRE(std::distance(fm.begin(), INSERT_ITR(res)) == 2);
         }
 
         {
-            auto [itr, inserted] = fm.insert(MAKE_PAIR(2, 5));
-            REQUIRE_FALSE(inserted);
-            REQUIRE(*itr == MAKE_PAIR(2, 3));
+            auto res = fm.insert(MAKE_PAIR(2, 5));
+            REQUIRE_INSERTED_FALSE(res);
+#if MULTI_CONTAINER
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(2, 5));
+#else
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(2, 3));
+#endif
         }
 
         auto itr = fm.begin();
@@ -569,6 +601,10 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(3, 4));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(4, 5));
@@ -605,12 +641,20 @@ TEST_CASE("insertion", "[insertion]")
 
         {
             auto itr = fm.insert(std::next(fm.begin(), 1), MAKE_PAIR(2, 5)); // 4
+#if MULTI_CONTAINER
+            REQUIRE(*itr == MAKE_PAIR(2, 5));
+#else
             REQUIRE(*itr == MAKE_PAIR(2, 3));
+#endif
         }
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 4));
@@ -656,14 +700,24 @@ TEST_CASE("insertion", "[insertion]")
 
         {
             auto itr = fm.insert(std::next(fm.begin(), 2), MAKE_PAIR(2, 5)); // 3
+#if MULTI_CONTAINER
+            REQUIRE(fm.size() == 8);
+            REQUIRE(*itr == MAKE_PAIR(2, 5));
+#else
             REQUIRE(fm.size() == 7);
             REQUIRE(*itr == MAKE_PAIR(2, 3));
+#endif
         }
 
         {
             auto itr = fm.insert(std::next(fm.begin()), MAKE_PAIR(6, 9)); // 6
+#if MULTI_CONTAINER
+            REQUIRE(fm.size() == 9);
+            REQUIRE(*itr == MAKE_PAIR(6, 9));
+#else
             REQUIRE(fm.size() == 7);
             REQUIRE(*itr == MAKE_PAIR(6, 7));
+#endif
         }
 
         auto itr = fm.begin();
@@ -671,6 +725,10 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 2));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 4));
@@ -679,6 +737,10 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(5, 6));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 9));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
         REQUIRE(itr == fm.end());
@@ -703,13 +765,21 @@ TEST_CASE("insertion", "[insertion]")
 
         fm.insert(v.begin(), v.end());
 
+#if MULTI_CONTAINER
+        REQUIRE(fm.size() == 8);
+#else
         REQUIRE(fm.size() == 6);
+#endif
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(1, 2));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 9));
@@ -718,6 +788,10 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 4));
+        ++itr;
+#endif
         REQUIRE(itr == fm.end());
     }
 
@@ -738,13 +812,21 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(1, 2),
         });
 
+#if MULTI_CONTAINER
+        REQUIRE(fm.size() == 8);
+#else
         REQUIRE(fm.size() == 6);
+#endif
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(1, 2));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 9));
@@ -753,6 +835,10 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 4));
+        ++itr;
+#endif
         REQUIRE(itr == fm.end());
     }
 
@@ -777,13 +863,21 @@ TEST_CASE("insertion", "[insertion]")
 
         fm.insert_sorted(v.begin(), v.end());
 
+#if MULTI_CONTAINER
+        REQUIRE(fm.size() == 10);
+#else
         REQUIRE(fm.size() == 7);
+#endif
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(1, 2));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 9));
@@ -792,8 +886,16 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 4));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(7, 8));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(7, 9));
+        ++itr;
+#endif
         REQUIRE(itr == fm.end());
     }
 
@@ -816,13 +918,21 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(6, 4),
         });
 
+#if MULTI_CONTAINER
+        REQUIRE(fm.size() == 10);
+#else
         REQUIRE(fm.size() == 7);
+#endif
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(1, 2));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 9));
@@ -831,8 +941,16 @@ TEST_CASE("insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 4));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(7, 8));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(7, 9));
+        ++itr;
+#endif
         REQUIRE(itr == fm.end());
     }
 }
@@ -879,18 +997,23 @@ TEST_CASE("node", "[insertion][erase]")
             MAKE_PAIR(6, 7),
         };
 
+        auto const size = fm.size();
         auto node = fm.extract(5);
-        REQUIRE(fm.size() == 4);
+        REQUIRE(fm.size() == size);
         REQUIRE_FALSE(node.value.has_value());
 
         node = fm.extract(2);
-        REQUIRE(fm.size() == 3);
+        REQUIRE(fm.size() == (size - 1));
         REQUIRE(node.value.has_value());
         REQUIRE(*node.value == MAKE_PAIR(2, 3));
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 1));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(4, 5));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(6, 7));
@@ -911,27 +1034,35 @@ TEST_CASE("node", "[insertion][erase]")
         };
 
         {
-            auto [itr, inserted, node] = fm.insert(node_type{MAKE_PAIR(8, 9)});
-            REQUIRE(inserted);
-            REQUIRE_FALSE(node.value.has_value());
-            REQUIRE(*itr == MAKE_PAIR(8, 9));
-            REQUIRE(std::distance(fm.begin(), itr) == 4);
+            auto res = fm.insert(node_type{MAKE_PAIR(8, 9)});
+            REQUIRE_NODE_INSERTED(res);
+#if !MULTI_CONTAINER
+            REQUIRE_FALSE(res.node.value.has_value());
+#endif
+            REQUIRE(*NODE_INSERT_ITR(res) == MAKE_PAIR(8, 9));
+            REQUIRE(std::distance(fm.begin(), NODE_INSERT_ITR(res)) == 4);
         }
 
         {
-            auto [itr, inserted, node] = fm.insert(node_type{MAKE_PAIR(3, 4)});
-            REQUIRE(inserted);
-            REQUIRE_FALSE(node.value.has_value());
+            auto res = fm.insert(node_type{MAKE_PAIR(3, 4)});
+            REQUIRE_NODE_INSERTED(res);
+#if !MULTI_CONTAINER
+            REQUIRE_FALSE(res.node.value.has_value());
+#endif
             REQUIRE(fm.size() == 6);
-            REQUIRE(*itr == MAKE_PAIR(3, 4));
-            REQUIRE(std::distance(fm.begin(), itr) == 2);
+            REQUIRE(*NODE_INSERT_ITR(res) == MAKE_PAIR(3, 4));
+            REQUIRE(std::distance(fm.begin(), NODE_INSERT_ITR(res)) == 2);
         }
 
         {
-            auto [itr, inserted, node] = fm.insert(node_type{MAKE_PAIR(2, 5)});
-            REQUIRE_FALSE(inserted);
-            REQUIRE(*node.value == MAKE_PAIR(2, 5));
-            REQUIRE(*itr == MAKE_PAIR(2, 3));
+            auto res = fm.insert(node_type{MAKE_PAIR(2, 5)});
+            REQUIRE_NODE_INSERTED_FALSE(res);
+#if MULTI_CONTAINER
+            REQUIRE(*res == MAKE_PAIR(2, 5));
+#else
+            REQUIRE(*res.node.value == MAKE_PAIR(2, 5));
+            REQUIRE(*res.position == MAKE_PAIR(2, 3));
+#endif
         }
 
         auto itr = fm.begin();
@@ -939,6 +1070,10 @@ TEST_CASE("node", "[insertion][erase]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(3, 4));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(4, 5));
@@ -975,12 +1110,20 @@ TEST_CASE("node", "[insertion][erase]")
 
         {
             auto itr = fm.insert(std::next(fm.begin(), 1), node_type{MAKE_PAIR(2, 5)}); // 4
+#if MULTI_CONTAINER
+            REQUIRE(*itr == MAKE_PAIR(2, 5));
+#else
             REQUIRE(*itr == MAKE_PAIR(2, 3));
+#endif
         }
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 4));
@@ -1026,14 +1169,24 @@ TEST_CASE("node", "[insertion][erase]")
 
         {
             auto itr = fm.insert(std::next(fm.begin(), 2), node_type{MAKE_PAIR(2, 5)}); // 3
+#if MULTI_CONTAINER
+            REQUIRE(fm.size() == 8);
+            REQUIRE(*itr == MAKE_PAIR(2, 5));
+#else
             REQUIRE(fm.size() == 7);
             REQUIRE(*itr == MAKE_PAIR(2, 3));
+#endif
         }
 
         {
             auto itr = fm.insert(std::next(fm.begin()), node_type{MAKE_PAIR(6, 9)}); // 6
+#if MULTI_CONTAINER
+            REQUIRE(fm.size() == 9);
+            REQUIRE(*itr == MAKE_PAIR(6, 9));
+#else
             REQUIRE(fm.size() == 7);
             REQUIRE(*itr == MAKE_PAIR(6, 7));
+#endif
         }
 
         auto itr = fm.begin();
@@ -1041,6 +1194,10 @@ TEST_CASE("node", "[insertion][erase]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 2));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 4));
@@ -1049,13 +1206,17 @@ TEST_CASE("node", "[insertion][erase]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(5, 6));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 9));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
         REQUIRE(itr == fm.end());
     }
 }
 
-#if FLAT_MAP
+#if FLAT_MAP && !MULTI_CONTAINER
 TEST_CASE("insert or assign", "[insertion]")
 {
     SECTION("insert or assign")
@@ -1224,24 +1385,28 @@ TEST_CASE("emplace insertion", "[insertion]")
         };
 
         {
-            auto [itr, inserted] = fm.emplace(PAIR_PARAM(8, 9));
-            REQUIRE(inserted);
-            REQUIRE(*itr == MAKE_PAIR(8, 9));
-            REQUIRE(std::distance(fm.begin(), itr) == 4);
+            auto res = fm.emplace(PAIR_PARAM(8, 9));
+            REQUIRE_INSERTED(res);
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(8, 9));
+            REQUIRE(std::distance(fm.begin(), INSERT_ITR(res)) == 4);
         }
 
         {
-            auto [itr, inserted] = fm.emplace(PAIR_PARAM(3, 4));
-            REQUIRE(inserted);
+            auto res = fm.emplace(PAIR_PARAM(3, 4));
+            REQUIRE_INSERTED(res);
             REQUIRE(fm.size() == 6);
-            REQUIRE(*itr == MAKE_PAIR(3, 4));
-            REQUIRE(std::distance(fm.begin(), itr) == 2);
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(3, 4));
+            REQUIRE(std::distance(fm.begin(), INSERT_ITR(res)) == 2);
         }
 
         {
-            auto [itr, inserted] = fm.emplace(PAIR_PARAM(2, 5));
-            REQUIRE_FALSE(inserted);
-            REQUIRE(*itr == MAKE_PAIR(2, 3));
+            auto res = fm.emplace(PAIR_PARAM(2, 5));
+            REQUIRE_INSERTED_FALSE(res);
+#if MULTI_CONTAINER
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(2, 5));
+#else
+            REQUIRE(*INSERT_ITR(res) == MAKE_PAIR(2, 3));
+#endif
         }
 
         auto itr = fm.begin();
@@ -1249,6 +1414,10 @@ TEST_CASE("emplace insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(3, 4));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(4, 5));
@@ -1285,12 +1454,20 @@ TEST_CASE("emplace insertion", "[insertion]")
 
         {
             auto itr = fm.emplace_hint(std::next(fm.begin(), 1), PAIR_PARAM(2, 5)); // 4
+#if MULTI_CONTAINER
+            REQUIRE(*itr == MAKE_PAIR(2, 5));
+#else
             REQUIRE(*itr == MAKE_PAIR(2, 3));
+#endif
         }
 
         auto itr = fm.begin();
         REQUIRE(*itr == MAKE_PAIR(0, 1));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 4));
@@ -1336,14 +1513,24 @@ TEST_CASE("emplace insertion", "[insertion]")
 
         {
             auto itr = fm.emplace_hint(std::next(fm.begin(), 2), PAIR_PARAM(2, 5)); // 3
+#if MULTI_CONTAINER
+            REQUIRE(fm.size() == 8);
+            REQUIRE(*itr == MAKE_PAIR(2, 5));
+#else
             REQUIRE(fm.size() == 7);
             REQUIRE(*itr == MAKE_PAIR(2, 3));
+#endif
         }
 
         {
             auto itr = fm.emplace_hint(std::next(fm.begin()), PAIR_PARAM(6, 9)); // 6
+#if MULTI_CONTAINER
+            REQUIRE(fm.size() == 9);
+            REQUIRE(*itr == MAKE_PAIR(6, 9));
+#else
             REQUIRE(fm.size() == 7);
             REQUIRE(*itr == MAKE_PAIR(6, 7));
+#endif
         }
 
         auto itr = fm.begin();
@@ -1351,6 +1538,10 @@ TEST_CASE("emplace insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(1, 2));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(2, 5));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(2, 3));
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(3, 4));
@@ -1359,12 +1550,16 @@ TEST_CASE("emplace insertion", "[insertion]")
         ++itr;
         REQUIRE(*itr == MAKE_PAIR(5, 6));
         ++itr;
+#if MULTI_CONTAINER
+        REQUIRE(*itr == MAKE_PAIR(6, 9));
+        ++itr;
+#endif
         REQUIRE(*itr == MAKE_PAIR(6, 7));
         ++itr;
         REQUIRE(itr == fm.end());
     }
 
-#if FLAT_MAP
+#if FLAT_MAP && !MULTI_CONTAINER
     SECTION("try emplace")
     {
         FLAT_CONTAINER<int, int> fm =

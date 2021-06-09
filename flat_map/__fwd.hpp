@@ -24,11 +24,20 @@
 #endif
 
 FLATMAP_BEGIN_STD
+template <typename T, typename Allocator> class vector;
 template <typename Key, typename T, typename Compare, typename Allocator> class map;
 template <typename Key, typename T, typename Compare, typename Allocator> class multimap;
 template <typename Key, typename Compare, typename Allocator> class set;
 template <typename Key, typename Compare, typename Allocator> class multiset;
 FLATMAP_END_STD
+
+namespace flat_map
+{
+template <typename Key, typename T, typename Compare, typename Container> class flat_map;
+template <typename Key, typename T, typename Compare, typename Container> class flat_multimap;
+template <typename Key, typename Compare, typename Container> class flat_set;
+template <typename Key, typename Compare, typename Container> class flat_multiset;
+} // namespace flat_map
 
 #undef FLATMAP_BEGIN_STD
 #undef FLATMAP_END_STD
