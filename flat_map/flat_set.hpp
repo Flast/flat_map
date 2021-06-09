@@ -22,12 +22,14 @@ namespace flat_map
 template <typename Key,
           typename Compare = std::less<Key>,
           typename Container = std::vector<Key>>
-class flat_set : private detail::flat_tree<flat_set<Key, Compare, Container>, Key, Key, Compare, Container>
+class flat_set : private detail::_flat_tree_base<flat_set<Key, Compare, Container>, Key, Key, Compare, Container>
 {
-    using _super = typename flat_set::flat_tree;
+    using _super = typename flat_set::_flat_tree_base;
 
     // To lookup private comparator
     friend _super;
+
+    static constexpr bool _is_uniq = true;
 
 public:
     using key_type = typename _super::key_type;
@@ -64,11 +66,17 @@ public:
 
     template <typename InputIterator>
     flat_set(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : _super{first, last, comp, alloc} { }
+      : _super{comp, alloc}
+    {
+        this->_initialize_container_uniq(first, last);
+    }
 
     template <typename InputIterator>
     flat_set(InputIterator first, InputIterator last, allocator_type const& alloc)
-      : _super{first, last, alloc} { }
+      : _super{alloc}
+    {
+        this->_initialize_container_uniq(first, last);
+    }
 
     flat_set(flat_set const& other) = default;
     flat_set(flat_set const& other, allocator_type const& alloc)
@@ -79,10 +87,16 @@ public:
       : _super{std::move(other), alloc} { }
 
     flat_set(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
-      : _super{init, comp, alloc} { }
+      : _super{comp, alloc}
+    {
+        this->_initialize_container_uniq(init.begin(), init.end());
+    }
 
     flat_set(std::initializer_list<value_type> init, allocator_type const& alloc)
-      : _super{init, alloc} { }
+      : _super{alloc}
+    {
+        this->_initialize_container_uniq(init.begin(), init.end());
+    }
 
     flat_set& operator=(flat_set const& other) = default;
 
@@ -98,7 +112,7 @@ public:
 
     flat_set& operator=(std::initializer_list<value_type> ilist)
     {
-        _super::operator=(ilist);
+        this->_initialize_container_uniq(ilist.begin(), ilist.end());
         return *this;
     }
 
@@ -144,6 +158,10 @@ private:
     template <typename Comp, typename Cont>
     std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
     _same_order(flat_set<key_type, Comp, Cont>&);
+
+    template <typename Comp, typename Cont>
+    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
+    _same_order(flat_multiset<key_type, Comp, Cont>&);
 
 public:
     template <typename Comp, typename Allocator>

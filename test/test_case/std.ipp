@@ -261,7 +261,7 @@ TEST_CASE("merge", "[merge]")
 
         REQUIRE(fm == ans);
 #if !MULTI_CONTAINER
-        REQUIRE(m == FLAT_CONTAINER<int, int>{MAKE_PAIR(4, 9)});
+        REQUIRE(m == FLAT_UNIQ_CONTAINER<int, int>{MAKE_PAIR(4, 9)});
 #endif
     }
 
@@ -307,7 +307,7 @@ TEST_CASE("merge", "[merge]")
 
         REQUIRE(fm == ans);
 #if !MULTI_CONTAINER
-        REQUIRE(m == FLAT_CONTAINER<int, int, std::greater<int>>{MAKE_PAIR(4, 9)});
+        REQUIRE(m == FLAT_UNIQ_CONTAINER<int, int, std::greater<int>>{MAKE_PAIR(4, 9)});
 #endif
     }
 
@@ -338,7 +338,7 @@ TEST_CASE("merge", "[merge]")
         REQUIRE(m.empty());
 #else
         REQUIRE(fm.size() == 6);
-        REQUIRE(m.size() == 1);
+        REQUIRE(m.size() == 4);
 #endif
 
         FLAT_CONTAINER<int, int> ans =
@@ -363,7 +363,7 @@ TEST_CASE("merge", "[merge]")
 
         REQUIRE(fm == ans);
 #if !MULTI_CONTAINER
-        REQUIRE(m == FLAT_CONTAINER<int, int>{MAKE_PAIR(4, 9)});
+        REQUIRE(m == FLAT_MULTI_CONTAINER<int, int>{MAKE_PAIR(1, 2), MAKE_PAIR(4, 9), MAKE_PAIR(4, 8), MAKE_PAIR(7, 2)});
 #endif
     }
 
@@ -394,7 +394,7 @@ TEST_CASE("merge", "[merge]")
         REQUIRE(m.empty());
 #else
         REQUIRE(fm.size() == 6);
-        REQUIRE(m.size() == 1);
+        REQUIRE(m.size() == 4);
 #endif
 
         FLAT_CONTAINER<int, int> ans =
@@ -419,7 +419,7 @@ TEST_CASE("merge", "[merge]")
 
         REQUIRE(fm == ans);
 #if !MULTI_CONTAINER
-        REQUIRE(m == FLAT_CONTAINER<int, int, std::greater<int>>{MAKE_PAIR(4, 9)});
+        REQUIRE(m == FLAT_MULTI_CONTAINER<int, int, std::greater<int>>{MAKE_PAIR(1, 2), MAKE_PAIR(4, 9), MAKE_PAIR(4, 8), MAKE_PAIR(7, 2)});
 #endif
     }
 }
