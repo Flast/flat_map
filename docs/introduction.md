@@ -14,6 +14,10 @@ flat\_map is well known replacement of std::map to improve scan access performan
 This library is header only library.
 No building and installing are not required.
 
+## Thread safety
+
+This library provides no special guarantee for inter-thread operations except read-only operations.
+
 ## License
 
 This library distributed under MIT license, see [LICENSE](../LICENSE) for more detail.
