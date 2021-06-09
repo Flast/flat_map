@@ -289,6 +289,14 @@ public:
     template <typename Comp, typename Cont>
     void merge(flat_map<key_type, mapped_type, Comp, Cont>&& source) { this->_merge(source, std::false_type{}); }
 
+    // extension
+    template <typename Comp, typename Cont>
+    void merge(flat_multimap<key_type, mapped_type, Comp, Cont>& source) { this->_merge(source, std::true_type{}); }
+
+    // extension
+    template <typename Comp, typename Cont>
+    void merge(flat_multimap<key_type, mapped_type, Comp, Cont>&& source) { this->_merge(source, std::true_type{}); }
+
     using _super::count;
     using _super::find;
     using _super::contains;
@@ -358,21 +366,6 @@ erase_if(flat_map<Key, T, Compare, Container>& c, Pred pred)
     c.erase(itr, c.end());
     return r;
 }
-
-namespace detail
-{
-
-template <typename InputIterator>
-using iter_key_t = std::remove_const_t<typename std::iterator_traits<InputIterator>::value_type::first_type>;
-
-template <typename InputIterator>
-using iter_val_t = typename std::iterator_traits<InputIterator>::value_type::second_type;
-
-// Use variadics for deducing defaulted allocator
-template <typename InputIterator, typename... Args>
-using iter_cont_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Args...>;
-
-} // namespace flat_map::detail
 
 template <typename InputIterator,
           typename Compare = std::less<detail::iter_key_t<InputIterator>>,

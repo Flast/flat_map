@@ -571,4 +571,406 @@ public:
     auto value_comp() { return static_cast<typename Subclass::value_compare>(_vcomp()); }
 };
 
+template <typename Subclass, typename Key, typename ValueType, typename Compare, typename Container>
+class flat_multitree : private detail::comparator_store<Compare>
+{
+    Container _container;
+
+    auto _self() { return static_cast<Subclass*>(this); }
+    auto _self() const { return static_cast<Subclass const*>(this); }
+
+public:
+    using key_type = Key;
+    using value_type = ValueType;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using key_compare = Compare;
+    using allocator_type = typename Container::allocator_type;
+    using reference = typename Container::reference;
+    using const_reference = typename Container::const_reference;
+    using pointer = typename Container::pointer;
+    using const_pointer = typename Container::const_pointer;
+    using iterator = typename Container::iterator;
+    using const_iterator = typename Container::const_iterator;
+    using reverse_iterator = typename Container::reverse_iterator;
+    using const_reverse_iterator = typename Container::const_reverse_iterator;
+    struct node_type
+    {
+        std::optional<value_type> value;
+
+        node_type() = default;
+        node_type(value_type&& value) : value{std::move(value)} {}
+    };
+
+    using detail::comparator_store<Compare>::_comp;
+
+    auto _vcomp() const { return static_cast<typename Subclass::_comparator>(key_comp()); }
+
+private:
+    auto _equality() const
+    {
+        return [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
+        {
+            return !comp(lhs, rhs) && !comp(rhs, lhs);
+        };
+    }
+
+    void _initialize_container()
+    {
+        std::stable_sort(_container.begin(), _container.end(), _vcomp());
+    }
+
+protected:
+    flat_multitree() = default;
+
+    explicit flat_multitree(Compare const& comp, allocator_type const& alloc)
+      : detail::comparator_store<Compare>{comp}, _container{alloc} { }
+
+    explicit flat_multitree(allocator_type const& alloc)
+      : _container{alloc} { }
+
+    template <typename InputIterator>
+    flat_multitree(InputIterator first, InputIterator last, Compare const& comp, allocator_type const& alloc)
+      : detail::comparator_store<Compare>{comp}, _container{first, last, alloc}
+    {
+        _initialize_container();
+    }
+
+    template <typename InputIterator>
+    flat_multitree(InputIterator first, InputIterator last, allocator_type const& alloc)
+      : _container{first, last, alloc}
+    {
+        _initialize_container();
+    }
+
+    flat_multitree(flat_multitree const& other) = default;
+    flat_multitree(flat_multitree const& other, allocator_type const& alloc)
+      : detail::comparator_store<Compare>{other._comp()}, _container{other._container, alloc} { }
+
+    flat_multitree(flat_multitree&& other) = default;
+    flat_multitree(flat_multitree&& other, allocator_type const& alloc)
+      : detail::comparator_store<Compare>{std::move(other._comp())}, _container{std::move(other._container), alloc} { }
+
+    flat_multitree(std::initializer_list<value_type> init, Compare const& comp, allocator_type const& alloc)
+      : detail::comparator_store<Compare>{comp}, _container{init, alloc}
+    {
+        _initialize_container();
+    }
+
+    flat_multitree(std::initializer_list<value_type> init, allocator_type const& alloc)
+      : _container{init, alloc}
+    {
+        _initialize_container();
+    }
+
+    flat_multitree& operator=(flat_multitree const& other) = default;
+
+    flat_multitree& operator=(flat_multitree&& other) noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>) = default;
+
+    flat_multitree& operator=(std::initializer_list<value_type> ilist)
+    {
+        _container = ilist;
+        _initialize_container();
+        return *this;
+    }
+
+    allocator_type get_allocator() const noexcept { return _container.get_allocator(); }
+
+    iterator begin() noexcept { return _container.begin(); }
+    const_iterator begin() const noexcept { return _container.begin(); }
+    const_iterator cbegin() const noexcept { return _container.cbegin(); }
+    iterator end() noexcept { return _container.end(); }
+    const_iterator end() const noexcept { return _container.end(); }
+    const_iterator cend() const noexcept { return _container.cend(); }
+    reverse_iterator rbegin() noexcept { return _container.rbegin(); }
+    const_reverse_iterator rbegin() const noexcept { return _container.rbegin(); }
+    const_reverse_iterator crbegin() const noexcept { return _container.crbegin(); }
+    reverse_iterator rend() noexcept { return _container.rend(); }
+    const_reverse_iterator rend() const noexcept { return _container.rend(); }
+    const_reverse_iterator crend() const noexcept { return _container.crend(); }
+
+    [[nodiscard]] bool empty() const noexcept { return _container.empty(); }
+    size_type size() const noexcept { return _container.size(); }
+    size_type max_size() const noexcept { return _container.max_size(); }
+    // extension
+    template <typename... ShouldBeEmpty, typename Dummy = Container>
+    auto reserve(size_type new_cap) -> std::void_t<decltype(std::declval<Dummy>().reserve(new_cap))>
+    {
+        static_assert(sizeof...(ShouldBeEmpty) == 0);
+        _container.reserve(new_cap);
+    }
+    // extension
+    template <typename... ShouldBeEmpty, typename Dummy = Container>
+    auto capacity() const noexcept -> decltype(std::declval<Dummy>().capacity(), size_type{})
+    {
+        static_assert(sizeof...(ShouldBeEmpty) == 0);
+        return _container.capacity();
+    }
+    // extension
+    template <typename... ShouldBeEmpty, typename Dummy = Container>
+    auto shrink_to_fit() -> std::void_t<decltype(std::declval<Dummy>().shrink_to_fit())>
+    {
+        static_assert(sizeof...(ShouldBeEmpty) == 0);
+        _container.shrink_to_fit();
+    }
+    void clear() noexcept { return _container.clear(); }
+
+    template <typename V>
+    iterator _insert(V&& value)
+    {
+        auto itr = upper_bound(Subclass::_key_extractor(value));
+        return _container.insert(itr, std::forward<V>(value));
+    }
+
+    iterator insert(value_type const& value) { return _insert(value); }
+
+    template <typename V>
+    std::enable_if_t<std::is_constructible_v<value_type, V&&>, iterator>
+    insert(V&& value) { return emplace(std::forward<V>(value)); }
+
+    iterator insert(value_type&& value) { return _insert(std::move(value)); }
+
+private:
+    iterator _mutable(const_iterator itr)
+    {
+        return std::next(_container.begin(), std::distance(_container.cbegin(), itr));
+    }
+
+public:
+    const_iterator _insert_point(const_iterator hint, key_type const& key)
+    {
+        if (hint == end() || !_vcomp()(*hint, key))
+        {
+            bool insert_here = hint == begin() || !_vcomp()(key, *std::prev(hint)); // 1
+            if (!insert_here)
+            {
+                hint = std::upper_bound(cbegin(), std::prev(hint), key, _vcomp()); // 2
+            }
+        }
+        else
+        {
+            hint = std::lower_bound(std::next(hint), cend(), key, _vcomp()); // 3
+        }
+        return hint;
+    }
+
+    template <typename V>
+    iterator _insert(const_iterator hint, V&& value)
+    {
+        auto itr = _insert_point(hint, Subclass::_key_extractor(value));
+        return _container.insert(itr, std::forward<V>(value));
+    }
+
+    iterator insert(const_iterator hint, value_type const&& value) { return _insert(hint, value); }
+
+    template <typename V>
+    std::enable_if_t<std::is_constructible_v<value_type, V&&>, iterator>
+    insert(const_iterator hint, V&& value) { return emplace_hint(hint, std::forward<V>(value)); }
+
+    iterator insert(const_iterator hint, value_type&& value) { return _insert(hint, std::move(value)); }
+
+    template <typename InputIterator>
+    void insert(InputIterator first, InputIterator last)
+    {
+        while (first != last) { _insert(*first++); }
+    }
+
+    void insert(std::initializer_list<value_type> ilist) { insert(ilist.begin(), ilist.end()); }
+
+    template <typename ForwardIterator>
+    void _insert_sorted(ForwardIterator first, ForwardIterator last, std::forward_iterator_tag)
+    {
+        for (auto itr = begin(); first != last && itr != end(); )
+        {
+            while (itr != end() && !_vcomp()(*first, *itr)) { ++itr; }
+            if (itr == end()) { break; }
+
+            auto orig = first++; // declare here to advance first anyway
+            // find contiguous range
+            for (; first != last && _vcomp()(*first, *itr); ++first);
+
+            itr = _container.insert(itr, orig, first);
+            std::advance(itr, std::distance(orig, first));
+        }
+        _container.insert(end(), first, last);
+    }
+
+    template <typename InputIterator>
+    void _insert_sorted(InputIterator first, InputIterator last, std::input_iterator_tag)
+    {
+        for (auto itr = begin(); first != last && itr != end(); ++first)
+        {
+            while (itr != end() && !_vcomp()(*first, *itr)) { ++itr; }
+            itr = std::next(_container.insert(itr, *first));
+        }
+        _container.insert(end(), first, last);
+    }
+
+    // extension
+    template <typename InputIterator>
+    void insert_sorted(InputIterator first, InputIterator last)
+    {
+        _insert_sorted(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
+    }
+
+    // extension
+    void insert_sorted(std::initializer_list<value_type> ilist) { insert_sorted(ilist.begin(), ilist.end()); }
+
+    iterator insert(node_type&& node)
+    {
+        if (!node.value.has_value()) { return end(); }
+        return insert(std::move(*node.value));
+    }
+
+    iterator insert(const_iterator hint, node_type&& node)
+    {
+        if (!node.value.has_value()) { return end(); }
+        return insert(hint, std::move(*node.value));
+    }
+
+    template <typename... Args>
+    auto _container_emplace(const_iterator itr, Args&&... args) { return _container.emplace(itr, std::forward<Args>(args)...); }
+
+    template <typename... Args>
+    iterator emplace(Args&&... args) { return _insert(value_type(std::forward<Args>(args)...)); }
+
+    template <typename... Args>
+    iterator emplace_hint(const_iterator hint, Args&&... args) { return _insert(hint, value_type(std::forward<Args>(args)...)); }
+
+    iterator erase(iterator pos) { return _container.erase(pos); }
+    iterator erase(const_iterator first, const_iterator last) { return _container.erase(first, last); }
+
+    size_type erase(key_type const& key)
+    {
+        auto [first, last] = equal_range(key);
+        auto count = std::distance(first, last);
+        _container.erase(first, last);
+        return count;
+    }
+
+    void swap(flat_multitree& other) noexcept(std::allocator_traits<allocator_type>::is_always_equal::value && std::is_nothrow_swappable<Compare>::value)
+    {
+        using std::swap;
+        swap(this->_comp(), other._comp());
+        swap(_container, other._container);
+    }
+
+    node_type extract(const_iterator position)
+    {
+        // standard requires `valid dereferenceable constant iterator`
+        assert(position != cend());
+
+        node_type node{std::move(*_mutable(position))};
+        erase(position);
+        return node;
+    }
+
+    node_type extract(key_type const& key)
+    {
+        if (auto [itr, found] = _find(key); found)
+        {
+            node_type node{std::move(*itr)};
+            erase(itr);
+            return node;
+        }
+        return {};
+    }
+
+    template <typename Cont>
+    void _merge(Cont& source)
+    {
+        // FIXME: improve performance
+        _container.insert(end(), std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
+        std::stable_sort(_container.begin(), _container.end(), _vcomp());
+        source.clear();
+    }
+
+private:
+    template <typename K, typename U>
+    using enable_if_transparent = std::enable_if_t<(sizeof(typename std::enable_if_t<(sizeof(K*) > 0), key_compare>::is_transparent*) > 0), U>;
+
+public:
+    size_type count(key_type const& key) const
+    {
+        auto [first, last] = equal_range(key);
+        return std::distance(first, last);
+    }
+
+    template <typename K>
+    enable_if_transparent<K, size_type>
+    count(K const& key) const
+    {
+        auto [first, last] = equal_range<K>(key);
+        return std::distance(first, last);
+    }
+
+    template <typename K>
+    std::pair<iterator, bool> _find(K const& key)
+    {
+        auto itr = lower_bound(key);
+        return {itr, !(itr == end() || _vcomp()(key, *itr))};
+    }
+
+    iterator find(key_type const& key)
+    {
+        auto [itr, found] = _find(key);
+        return found ? itr : end();
+    }
+
+    const_iterator find(key_type const& key) const { return const_cast<flat_multitree*>(this)->find(key); }
+
+    template <typename K>
+    enable_if_transparent<K, iterator> find(K const& key)
+    {
+        auto [itr, found] = _find(key);
+        return found ? itr : end();
+    }
+
+    template <typename K>
+    enable_if_transparent<K, const_iterator>
+    find(K const& key) const { return const_cast<flat_multitree*>(this)->template find<K>(key); }
+
+    bool contains(key_type const& key) const { return const_cast<flat_multitree*>(this)->_find(key).second; }
+
+    template <typename K>
+    enable_if_transparent<K, bool>
+    contains(K const& key) { return _find(key).second; }
+
+    std::pair<iterator, iterator> equal_range(key_type const& key) { return std::equal_range(begin(), end(), key, _vcomp()); }
+
+    std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<flat_multitree*>(this)->equal_range(key); }
+
+    template <typename K>
+    enable_if_transparent<K, std::pair<iterator, iterator>> equal_range(K const& key) { return std::equal_range(begin(), end(), key, _vcomp()); }
+
+    template <typename K>
+    enable_if_transparent<K, std::pair<const_iterator, const_iterator>>
+    equal_range(K const& key) const { return const_cast<flat_multitree*>(this)->template equal_range<K>(key); }
+
+    iterator lower_bound(key_type const& key) { return std::lower_bound(begin(), end(), key, _vcomp()); }
+
+    const_iterator lower_bound(key_type const& key) const { return const_cast<flat_multitree*>(this)->lower_bound(key); }
+
+    template <typename K>
+    enable_if_transparent<K, iterator> lower_bound(K const& key) { return std::lower_bound(begin(), end(), key, _vcomp()); }
+
+    template <typename K>
+    enable_if_transparent<K, const_iterator>
+    lower_bound(K const& key) const { return const_cast<flat_multitree*>(this)->template lower_bound<K>(key); }
+
+    iterator upper_bound(key_type const& key) { return std::upper_bound(begin(), end(), key, _vcomp()); }
+
+    const_iterator upper_bound(key_type const& key) const { return const_cast<flat_multitree*>(this)->upper_bound(key); }
+
+    template <typename K>
+    enable_if_transparent<K, iterator> upper_bound(K const& key) { return std::upper_bound(begin(), end(), key, _vcomp()); }
+
+    template <typename K>
+    enable_if_transparent<K, const_iterator>
+    upper_bound(K const& key) const { return const_cast<flat_multitree*>(this)->template upper_bound<K>(key); }
+
+    key_compare key_comp() const { return this->_comp(); }
+    auto value_comp() { return static_cast<typename Subclass::value_compare>(_vcomp()); }
+};
+
 } // namespace flat_map::detail

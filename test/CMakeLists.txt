@@ -38,5 +38,11 @@ endmacro()
 add_tests(map_vector_test map_vector.cpp)
 add_tests(map_deque_test map_deque.cpp)
 
+add_tests(multimap_vector_test multimap_vector.cpp)
+add_tests(multimap_deque_test multimap_deque.cpp)
+
 add_tests(set_vector_test set_vector.cpp)
 add_tests(set_deque_test set_deque.cpp)
+
+add_tests(multiset_vector_test multiset_vector.cpp)
+add_tests(multiset_deque_test multiset_deque.cpp)
