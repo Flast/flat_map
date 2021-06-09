@@ -1,13 +1,12 @@
-# flat\_map
+# flat\_set
 
 ```cpp
-#include <flat_map/flat_map.hpp>
+#include <flat_map/flat_multiset.hpp>
 
 template <typename Key,
-          typename T,
           typename Compare = std::less<Key>,
-          typename Container = std::vector<std::pair<Key, T>>>
-class flat_map;
+          typename Container = std::vector<Key>>
+class flat_multiset;
 ```
 
 **Requirements**
@@ -22,11 +21,11 @@ class flat_map;
 
 ```cpp
 using key_type = Key;
-using mapped_type = T;
-using value_type = std::pair<Key, T>;
+using value_type = Key;
 using size_type = std::size_t;
 using difference_type = std::ptrdiff_t;
 using key_compare = Compare;
+using value_compare = Compare;
 using allocator_type = typename Container::allocator_type;
 using reference = typename Container::reference;
 using const_reference = typename Container::const_reference;
@@ -45,42 +44,20 @@ using insert_return_type = struct /* unspecified */
 };
 ```
 
-## Member classes
-
-```cpp
-struct value_compare;
-```
-
-### Constructor
-
-```cpp
-protected:
-value_type(Compare c);
-```
-
-### Operator
-
-```cpp
-bool operator()(value_type const& lhs, value_type const& rhs);
-```
-
-**Return value**
-`comp(lhs.first, rhs.first)`
-
 ## Constructors
 
 ```cpp
-flat_map();
+flat_multiset();
 
-explicit flat_map(Compare const& comp, allocator_type const& alloc = allocator_type());
+explicit flat_multiset(Compare const& comp, allocator_type const& alloc = allocator_type());
 ```
 
 ```cpp
 template <typename InputIterator>
-flat_map(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type());
+flat_multiset(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type());
 
 template <typename InputIterator>
-flat_map(InputIterator first, InputIterator last, allocator_type const& alloc);
+flat_multiset(InputIterator first, InputIterator last, allocator_type const& alloc);
 ```
 
 Construct container from `[first, last)`.
@@ -92,25 +69,25 @@ Construct container from `[first, last)`.
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ```cpp
-flat_map(flat_map const& other);
+flat_multiset(flat_multiset const& other);
 
-flat_map(flat_map const& other, allocator_type const& alloc);
+flat_multiset(flat_multiset const& other, allocator_type const& alloc);
 ```
 
 Copy from other.
 
 ```cpp
-flat_map(flat_map&& other);
+flat_multiset(flat_multiset&& other);
 
-flat_map(flat_map&& other, allocator_type const& alloc);
+flat_multiset(flat_multiset&& other, allocator_type const& alloc);
 ```
 
 Move entire elements from other.
 
 ```cpp
-flat_map(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type());
+flat_multiset(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type());
 
-flat_map(std::initializer_list<value_type> init, allocator_type const& alloc);
+flat_multiset(std::initializer_list<value_type> init, allocator_type const& alloc);
 ```
 
 Construct from init.
@@ -121,13 +98,13 @@ Construct from init.
 ## Assignments
 
 ```cpp
-flat_map& operator=(flat_map const& other);
+flat_multiset& operator=(flat_multiset const& other);
 ```
 
 Copy from other.
 
 ```cpp
-flat_map& operator=(flat_map&& other) noexcept(/* see below */);
+flat_multiset& operator=(flat_multiset&& other) noexcept(/* see below */);
 ```
 
 Move entire elements from other.
@@ -138,36 +115,11 @@ No except only if it meets all of
 - `std::is_nothrow_move_assignable_v<Compare> == true`
 
 ```cpp
-flat_map& operator=(std::initializer_list<value_type> ilist);
+flat_multiset& operator=(std::initializer_list<value_type> ilist);
 ```
 
 **Complexity**
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
-
-## Element access
-
-### at
-
-```cpp
-mapped_type const& at(key_type const& key) const;
-mapped_type& at(key_type const& key);
-```
-
-**Exceptions**
-Throws `std::out_of_range` only if `key` is not found.
-
-**Complexity**
-`O(log(N))`.
-
-### operator[]
-
-```cpp
-mapped_type& operator[](key_type const& key);
-mapped_type& operator[](key_type&& key);
-```
-
-**Complexity**
-Amortized `O(log(N))`.
 
 ## Iterators
 
@@ -295,12 +247,12 @@ Invalidates every interators and references.
 ### insert
 
 ```cpp
-std::pair<iterator, bool> insert(value_type const& value);
+iterator insert(value_type const& value);
 
 template <typename V>
-std::pair<iterator, bool> insert(V&& value);
+iterator insert(V&& value);
 
-std::pair<iterator, bool> insert(value_type&& value);
+iterator insert(value_type&& value);
 ```
 
 Insert a `value`.
@@ -308,7 +260,7 @@ Insert a `value`.
 The second form only participants in overload resolution if `std::is_constructible_v<value_type, V&&> == true`.
 
 **Return value**
-An iterator to inserted value or the element which has same key, `bool` denotes whether the insertion is succeeded.
+An iterator to inserted value.
 
 **Complexity**
 Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
@@ -331,7 +283,7 @@ The `hint` is used for looking up insertion point.
 The second form only participants in overload resolution if `std::is_constructible_v<value_type, V&&> == true`.
 
 **Return value**
-An iterator to inserted value or the element which has same key.
+An iterator to inserted value.
 
 **Complexity**
 Amortized `O(M)` for insertion, `O(1)` for searching insertion point with valid `hint` otherwise `O(log(N))`.
@@ -358,7 +310,7 @@ Amortized `O(M E)` for insertion, `O(E log(N))` for searching insertion point.
 Same as `Container::insert`.
 
 ```cpp
-insert_return_type insert(node_type&& node)
+iterator insert(node_type&& node)
 
 iterator insert(const_iterator hint, node_type&& node)
 ```
@@ -367,7 +319,7 @@ Insert `node`.
 The `hint` is used in same way as other `insert()`.
 
 **Return value**
-An iterator to inserted value or the element which has same key.
+An iterator to inserted value.
 
 **Complexity**
 Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
@@ -388,7 +340,7 @@ Range insertion with sorted range.
 
 **Pre requirements**
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
-The ranges should be sorted in `Compare` order, otherwise the behaviour is undefined (Note that it doesn't require deduplication).
+The ranges should be sorted in `Compare` order, otherwise the behaviour is undefined.
 
 **Complexity**
 Amortized `O(M E)` for insertion, `O(N+E)` for searching insertion point.
@@ -396,29 +348,11 @@ Amortized `O(M E)` for insertion, `O(N+E)` for searching insertion point.
 **Invalidation**
 Same as `Container::insert`.
 
-### insert_or_assign
-
-```cpp
-template <typename M>
-std::pair<iterator, bool> insert_or_assign(key_type const& key, M&& obj);
-
-template <typename M>
-std::pair<iterator, bool> insert_or_assign(key_type&& key, M&& obj);
-
-template <typename M>
-iterator insert_or_assign(const_iterator hint, key_type const& key, M&& obj);
-
-template <typename M>
-iterator insert_or_assign(const_iterator hint, key_type&& key, M&& obj);
-```
-
-Same as `insert()` except replace with obj if key is always exists.
-
 ### emplace
 
 ```cpp
 template <typename... Args>
-std::pair<iterator, bool> emplace(Args&&... args);
+iterator emplace(Args&&... args);
 ```
 Equivalent to `insert(value_type(std::forward<Args>(args)...))`.
 
@@ -430,25 +364,6 @@ iterator emplace_hint(const_iterator hint, Args&&... args);
 ```
 
 Equivalent to `insert(hint, value_type(std::forward<Args>(args)...))`.
-
-### try_emplace
-
-```cpp
-template <typename... Args>
-std::pair<iterator, bool> try_emplace(key_type const& key, Args&&... args);
-
-template <typename... Args>
-std::pair<iterator, bool> try_emplace(key_type&& key, Args&&... args);
-
-template <typename... Args>
-iterator try_emplace(const_iterator hint, key_type const& key, Args&&... args);
-
-template <typename... Args>
-iterator try_emplace(const_iterator hint, key_type&& key, Args&&... args);
-```
-
-Equivalent to `insert(value_type(key, std::forward<Args>(args)...))` in first and second form.
-Equivalent to `insert(hint, value_type(key, std::forward<Args>(args)...))` in third and fourth form.
 
 ### erase
 
@@ -473,7 +388,7 @@ Same as `Container::erase`.
 ### swap
 
 ```cpp
-void swap(flat_map& other) noexcept(/* see below */);
+void swap(flat_multiset& other) noexcept(/* see below */);
 ```
 
 Swap elements, allocator, and comparator.
@@ -492,7 +407,7 @@ node_type extract(key_type const& key);
 ```
 
 Extract an element and returns it.
-Unlike `std::map::extract`, move element.
+Unlike `std::set::extract`, move element.
 
 **Pre requirements**
 `position` should be valid dereferenceable iterator in first form.
@@ -508,34 +423,35 @@ Extracted node handle.
 
 ```cpp
 template <typename Comp, typename Allocator>
-void merge(std::map<key_type, mapped_type, Comp, Allocator>& source);
+void merge(std::set<key_type, Comp, Allocator>& source);
 
 template <typename Comp, typename Allocator>
-void merge(std::map<key_type, mapped_type, Comp, Allocator>&& source);
+void merge(std::set<key_type, Comp, Allocator>&& source);
 
 template <typename Comp, typename Allocator>
-void merge(std::multimap<key_type, mapped_type, Comp, Allocator>& source);
+void merge(std::multiset<key_type, Comp, Allocator>& source);
 
 template <typename Comp, typename Allocator>
-void merge(std::multimap<key_type, mapped_type, Comp, Allocator>&& source);
+void merge(std::multiset<key_type, Comp, Allocator>&& source);
 
 template <typename Comp, typename Cont>
-void merge(flat_map<key_type, mapped_type, Comp, Cont>& source);
+void merge(flat_set<key_type, Comp, Cont>& source);
 
 template <typename Comp, typename Cont>
-void merge(flat_map<key_type, mapped_type, Comp, Cont>&& source);
+void merge(flat_set<key_type, Comp, Cont>&& source);
 
 template <typename Comp, typename Cont>
-void merge(flat_multimap<key_type, mapped_type, Comp, Cont>& source);
+void merge(flat_multiset<key_type, Comp, Cont>& source);
 
 template <typename Comp, typename Cont>
-void merge(flat_multimap<key_type, mapped_type, Comp, Cont>&& source);
+void merge(flat_multiset<key_type, Comp, Cont>&& source);
 ```
 
 Merge `source` container into self.
 
 **Complexity**
-Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise `O(E log(N))`.
+<!-- Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise `O(E log(N))`. -->
+Amortized `O((N+E) log(N+E)^2)`.
 
 ## Lookup
 
@@ -666,8 +582,8 @@ value_compare value_comp() const;
 ### operator==
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+bool operator==(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Complexity**
@@ -676,8 +592,8 @@ bool operator==(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T
 ### operator!=
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-bool operator!=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+bool operator!=(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Complexity**
@@ -691,8 +607,8 @@ This function is removed if
 ### operator<
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-bool operator<(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+bool operator<(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Complexity**
@@ -706,8 +622,8 @@ This function is removed if
 ### operator<=
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-bool operator<=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+bool operator<=(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Complexity**
@@ -721,8 +637,8 @@ This function is removed if
 ### operator>
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-bool operator>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+bool operator>(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Complexity**
@@ -736,8 +652,8 @@ This function is removed if
 ### operator>=
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-bool operator>=(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+bool operator>=(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Complexity**
@@ -751,8 +667,8 @@ This function is removed if
 ### operator<=>
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-/* see below */ operator<=>(flat_map<Key, T, Compare, Container> const& lhs, flat_map<Key, T, Compare, Container> const& rhs);
+template <typename Key, typename Compare, typename Container>
+/* see below */ operator<=>(flat_multiset<Key, Compare, Container> const& lhs, flat_multiset<Key, Compare, Container> const& rhs);
 ```
 
 **Return value**
@@ -769,8 +685,8 @@ This function is defined only if
 ### swap
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container>
-void swap(flat_map<Key, T, Compare, Container>& lhs, flat_map<Key, T, Compare, Container>& rhs) noexcept(/* see below */);
+template <typename Key, typename Compare, typename Container>
+void swap(flat_multiset<Key, Compare, Container>& lhs, flat_multiset<Key, Compare, Container>& rhs) noexcept(/* see below */);
 ```
 
 **Exceptions**
@@ -779,8 +695,8 @@ No except only if `noexcept(lhs.swap(rhs))` is true.
 ### erase_if
 
 ```cpp
-template <typename Key, typename T, typename Compare, typename Container, typename Pred>
-std::size_t erase_if(flat_map<Key, T, Compare, Container>& c, Pred pred);
+template <typename Key, typename Compare, typename Container, typename Pred>
+std::size_t erase_if(flat_multiset<Key, Compare, Container>& c, Pred pred);
 ```
 
 Erase every elements which `pred` returned true.
@@ -795,40 +711,31 @@ Number of erased elements.
 
 ```cpp
 template <typename InputIterator,
-          typename Compare = std::less<iter_key_t<InputIterator>>,
-          typename Allocator = iter_to_alloc_t<InputIterator>>
-flat_map(InputIterator, InputIterator, Compare = Compare(), Allocator = Allocator())
-  -> flat_map<iter_key_t<InputIterator>, iter_val_t<InputIterator>, Compare, iter_to_container_t<InputIterator, Allocator>>;
+          typename Compare = std::less<iter_val_t<InputIterator>>,
+          typename Allocator = typename std::vector<iter_val_t<InputIterator>>::allocator_type>
+flat_multiset(InputIterator, InputIterator, Compare = Compare(), Allocator = Allocator())
+  -> flat_multiset<iter_val_t<InputIterator>, Compare, std::vector<iter_val_t<InputIterator>, Allocator>>;
 
-template <typename Key, typename T,
+template <typename Key,
           typename Compare = std::less<Key>,
-          typename Allocator = typename std::vector<std::pair<Key, T>>::allocator_type>
-flat_map(std::initializer_list<std::pair<Key, T>>, Compare = Compare(), Allocator = Allocator())
-  -> flat_map<Key, T, Compare, std::vector<std::pair<Key, T>, Allocator>>;
+          typename Allocator = typename std::vector<Key>::allocator_type>
+flat_multiset(std::initializer_list<Key>, Compare = Compare(), Allocator = Allocator())
+  -> flat_multiset<Key, Compare, std::vector<Key, Allocator>>;
 
 template <typename InputIterator, typename Allocator>
-flat_map(InputIterator, InputIterator, Allocator)
-  -> flat_map<iter_key_t<InputIterator>, iter_val_t<InputIterator>, std::less<iter_key_t<InputIterator>>, iter_to_container_t<InputIterator, Allocator>>;
+flat_multiset(InputIterator, InputIterator, Allocator)
+  -> flat_multiset<iter_val_t<InputIterator>, std::less<iter_val_t<InputIterator>>, std::vector<iter_val_t<InputIterator>, Allocator>>;
 
-template <typename Key, typename T, typename Allocator>
-flat_map(std::initializer_list<std::pair<Key, T>>, Allocator)
-  -> flat_map<Key, T, std::less<Key>, std::vector<std::pair<Key, T>, Allocator>>;
+template <typename Key, typename Allocator>
+flat_multiset(std::initializer_list<Key>, Allocator)
+  -> flat_multiset<Key, std::less<Key>, std::vector<Key, Allocator>>;
 ```
 
 Where the exposition only type aliases are defined as
 
 ```cpp
 template <typename InputIterator>
-using iter_key_t = std::remove_const_t<typename std::iterator_traits<InputIterator>::value_type::first_type>;
-
-template <typename InputIterator>
-using iter_val_t = typename std::iterator_traits<InputIterator>::value_type::second_type;
-
-template <typename InputIterator>
-using iter_to_alloc_t = std::allocator<iter_key_t<InputIterator>, iter_val_t<InputIterator>>;
-
-template <typename InputIterator, typename Allocator>
-using iter_to_container_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Allocator>;
+using iter_val_t = typename std::iterator_traits<InputIterator>::value_type;
 ```
 
 First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
