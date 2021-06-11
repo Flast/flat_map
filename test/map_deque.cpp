@@ -13,3 +13,4 @@ using CONTAINER = std::deque<T>;
 #include "test_case/basic.ipp"
 #include "test_case/stateful_comparison.ipp"
 #include "test_case/std.ipp"
+#include "test_case/map_only.ipp"
