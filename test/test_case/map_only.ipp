@@ -16,7 +16,7 @@ struct Value
     explicit Value(int value, char const* name) : value{value}, name{name} {}
 };
 
-TEST_CASE("accessor", "[accessor]")
+TEST_CASE("map accessor", "[accessor]")
 {
     FLAT_CONTAINER<int, int> fm =
     {
@@ -195,7 +195,7 @@ TEST_CASE("insert or assign", "[insertion]")
     }
 }
 
-TEST_CASE("emplace insertion", "[insertion]")
+TEST_CASE("map emplace insertion", "[insertion]")
 {
     SECTION("try emplace")
     {
