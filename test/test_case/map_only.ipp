@@ -7,6 +7,15 @@
 
 #include "config.hpp"
 
+struct Value
+{
+    int value = 0xcccccccc;
+    char const* name = "defaulted";
+
+    Value() = default;
+    explicit Value(int value, char const* name) : value{value}, name{name} {}
+};
+
 TEST_CASE("accessor", "[accessor]")
 {
     SECTION("found on at")
@@ -309,5 +318,19 @@ TEST_CASE("emplace insertion", "[insertion]")
         REQUIRE(*itr++ == MAKE_PAIR(5, 6));
         REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
+    }
+
+    SECTION("piecewise insertion")
+    {
+        FLAT_CONTAINER<int, Value> fm;
+
+        fm.try_emplace(3, 0xdeadbeef, "deadbeef");
+        fm.try_emplace(1, 0xc0ffee, "c0ffee");
+
+        REQUIRE(fm[1].value == 0xc0ffee);
+        REQUIRE(!strcmp(fm[1].name, "c0ffee"));
+
+        REQUIRE(fm[3].value == 0xdeadbeef);
+        REQUIRE(!strcmp(fm[3].name, "deadbeef"));
     }
 }
