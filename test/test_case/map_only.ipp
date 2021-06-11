@@ -18,6 +18,15 @@ struct Value
 
 TEST_CASE("accessor", "[accessor]")
 {
+    FLAT_CONTAINER<int, int> fm =
+    {
+        MAKE_PAIR(0, 1),
+        MAKE_PAIR(2, 3),
+        MAKE_PAIR(2, 9),
+        MAKE_PAIR(4, 5),
+        MAKE_PAIR(6, 7),
+    };
+
     SECTION("found on at")
     {
         auto& value = fm.at(2);
@@ -330,7 +339,7 @@ TEST_CASE("emplace insertion", "[insertion]")
         REQUIRE(fm[1].value == 0xc0ffee);
         REQUIRE(!strcmp(fm[1].name, "c0ffee"));
 
-        REQUIRE(fm[3].value == 0xdeadbeef);
+        REQUIRE(fm[3].value == (int)0xdeadbeef);
         REQUIRE(!strcmp(fm[3].name, "deadbeef"));
     }
 }
