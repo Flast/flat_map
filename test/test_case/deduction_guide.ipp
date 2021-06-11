@@ -1,6 +1,7 @@
 // Copyright (c) 2021 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
+#include <catch2/catch.hpp>
 #include <vector>
 #include <memory>
 #include <functional>

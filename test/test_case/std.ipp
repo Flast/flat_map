@@ -4,11 +4,12 @@
 #include <catch2/catch.hpp>
 
 #include "config.hpp"
-#include STD_HEADER
 #if FLAT_MAP
+#include <map>
 #include "flat_map/flat_map.hpp"
 #include "flat_map/flat_multimap.hpp"
 #else
+#include <set>
 #include "flat_map/flat_set.hpp"
 #include "flat_map/flat_multiset.hpp"
 #endif

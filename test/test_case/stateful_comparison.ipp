@@ -2,6 +2,7 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <catch2/catch.hpp>
+#include <vector>
 
 #include "config.hpp"
 

@@ -25,8 +25,6 @@ auto MAKE_PAIR(T1 v1, T2 v2) { return std::pair<T1, T2>{v1, v2}; }
 template <typename KVP>
 auto FIRST(KVP const& kvp) { return kvp.first; }
 
-#define STD_HEADER <map>
-
 template <typename Key, typename T, typename Compare = std::less<Key>>
 using STD_CONTAINER = std::map<Key, T, Compare>;
 
@@ -48,8 +46,6 @@ auto MAKE_PAIR(T1 v1, T2) { return v1; }
 
 template <typename KVP>
 auto FIRST(KVP const& kvp) { return kvp; }
-
-#define STD_HEADER <set>
 
 template <typename Key, typename T, typename Compare = std::less<Key>>
 using STD_CONTAINER = std::set<Key, Compare>;
