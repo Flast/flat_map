@@ -24,14 +24,10 @@ TEST_CASE("construction fp", "[construction][fp]")
         FLAT_CONTAINER<int, int, bool(*)(int, int)> fm{v.begin(), v.end(), less};
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -49,14 +45,10 @@ TEST_CASE("construction fp", "[construction][fp]")
         };
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == fm.end());
     }
 
@@ -83,16 +75,11 @@ TEST_CASE("construction fp", "[construction][fp]")
         copy.emplace(PAIR_PARAM(1, 2));
 
         auto itr = copy.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == copy.end());
     }
 
@@ -119,16 +106,11 @@ TEST_CASE("construction fp", "[construction][fp]")
         move.emplace(PAIR_PARAM(1, 2));
 
         auto itr = move.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == move.end());
     }
 }
@@ -165,16 +147,11 @@ TEST_CASE("assignment fp", "[assignment][fp]")
         copy.emplace(PAIR_PARAM(1, 2));
 
         auto itr = copy.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == copy.end());
     }
 
@@ -208,16 +185,11 @@ TEST_CASE("assignment fp", "[assignment][fp]")
         move.emplace(PAIR_PARAM(1, 2));
 
         auto itr = move.begin();
-        REQUIRE(*itr == MAKE_PAIR(0, 1));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(4, 5));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(6, 7));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == move.end());
     }
 }
@@ -251,12 +223,9 @@ TEST_CASE("swap fp", "[swap][fp]")
         fm.emplace(PAIR_PARAM(2, 3));
 
         auto itr = fm.begin();
-        REQUIRE(*itr == MAKE_PAIR(3, 4));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(2, 3));
-        ++itr;
-        REQUIRE(*itr == MAKE_PAIR(1, 2));
-        ++itr;
+        REQUIRE(*itr++ == MAKE_PAIR(3, 4));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(1, 2));
         REQUIRE(itr == fm.end());
     }
 }
