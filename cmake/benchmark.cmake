@@ -1,7 +1,8 @@
 find_package(benchmark QUIET)
 
 if(benchmark_FOUND)
-  add_library(benchmarkTarget ALIAS benchmark::benchmark)
+  add_library(benchmarkLib ALIAS benchmark::benchmark)
+  add_library(benchmarkInc ALIAS benchmark::benchmark)
 else()
   include(ExternalProject)
 
