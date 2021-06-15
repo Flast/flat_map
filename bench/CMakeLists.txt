@@ -5,6 +5,7 @@ set_target_properties(benchmark PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAU
 
 macro(add_bench benchname)
   add_benchmark(${benchname} ${ARGN})
+  set_target_properties(${benchname} PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
   target_link_libraries(${benchname} flat_map)
   add_dependencies(benchmark ${benchname})
 endmacro()
