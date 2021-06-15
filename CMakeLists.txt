@@ -12,4 +12,4 @@ add_library(flat_map INTERFACE)
 target_include_directories(flat_map INTERFACE .)
 
 add_subdirectory(test)
-#add_subdirectory(bench)
+add_subdirectory(bench)
