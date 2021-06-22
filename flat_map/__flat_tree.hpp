@@ -79,23 +79,19 @@ public:
     auto _vcomp() const { return static_cast<typename Subclass::_comparator>(key_comp()); }
 
     template <typename InputIterator>
-    void _initialize_container_uniq(InputIterator first, InputIterator last)
+    void _initialize_container(InputIterator first, InputIterator last)
     {
         _container.assign(first, last);
         std::stable_sort(_container.begin(), _container.end(), _vcomp());
-        auto itr = std::unique(_container.begin(), _container.end(),
-            [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
-            {
-                return !comp(lhs, rhs) && !comp(rhs, lhs);
-            });
-        _container.erase(itr, _container.end());
-    }
-
-    template <typename InputIterator>
-    void _initialize_container_multi(InputIterator first, InputIterator last)
-    {
-        _container.assign(first, last);
-        std::stable_sort(_container.begin(), _container.end(), _vcomp());
+        if constexpr (Subclass::_is_uniq)
+        {
+            auto itr = std::unique(_container.begin(), _container.end(),
+                [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
+                {
+                    return !comp(lhs, rhs) && !comp(rhs, lhs);
+                });
+            _container.erase(itr, _container.end());
+        }
     }
 
 public:

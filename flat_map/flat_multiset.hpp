@@ -67,14 +67,14 @@ public:
     flat_multiset(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
       : _super{comp, alloc}
     {
-        this->_initialize_container_multi(first, last);
+        this->_initialize_container(first, last);
     }
 
     template <typename InputIterator>
     flat_multiset(InputIterator first, InputIterator last, allocator_type const& alloc)
       : _super{alloc}
     {
-        this->_initialize_container_multi(first, last);
+        this->_initialize_container(first, last);
     }
 
     flat_multiset(flat_multiset const& other) = default;
@@ -88,13 +88,13 @@ public:
     flat_multiset(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
       : _super{comp, alloc}
     {
-        this->_initialize_container_multi(init.begin(), init.end());
+        this->_initialize_container(init.begin(), init.end());
     }
 
     flat_multiset(std::initializer_list<value_type> init, allocator_type const& alloc)
       : _super{alloc}
     {
-        this->_initialize_container_multi(init.begin(), init.end());
+        this->_initialize_container(init.begin(), init.end());
     }
 
     flat_multiset& operator=(flat_multiset const& other) = default;
@@ -111,7 +111,7 @@ public:
 
     flat_multiset& operator=(std::initializer_list<value_type> ilist)
     {
-        this->_initialize_container_multi(ilist.begin(), ilist.end());
+        this->_initialize_container(ilist.begin(), ilist.end());
         return *this;
     }
 

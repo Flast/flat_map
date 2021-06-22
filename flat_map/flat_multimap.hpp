@@ -97,14 +97,14 @@ public:
     flat_multimap(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
       : _super{comp, alloc}
     {
-        this->_initialize_container_multi(first, last);
+        this->_initialize_container(first, last);
     }
 
     template <typename InputIterator>
     flat_multimap(InputIterator first, InputIterator last, allocator_type const& alloc)
       : _super{alloc}
     {
-        this->_initialize_container_multi(first, last);
+        this->_initialize_container(first, last);
     }
 
     flat_multimap(flat_multimap const& other) = default;
@@ -118,13 +118,13 @@ public:
     flat_multimap(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
       : _super{comp, alloc}
     {
-        this->_initialize_container_multi(init.begin(), init.end());
+        this->_initialize_container(init.begin(), init.end());
     }
 
     flat_multimap(std::initializer_list<value_type> init, allocator_type const& alloc)
       : _super{alloc}
     {
-        this->_initialize_container_multi(init.begin(), init.end());
+        this->_initialize_container(init.begin(), init.end());
     }
 
     flat_multimap& operator=(flat_multimap const& other) = default;
@@ -141,7 +141,7 @@ public:
 
     flat_multimap& operator=(std::initializer_list<value_type> ilist)
     {
-        this->_initialize_container_multi(ilist.begin(), ilist.end());
+        this->_initialize_container(ilist.begin(), ilist.end());
         return *this;
     }
 

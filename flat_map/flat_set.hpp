@@ -68,14 +68,14 @@ public:
     flat_set(InputIterator first, InputIterator last, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
       : _super{comp, alloc}
     {
-        this->_initialize_container_uniq(first, last);
+        this->_initialize_container(first, last);
     }
 
     template <typename InputIterator>
     flat_set(InputIterator first, InputIterator last, allocator_type const& alloc)
       : _super{alloc}
     {
-        this->_initialize_container_uniq(first, last);
+        this->_initialize_container(first, last);
     }
 
     flat_set(flat_set const& other) = default;
@@ -89,13 +89,13 @@ public:
     flat_set(std::initializer_list<value_type> init, Compare const& comp = Compare(), allocator_type const& alloc = allocator_type())
       : _super{comp, alloc}
     {
-        this->_initialize_container_uniq(init.begin(), init.end());
+        this->_initialize_container(init.begin(), init.end());
     }
 
     flat_set(std::initializer_list<value_type> init, allocator_type const& alloc)
       : _super{alloc}
     {
-        this->_initialize_container_uniq(init.begin(), init.end());
+        this->_initialize_container(init.begin(), init.end());
     }
 
     flat_set& operator=(flat_set const& other) = default;
@@ -112,7 +112,7 @@ public:
 
     flat_set& operator=(std::initializer_list<value_type> ilist)
     {
-        this->_initialize_container_uniq(ilist.begin(), ilist.end());
+        this->_initialize_container(ilist.begin(), ilist.end());
         return *this;
     }
 
