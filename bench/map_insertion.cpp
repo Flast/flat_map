@@ -9,7 +9,7 @@
 static std::mt19937 rng_state{};
 
 template <typename C>
-static void BM_construct_by_iterator(benchmark::State& state)
+static void BM_range_insertion(benchmark::State& state)
 {
     for (auto _ : state)
     {
@@ -28,9 +28,9 @@ static void BM_construct_by_iterator(benchmark::State& state)
         benchmark::ClobberMemory();
     }
 }
-BENCHMARK_TEMPLATE(BM_construct_by_iterator, std::map<int, int>)->Range(4, 1 << 18);
-BENCHMARK_TEMPLATE(BM_construct_by_iterator, std::unordered_map<int, int>)->Range(4, 1 << 18);
-BENCHMARK_TEMPLATE(BM_construct_by_iterator, flat_map::flat_map<int, int>)->Range(4, 1 << 18);
-BENCHMARK_TEMPLATE(BM_construct_by_iterator, flat_map::flat_map<int, int, std::less<int>, std::deque<std::pair<int, int>>>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_range_insertion, std::map<int, int>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_range_insertion, std::unordered_map<int, int>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_range_insertion, flat_map::flat_map<int, int>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_range_insertion, flat_map::flat_map<int, int, std::less<int>, std::deque<std::pair<int, int>>>)->Range(4, 1 << 18);
 
 BENCHMARK_MAIN();
