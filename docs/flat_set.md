@@ -304,7 +304,7 @@ Range insertion.
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
 
 **Complexity**
-Amortized `O(M E)` for insertion, `O(E log(N))` for searching insertion point.
+Amortized `O(E log(E))` if enough additional memory is available, otherwise amortized `O(E log(E)^2)`.
 
 **Invalidation**
 Same as `Container::insert`.
