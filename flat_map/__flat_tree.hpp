@@ -283,7 +283,17 @@ public:
     template <typename InputIterator>
     void insert(InputIterator first, InputIterator last)
     {
-        while (first != last) { _insert(*first++); }
+        _container.insert(end(), first, last);
+        std::stable_sort(_container.begin(), _container.end(), _vcomp());
+        if constexpr (Subclass::_is_uniq)
+        {
+            auto itr = std::unique(_container.begin(), _container.end(),
+                [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
+                {
+                    return !comp(lhs, rhs) && !comp(rhs, lhs);
+                });
+            _container.erase(itr, _container.end());
+        }
     }
 
     void insert(std::initializer_list<value_type> ilist) { insert(ilist.begin(), ilist.end()); }
