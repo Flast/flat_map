@@ -529,7 +529,7 @@ public:
     }
 
     template <typename Cont, typename Cond>
-    void _merge(Cont& source, Cond multimap)
+    void _merge(Cont& source, [[maybe_unused]] Cond multimap)
     {
         if constexpr (Subclass::_is_uniq)
         {
