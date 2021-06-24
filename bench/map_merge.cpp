@@ -38,9 +38,9 @@ static void BM_merge(benchmark::State& state)
         benchmark::ClobberMemory();
     }
 }
-BENCHMARK_TEMPLATE(BM_merge, std::map<int, int>)->Ranges({{4, 1 << 18}, {128, 1 << 16}});
-BENCHMARK_TEMPLATE(BM_merge, std::unordered_map<int, int>)->Ranges({{4, 1 << 18}, {128, 1 << 16}});
-BENCHMARK_TEMPLATE(BM_merge, flat_map::flat_map<int, int>)->Ranges({{4, 1 << 18}, {128, 1 << 16}});
-BENCHMARK_TEMPLATE(BM_merge, flat_map::flat_map<int, int, std::less<int>, std::deque<std::pair<int, int>>>)->Ranges({{4, 1 << 18}, {128, 1 << 16}});
+BENCHMARK_TEMPLATE(BM_merge, std::map<int, int>)->Ranges({{4, 1 << 16}, {4, 1 << 16}});
+BENCHMARK_TEMPLATE(BM_merge, std::unordered_map<int, int>)->Ranges({{4, 1 << 16}, {4, 1 << 16}});
+BENCHMARK_TEMPLATE(BM_merge, flat_map::flat_map<int, int>)->Ranges({{4, 1 << 16}, {4, 1 << 16}});
+BENCHMARK_TEMPLATE(BM_merge, flat_map::flat_map<int, int, std::less<int>, std::deque<std::pair<int, int>>>)->Ranges({{4, 1 << 16}, {4, 1 << 16}});
 
 BENCHMARK_MAIN();
