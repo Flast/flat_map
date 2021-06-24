@@ -11,6 +11,7 @@ It compliants C++17/20 standard associative container requirements except comple
 
 - [introduction](./docs/introduction.md)
 - references
+  - [enum](./docs/enum.md)
   - [flat\_map](./docs/flat\_map.md)
   - [flat\_set](./docs/flat\_set.md)
   - [flat\_multimap](./docs/flat\_multimap.md)

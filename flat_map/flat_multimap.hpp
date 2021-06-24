@@ -165,7 +165,6 @@ public:
     using _super::clear;
 
     using _super::insert;
-    using _super::insert_sorted;
     using _super::emplace;
     using _super::emplace_hint;
 

@@ -758,7 +758,7 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(6, 7),
         };
 
-        fm.insert_sorted(v.begin(), v.end());
+        fm.insert(flat_map::range_order::sorted, v.begin(), v.end());
 
 #if MULTI_CONTAINER
         REQUIRE(fm.size() == 10);
@@ -798,7 +798,8 @@ TEST_CASE("insertion", "[insertion]")
             MAKE_PAIR(7, 9),
         };
 
-        fm.insert_sorted({
+        fm.insert(flat_map::range_order::sorted,
+        {
             MAKE_PAIR(1, 3),
             MAKE_PAIR(1, 2),
             MAKE_PAIR(3, 9),

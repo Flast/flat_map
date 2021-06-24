@@ -183,7 +183,6 @@ public:
     using _super::clear;
 
     using _super::insert;
-    using _super::insert_sorted;
 
 private:
     template <typename K, typename M>

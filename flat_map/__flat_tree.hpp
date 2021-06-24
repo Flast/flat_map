@@ -12,6 +12,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "flat_map/enum.hpp"
+
 namespace flat_map::detail
 {
 
@@ -365,20 +367,31 @@ public:
 
     // extension
     template <typename InputIterator>
-    void insert_sorted(InputIterator first, InputIterator last)
+    void insert(range_order order, InputIterator first, InputIterator last)
     {
-        if (Subclass::_is_uniq)
+        switch (order)
         {
-            _insert_sorted_uniq(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
-        }
-        else
-        {
-            _insert_sorted_multi(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
+        case range_order::no_ordered:
+        case range_order::uniqued:
+            insert(first, last);
+            break;
+
+        case range_order::sorted:
+        case range_order::unique_sorted:
+            if constexpr (Subclass::_is_uniq)
+            {
+                _insert_sorted_uniq(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
+            }
+            else
+            {
+                _insert_sorted_multi(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
+            }
+            break;
         }
     }
 
     // extension
-    void insert_sorted(std::initializer_list<value_type> ilist) { insert_sorted(ilist.begin(), ilist.end()); }
+    void insert(range_order order, std::initializer_list<value_type> ilist) { insert(order, ilist.begin(), ilist.end()); }
 
     auto insert(node_type&& node)
     {

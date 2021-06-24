@@ -75,7 +75,7 @@ static void BM_insert_sorted(benchmark::State& state)
         state.ResumeTiming();
 
         C fm;
-        fm.insert_sorted(v.begin(), v.end());
+        fm.insert(flat_map::range_order::sorted, v.begin(), v.end());
         benchmark::DoNotOptimize(fm.begin());
         benchmark::ClobberMemory();
     }

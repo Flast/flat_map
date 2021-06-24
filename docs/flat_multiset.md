@@ -327,23 +327,21 @@ Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
 **Invalidation**
 Same as `Container::insert`.
 
-### insert_sorted
-
 ```cpp
 template <typename InputIterator>
-void insert_sorted(InputIterator first, InputIterator last);
+void insert(range_order order, InputIterator first, InputIterator last);
 
-void insert_sorted(std::initializer_list<value_type> ilist);
+void insert(range_order order, std::initializer_list<value_type> ilist);
 ```
 
-Range insertion with sorted range.
+Range insertion with ordered or non-ordered range.
 
 **Pre requirements**
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
-The ranges should be sorted in `Compare` order, otherwise the behaviour is undefined.
+If the `order` is `range_order::sorted` or `range_order::unique_sorted`, the ranges should be sorted in `Compare` order, otherwise the behaviour is undefined.
 
 **Complexity**
-Amortized `O(M E)` for insertion, `O(N+E)` for searching insertion point.
+For sorted range, amortized `O(M E)` for insertion, `O(N+E)` for searching insertion point, otherwise same as `insert(first, last)` or `insert(ilist)` respectively.
 
 **Invalidation**
 Same as `Container::insert`.
