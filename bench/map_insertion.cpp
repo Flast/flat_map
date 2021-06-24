@@ -34,6 +34,32 @@ BENCHMARK_TEMPLATE(BM_range_insertion, flat_map::flat_map<int, int>)->Range(4, 1
 BENCHMARK_TEMPLATE(BM_range_insertion, flat_map::flat_map<int, int, std::less<int>, std::deque<std::pair<int, int>>>)->Range(4, 1 << 18);
 
 template <typename C>
+static void BM_sorted_range_insertion(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        state.PauseTiming();
+        std::vector<std::pair<int, int>> v(state.range(0));
+        for (auto& [k, v] : v)
+        {
+            k = std::uniform_int_distribution<int>{}(rng_state);
+            v = std::uniform_int_distribution<int>{}(rng_state);
+        }
+        std::sort(v.begin(), v.end(), [](auto& lhs, auto& rhs) { return lhs.first < rhs.first; });
+        state.ResumeTiming();
+
+        C fm;
+        fm.insert(v.begin(), v.end());
+        benchmark::DoNotOptimize(fm.begin());
+        benchmark::ClobberMemory();
+    }
+}
+BENCHMARK_TEMPLATE(BM_sorted_range_insertion, std::map<int, int>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_sorted_range_insertion, std::unordered_map<int, int>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_sorted_range_insertion, flat_map::flat_map<int, int>)->Range(4, 1 << 18);
+BENCHMARK_TEMPLATE(BM_sorted_range_insertion, flat_map::flat_map<int, int, std::less<int>, std::deque<std::pair<int, int>>>)->Range(4, 1 << 18);
+
+template <typename C>
 static void BM_insert_sorted(benchmark::State& state)
 {
     for (auto _ : state)
