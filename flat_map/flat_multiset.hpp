@@ -100,13 +100,13 @@ public:
     flat_multiset& operator=(flat_multiset const& other) = default;
 
     flat_multiset& operator=(flat_multiset&& other) noexcept(std::is_nothrow_move_assignable_v<_super>)
-#if FLAT_MAP_COMPILER_VERSION(10,0,0) <= FLAT_MAP_COMPILER_GCC
-      = default;
-#else
+#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
     {
         _super::operator=(std::move(other));
         return *this;
     }
+#else
+      = default;
 #endif
 
     flat_multiset& operator=(std::initializer_list<value_type> ilist)
