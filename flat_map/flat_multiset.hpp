@@ -144,24 +144,6 @@ public:
 
     using _super::extract;
 
-private:
-    template <typename Comp, typename Allocator>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(std::set<key_type, Comp, Allocator>&);
-
-    template <typename Comp, typename Allocator>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(std::multiset<key_type, Comp, Allocator>&);
-
-    template <typename Comp, typename Cont>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(flat_set<key_type, Comp, Cont>&);
-
-    template <typename Comp, typename Cont>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(flat_multiset<key_type, Comp, Cont>&);
-
-public:
     template <typename Comp, typename Allocator>
     void merge(std::set<key_type, Comp, Allocator>& source) { this->_merge(source, std::false_type{}); }
 

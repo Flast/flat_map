@@ -174,24 +174,6 @@ public:
 
     using _super::extract;
 
-private:
-    template <typename Comp, typename Allocator>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(std::map<key_type, mapped_type, Comp, Allocator>&);
-
-    template <typename Comp, typename Allocator>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(std::multimap<key_type, mapped_type, Comp, Allocator>&);
-
-    template <typename Comp, typename Cont>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(flat_map<key_type, mapped_type, Comp, Cont>&);
-
-    template <typename Comp, typename Cont>
-    std::bool_constant<std::is_empty_v<key_compare> && std::is_same_v<key_compare, Comp>>
-    _same_order(flat_multimap<key_type, mapped_type, Comp, Cont>&);
-
-public:
     template <typename Comp, typename Allocator>
     void merge(std::map<key_type, mapped_type, Comp, Allocator>& source) { this->_merge(source, std::false_type{}); }
 

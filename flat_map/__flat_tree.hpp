@@ -447,7 +447,8 @@ public:
     template <typename Cont, typename Cond>
     void _merge(Cont& source, [[maybe_unused]] Cond multimap)
     {
-        constexpr auto same_order = decltype(static_cast<Subclass*>(this)->_same_order(source)){};
+        // FIXME: Stateful comparator is always treated as non equivalent comparator.
+        constexpr auto same_order = std::is_empty_v<key_compare> && std::is_same_v<typename Cont::key_compare, key_compare>;
         if constexpr (Subclass::_is_uniq)
         {
             if constexpr (same_order)
