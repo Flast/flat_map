@@ -20,6 +20,7 @@ set_target_properties(unit_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAU
 macro(add_unit_test testname)
   add_catch2_test(${testname} ${ARGN})
   target_link_libraries(${testname} flat_map)
+  target_compile_definitions(${testname} PRIVATE CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS)
   add_dependencies(unit_test ${testname})
 endmacro()
 
