@@ -79,6 +79,13 @@ public:
     using detail::comparator_store<Compare>::_comp;
 
     auto _vcomp() const { return static_cast<typename Subclass::_comparator>(key_comp()); }
+    auto _veq() const
+    {
+        return [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
+        {
+            return !comp(lhs, rhs) && !comp(rhs, lhs);
+        };
+    }
 
     template <typename InputIterator>
     void _initialize_container(InputIterator first, InputIterator last)
@@ -87,11 +94,7 @@ public:
         std::stable_sort(_container.begin(), _container.end(), _vcomp());
         if constexpr (Subclass::_is_uniq)
         {
-            auto itr = std::unique(_container.begin(), _container.end(),
-                [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
-                {
-                    return !comp(lhs, rhs) && !comp(rhs, lhs);
-                });
+            auto itr = std::unique(_container.begin(), _container.end(), _veq());
             _container.erase(itr, _container.end());
         }
     }
@@ -279,114 +282,30 @@ public:
     iterator insert(const_iterator hint, value_type&& value) { return _insert(hint, std::move(value)); }
 
     template <typename InputIterator>
-    void insert(InputIterator first, InputIterator last)
-    {
-        _container.insert(end(), first, last);
-        std::stable_sort(_container.begin(), _container.end(), _vcomp());
-        if constexpr (Subclass::_is_uniq)
-        {
-            auto itr = std::unique(_container.begin(), _container.end(),
-                [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
-                {
-                    return !comp(lhs, rhs) && !comp(rhs, lhs);
-                });
-            _container.erase(itr, _container.end());
-        }
-    }
+    void insert(InputIterator first, InputIterator last) { insert(range_order::no_ordered, first, last); }
 
     void insert(std::initializer_list<value_type> ilist) { insert(ilist.begin(), ilist.end()); }
-
-    template <typename ForwardIterator>
-    void _insert_sorted_uniq(ForwardIterator first, ForwardIterator last, std::forward_iterator_tag)
-    {
-        for (auto itr = begin(); first != last; )
-        {
-            while (itr != end() && _vcomp()(*itr, *first)) { ++itr; }
-
-            auto orig = first++; // declare here to advance first anyway
-            if (itr != end())
-            {
-                if (!_vcomp()(*orig, *itr)) { continue; } // orig == itr
-
-                // find unique range
-                for (; first != last && _vcomp()(*std::prev(first), *first) && _vcomp()(*first, *itr); ++first);
-
-                itr = _container.insert(itr, orig, first);
-                std::advance(itr, std::distance(orig, first) - 1); // sub 1 to compare *--first and *first (to skip duplicated)
-            }
-            else
-            {
-                for (; first != last && _vcomp()(*std::prev(first), *first); ++first);
-                itr = _container.insert(end(), orig, first);
-            }
-        }
-    }
-
-    template <typename InputIterator>
-    void _insert_sorted_uniq(InputIterator first, InputIterator last, std::input_iterator_tag)
-    {
-        for (auto itr = begin(); first != last; ++first)
-        {
-            while (itr != end() && _vcomp()(*itr, *first)) { ++itr; }
-            if (itr == end() || _vcomp()(*first, *itr))
-            {
-                itr = _container.insert(itr, *first);
-                // Don't advance iterator to compare *first and *++first (to skip duplicated).
-            }
-        }
-    }
-
-    template <typename ForwardIterator>
-    void _insert_sorted_multi(ForwardIterator first, ForwardIterator last, std::forward_iterator_tag)
-    {
-        for (auto itr = begin(); first != last && itr != end(); )
-        {
-            while (itr != end() && !_vcomp()(*first, *itr)) { ++itr; }
-            if (itr == end()) { break; }
-
-            auto orig = first++; // declare here to advance first anyway
-            // find contiguous range
-            for (; first != last && _vcomp()(*first, *itr); ++first);
-
-            itr = _container.insert(itr, orig, first);
-            std::advance(itr, std::distance(orig, first));
-        }
-        _container.insert(end(), first, last);
-    }
-
-    template <typename InputIterator>
-    void _insert_sorted_multi(InputIterator first, InputIterator last, std::input_iterator_tag)
-    {
-        for (auto itr = begin(); first != last && itr != end(); ++first)
-        {
-            while (itr != end() && !_vcomp()(*first, *itr)) { ++itr; }
-            itr = std::next(_container.insert(itr, *first));
-        }
-        _container.insert(end(), first, last);
-    }
-
     // extension
     template <typename InputIterator>
     void insert(range_order order, InputIterator first, InputIterator last)
     {
+        auto mid = _container.insert(_container.end(), first, last);
         switch (order)
         {
         case range_order::no_ordered:
         case range_order::uniqued:
-            insert(first, last);
+            std::stable_sort(_container.begin(), _container.end(), _vcomp());
             break;
 
         case range_order::sorted:
         case range_order::unique_sorted:
-            if constexpr (Subclass::_is_uniq)
-            {
-                _insert_sorted_uniq(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
-            }
-            else
-            {
-                _insert_sorted_multi(first, last, typename std::iterator_traits<InputIterator>::iterator_category{});
-            }
+            std::inplace_merge(_container.begin(), mid, _container.end(), _vcomp());
             break;
+        }
+        if constexpr (Subclass::_is_uniq)
+        {
+            auto itr = std::unique(_container.begin(), _container.end(), _veq());
+            _container.erase(itr, _container.end());
         }
     }
 
@@ -510,49 +429,28 @@ public:
         }
     }
 
-    template <typename Cont>
-    void _merge_unordered_uniq(Cont& source, std::false_type /* multimap */)
+    template <typename Cont, typename Cond>
+    void _merge_unordered_uniq(Cont& source, Cond multimap)
     {
         for (auto first = source.begin(); first != source.end(); )
         {
-            if (auto [itr, found] = _find(Subclass::_key_extractor(*first)); !found)
+            auto [itr, inserted] = _insert(*first);
+            first = inserted ? source.erase(first) : std::next(first);
+            if constexpr (multimap)
             {
-                _container.insert(itr, std::move(*first));
-                first = source.erase(first);
+                auto comp = source.value_comp();
+                while (first != source.end() && !comp(*itr, *first)) { ++first; } // skip duplicated
             }
-            else
-            {
-                ++first;
-            }
-        }
-    }
-
-    template <typename Cont>
-    void _merge_unordered_uniq(Cont& source, std::true_type /* multimap */)
-    {
-        auto comp = source.value_comp();
-        for (auto first = source.begin(); first != source.end(); )
-        {
-            auto [itr, found] = _find(Subclass::_key_extractor(*first));
-            if (!found)
-            {
-                itr = _container.insert(itr, std::move(*first));
-                first = source.erase(first);
-            }
-            else
-            {
-                ++first;
-            }
-            while (first != source.end() && !comp(*itr, *first)) { ++first; } // skip duplicated
         }
     }
 
     template <typename Cont, typename Cond>
     void _merge(Cont& source, [[maybe_unused]] Cond multimap)
     {
+        constexpr auto same_order = decltype(static_cast<Subclass*>(this)->_same_order(source)){};
         if constexpr (Subclass::_is_uniq)
         {
-            if constexpr (decltype(static_cast<Subclass*>(this)->_same_order(source)){})
+            if constexpr (same_order)
             {
                 _merge_ordered_uniq(source, multimap);
             }
@@ -563,9 +461,8 @@ public:
         }
         else
         {
-            // FIXME: improve performance
-            _container.insert(end(), std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
-            std::stable_sort(_container.begin(), _container.end(), _vcomp());
+            constexpr auto order = same_order ? range_order::sorted : range_order::no_ordered;
+            insert(order, std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
             source.clear();
         }
     }

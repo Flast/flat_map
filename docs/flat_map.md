@@ -346,16 +346,7 @@ void insert(InputIterator first, InputIterator last);
 void insert(std::initializer_list<value_type> ilist);
 ```
 
-Range insertion.
-
-**Pre requirements**
-`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
-
-**Complexity**
-Amortized `O(E log(E))` if enough additional memory is available, otherwise amortized `O(E log(E)^2)`.
-
-**Invalidation**
-Same as `Container::insert`.
+Range insertion. Same effect as `insert(range_order::no_ordered, first, last)` and `insert(range_order::no_ordered, ilist)` respectively.
 
 ```cpp
 insert_return_type insert(node_type&& node)
@@ -389,7 +380,8 @@ Range insertion with ordered or non-ordered range.
 If the `order` is `range_order::sorted` or `range_order::unique_sorted`, the ranges should be sorted in `Compare` order, otherwise the behaviour is undefined.
 
 **Complexity**
-For sorted range, amortized `O(M E)` for insertion, `O(N+E)` for searching insertion point, otherwise same as `insert(first, last)` or `insert(ilist)` respectively.
+For non sorted range, amortized `O((N+E) log(N+E))` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E)^2)`.
+For sorted range, amortized `O(N+E)` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E))`
 
 **Invalidation**
 Same as `Container::insert`.
