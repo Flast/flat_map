@@ -4,6 +4,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
