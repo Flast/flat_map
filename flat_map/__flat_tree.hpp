@@ -348,10 +348,12 @@ public:
 
     size_type erase(key_type const& key)
     {
-        auto itr = lower_bound(key);
-        if (itr == end() || _vcomp()(key, *itr)) { return 0; }
-        _container.erase(itr);
-        return 1;
+        if (auto [itr, found] = _find(key); found)
+        {
+            _container.erase(itr);
+            return 1;
+        }
+        return 0;
     }
 
     void swap(_flat_tree_base& other) noexcept(std::allocator_traits<allocator_type>::is_always_equal::value && std::is_nothrow_swappable<Compare>::value)
@@ -519,8 +521,8 @@ public:
     {
         if constexpr (Subclass::_is_uniq)
         {
-            auto itr = lower_bound(key);
-            return {itr, (itr == end() || _vcomp()(key, *itr)) ? itr : std::next(itr)};
+            auto [itr, found] = _find(key);
+            return {itr, found ? std::next(itr) : itr};
         }
         else
         {

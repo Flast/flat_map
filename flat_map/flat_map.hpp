@@ -152,9 +152,8 @@ public:
 
     mapped_type const& at(key_type const& key) const
     {
-        auto itr = lower_bound(key);
-        if (itr == this->end() || this->_vcomp()(key, *itr)) { throw std::out_of_range("no such key"); }
-        return itr->second;
+        if (auto [itr, found] = this->_find(key); found) { return itr->second; }
+        throw std::out_of_range("no such key");
     }
 
     mapped_type& at(key_type const& key)
