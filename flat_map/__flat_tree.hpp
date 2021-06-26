@@ -369,7 +369,7 @@ public:
         assert(position != cend());
 
         node_type node{std::move(*_mutable(position))};
-        erase(position);
+        _container.erase(position);
         return node;
     }
 
