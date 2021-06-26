@@ -348,12 +348,10 @@ public:
 
     size_type erase(key_type const& key)
     {
-        if (auto [itr, found] = _find(key); found)
-        {
-            _container.erase(itr);
-            return 1;
-        }
-        return 0;
+        auto [first, last] = _equal_range(key);
+        auto count = std::distance(first, last);
+        _container.erase(first, last);
+        return count;
     }
 
     void swap(_flat_tree_base& other) noexcept(std::allocator_traits<allocator_type>::is_always_equal::value && std::is_nothrow_swappable<Compare>::value)

@@ -841,14 +841,19 @@ TEST_CASE("erase", "[erase]")
         {
             MAKE_PAIR(0, 1),
             MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 8),
             MAKE_PAIR(4, 5),
             MAKE_PAIR(6, 7),
         };
 
         REQUIRE(fm.erase(5) == 0);
+#if MULTI_CONTAINER
+        REQUIRE(fm.size() == 5);
+        REQUIRE(fm.erase(2) == 2);
+#else
         REQUIRE(fm.size() == 4);
-
         REQUIRE(fm.erase(2) == 1);
+#endif
         REQUIRE(fm.size() == 3);
 
         auto itr = fm.begin();
