@@ -474,15 +474,8 @@ public:
     template <typename K>
     size_type _count(K const& key) const
     {
-        if constexpr (Subclass::_is_uniq)
-        {
-            return find(key) == end() ? 0 : 1;
-        }
-        else
-        {
-            auto [first, last] = equal_range(key);
-            return std::distance(first, last);
-        }
+        auto [first, last] = equal_range(key);
+        return std::distance(first, last);
     }
 
     size_type count(key_type const& key) const { return _count(key); }
