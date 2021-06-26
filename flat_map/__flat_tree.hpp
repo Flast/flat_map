@@ -255,24 +255,18 @@ public:
         return hint;
     }
 
-    auto _insert_point(const_iterator hint, key_type const& key)
-    {
-        if constexpr (Subclass::_is_uniq) { return _insert_point_uniq(hint, key); }
-        else { return _insert_point_multi(hint, key); }
-    }
-
     template <typename V>
     iterator _insert(const_iterator hint, V&& value)
     {
         if constexpr (Subclass::_is_uniq)
         {
-            auto [itr, found] = _insert_point(hint, Subclass::_key_extractor(value));
+            auto [itr, found] = _insert_point_uniq(hint, Subclass::_key_extractor(value));
             if (!found) { itr = _container.insert(itr, std::forward<V>(value)); }
             return itr;
         }
         else
         {
-            auto itr = _insert_point(hint, Subclass::_key_extractor(value));
+            auto itr = _insert_point_multi(hint, Subclass::_key_extractor(value));
             return _container.insert(itr, std::forward<V>(value));
         }
     }
