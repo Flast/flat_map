@@ -198,6 +198,7 @@ private:
     template <typename K, typename M>
     iterator _insert_or_assign(const_iterator hint, K&& key, M&& obj)
     {
+        static_assert(std::is_assignable_v<mapped_type&, M&&>);
         auto [itr, found] = this->_insert_point(hint, key);
         if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
         else { itr->second = std::forward<M>(obj); }
