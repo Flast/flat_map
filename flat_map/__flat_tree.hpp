@@ -169,6 +169,9 @@ public:
         return {itr, !(itr == end() || _vcomp()(key, *itr))};
     }
 
+    template <typename K>
+    std::pair<const_iterator, bool> _find(K const& key) const { return const_cast<_flat_tree_base*>(this)->_find(key); }
+
     template <typename V>
     auto _insert(V&& value)
     {
@@ -512,10 +515,10 @@ public:
     enable_if_transparent<K, const_iterator>
     find(K const& key) const { return const_cast<_flat_tree_base*>(this)->template find<K>(key); }
 
-    bool contains(key_type const& key) const { return const_cast<_flat_tree_base*>(this)->_find(key).second; }
+    bool contains(key_type const& key) const { return _find(key).second; }
 
     template <typename K>
-    enable_if_transparent<K, bool> contains(K const& key) { return _find(key).second; }
+    enable_if_transparent<K, bool> contains(K const& key) const { return _find(key).second; }
 
     template <typename K>
     std::pair<iterator, iterator> _equal_range(K const& key)

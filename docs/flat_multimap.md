@@ -505,7 +505,7 @@ The third and fourth form are only participants in overload resolution if the `C
 bool contains(key_type const& key) const;
 
 template <typename K>
-bool contains(K const& key);
+bool contains(K const& key) const;
 ```
 
 The second form are only participants in overload resolution if the `Compare::is_transparent` is valid.
