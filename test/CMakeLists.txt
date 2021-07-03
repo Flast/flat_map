@@ -1,15 +1,24 @@
-set(GNUCC_COMPAT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" INTERNAL)
+set(GNUCC_COMPAT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" INTERNAL)
 
 set(SANITIZE OFF CACHE STRING "Enable sanitizer")
 set(CXX_STANDARD_UPTO 17 CACHE STRING "Latest C++ version to test")
 
+add_library(requirements INTERFACE)
+target_compile_definitions(requirements INTERFACE CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS)
+
 if(GNUCC_COMPAT)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+  target_compile_options(requirements INTERFACE -Wall -Wextra -pedantic -Werror=unused)
 
   if(SANITIZE)
+    # target_compile_options(requirements INTERFACE -fsanitize=${SANITIZE})
+    # XXX: requires cmake 3.13
+    # target_link_options(requirements INTERFACE -fsanitize=${SANITIZE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZE}")
-    set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fsanitize=${SANITIZE}")
   endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(requirements INTERFACE -Werror=return-type -Werror=undefined-inline)
 endif()
 
 include(cmake/catch2)
@@ -19,8 +28,8 @@ set_target_properties(unit_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAU
 
 macro(add_unit_test testname)
   add_catch2_test(${testname} ${ARGN})
+  target_link_libraries(${testname} requirements)
   target_link_libraries(${testname} flat_map)
-  target_compile_definitions(${testname} PRIVATE CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS)
   add_dependencies(unit_test ${testname})
 endmacro()
 
