@@ -11,7 +11,7 @@ class flat_map;
 ```
 
 **Requirements**
-- `Container` should meets [*Container*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
+- `Container` should meet [*Container*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
 
 **Complexity**
 - `N` denotes number of elements that stored in the container.
