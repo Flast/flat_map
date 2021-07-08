@@ -56,3 +56,5 @@ add_tests(set_deque_test set_deque.cpp)
 
 add_tests(multiset_vector_test multiset_vector.cpp)
 add_tests(multiset_deque_test multiset_deque.cpp)
+
+add_tests(tied_sequence_test tied_sequence.cpp)

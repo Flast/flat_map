@@ -31,4 +31,17 @@ using iter_val_t = typename std::iterator_traits<InputIterator>::value_type::sec
 template <typename InputIterator, typename... Args>
 using iter_cont_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Args...>;
 
+template <typename T>
+using remove_cvref = std::remove_reference<std::remove_cv_t<T>>;
+
+template <typename T>
+using remove_cvref_t = typename remove_cvref<T>::type;
+
+template <typename T, typename U> struct copy_cv { using type = T; };
+template <typename T, typename U> struct copy_cv<T, U const> { using type = T const; };
+template <typename T, typename U> struct copy_cv<T, U volatile> { using type = T volatile; };
+template <typename T, typename U> struct copy_cv<T, U const volatile> { using type = T const volatile; };
+
+template <typename T, typename U> using copy_cv_t = typename copy_cv<T, U>::type;
+
 } // namespace flat_map::detail
