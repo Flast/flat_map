@@ -420,7 +420,7 @@ public:
     constexpr reference back() { return *std::prev(end()); }
     constexpr const_reference back() const { return *std::prev(end()); }
 
-    constexpr pointer data() noexcept((sizeof(std::declval<Sequences>().data(), ...), true))
+    constexpr pointer data() noexcept((static_cast<void>(sizeof(std::declval<Sequences>().data())), ..., true))
     {
         return detail::tuple_transform([](auto&... c) { return std::tuple{c.data()...}; }, _seq);
     }
