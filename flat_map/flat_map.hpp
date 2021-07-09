@@ -24,7 +24,7 @@ namespace flat_map
 template <typename Key, typename T,
           typename Compare = std::less<Key>,
           typename Container = std::vector<std::pair<Key, T>>>
-class flat_map : private detail::_flat_tree_base<flat_map<Key, T, Compare, Container>, Key, std::pair<Key, T>, Compare, Container>
+class flat_map : private detail::_flat_tree_base<flat_map<Key, T, Compare, Container>, Key, Compare, Container>
 {
     using _super = typename flat_map::_flat_tree_base;
 
@@ -60,7 +60,7 @@ public:
     public:
         bool operator()(value_type const& lhs, value_type const& rhs) const
         {
-            return c(lhs.first, rhs.first);
+            return c(std::get<0>(lhs), std::get<0>(rhs));
         }
     };
     using insert_return_type = typename _super::insert_return_type;
@@ -75,17 +75,17 @@ private:
         template <typename K>
         auto operator()(value_type const& lhs, K const& rhs) const
         {
-            return this->c(lhs.first, rhs);
+            return this->c(std::get<0>(lhs), rhs);
         }
 
         template <typename K>
         auto operator()(K const& lhs, value_type const& rhs) const
         {
-            return this->c(lhs, rhs.first);
+            return this->c(lhs, std::get<0>(rhs));
         }
     };
 
-    static auto& _key_extractor(value_type const& value) { return value.first; }
+    static auto& _key_extractor(value_type const& value) { return std::get<0>(value); }
 
 public:
     flat_map() = default;
