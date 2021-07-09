@@ -130,7 +130,7 @@ public:
     flat_multimap& operator=(flat_multimap const& other) = default;
 
     flat_multimap& operator=(flat_multimap&& other) noexcept(std::is_nothrow_move_assignable_v<_super>)
-#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
+#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10))
     {
         _super::operator=(std::move(other));
         return *this;

@@ -101,7 +101,7 @@ public:
     flat_set& operator=(flat_set const& other) = default;
 
     flat_set& operator=(flat_set&& other) noexcept(std::is_nothrow_move_assignable_v<_super>)
-#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
+#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10))
     {
         _super::operator=(std::move(other));
         return *this;

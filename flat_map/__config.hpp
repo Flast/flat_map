@@ -7,7 +7,8 @@
 #include <compare>
 #endif
 
-#define FLAT_MAP_COMPILER_VERSION(major, minor, patch) (((major * 1000) + minor) * 100 + patch)
+#define FLAT_MAP_COMPILER_VERSION_I(major, minor, patch, ...) (((major * 1000) + minor) * 100 + patch)
+#define FLAT_MAP_COMPILER_VERSION(...) FLAT_MAP_COMPILER_VERSION_I(__VA_ARGS__, 0, 0, 0)
 
 #if defined(__GNUC__) && !defined(__clang__)
 #   define FLAT_MAP_COMPILER_GCC FLAT_MAP_COMPILER_VERSION(__GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__)
