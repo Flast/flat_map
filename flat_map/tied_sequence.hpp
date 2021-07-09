@@ -320,7 +320,12 @@ private:
       : _seq{Sequences(detail::extractor<N>(first), detail::extractor<N>(last), alloc)...} { }
 
 public:
-    constexpr tied_sequence() noexcept((std::is_nothrow_default_constructible_v<Sequences> && ... && true)) = default;
+    constexpr tied_sequence() noexcept((std::is_nothrow_default_constructible_v<Sequences> && ... && true))
+#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
+    {}
+#else
+      = default;
+#endif
 
     constexpr explicit tied_sequence(typename Sequences::allocator_type const&... alloc) noexcept : _seq{alloc...} { }
 
