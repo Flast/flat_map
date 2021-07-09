@@ -42,7 +42,7 @@ struct comparator_store<Compare, std::enable_if_t<std::is_class_v<Compare> && !s
     auto& _comp() { return *static_cast<Compare*>(this); }
 };
 
-template <typename Subclass, typename Key, typename ValueType, typename Compare, typename Container>
+template <typename Subclass, typename Key, typename Compare, typename Container>
 class _flat_tree_base : private detail::comparator_store<Compare>
 {
 public:
@@ -50,7 +50,7 @@ public:
 
 public:
     using key_type = Key;
-    using value_type = ValueType;
+    using value_type = typename Container::value_type;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using key_compare = Compare;

@@ -17,13 +17,10 @@
 template <typename T1, typename T2>
 using PAIR = std::pair<T1, T2>;
 
-template <typename T1, typename T2>
-auto MAKE_PAIR(T1 v1, T2 v2) { return std::pair<T1, T2>{v1, v2}; }
-
 #define PAIR_PARAM(v1, v2) v1, v2
 
 template <typename KVP>
-auto FIRST(KVP const& kvp) { return kvp.first; }
+auto FIRST(KVP const& kvp) { return std::get<0>(kvp); }
 
 template <typename Key, typename T, typename Compare = std::less<Key>>
 using STD_CONTAINER = std::map<Key, T, Compare>;
@@ -38,9 +35,6 @@ using STD_MULTI_CONTAINER = std::multimap<Key, T, Compare>;
 
 template <typename T1, typename>
 using PAIR = T1;
-
-template <typename T1, typename T2>
-auto MAKE_PAIR(T1 v1, T2) { return v1; }
 
 #define PAIR_PARAM(v1, v2) v1
 
@@ -89,3 +83,9 @@ using FLAT_UNIQ_CONTAINER = FLAT_UNIQ_CONTAINER_KEY<PAIR_PARAM(Key, T), Compare,
 
 template <typename Key, typename T, typename Compare = std::less<Key>>
 using FLAT_MULTI_CONTAINER = FLAT_MULTI_CONTAINER_KEY<PAIR_PARAM(Key, T), Compare, CONTAINER<PAIR<Key, T>>>;
+
+template <typename T1, typename T2>
+auto MAKE_PAIR(T1 t1, [[maybe_unused]] T2 t2)
+{
+    return typename CONTAINER<PAIR<T1, T2>>::value_type{PAIR_PARAM(t1, t2)};
+}

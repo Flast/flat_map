@@ -22,7 +22,7 @@ namespace flat_map
 template <typename Key,
           typename Compare = std::less<Key>,
           typename Container = std::vector<Key>>
-class flat_set : private detail::_flat_tree_base<flat_set<Key, Compare, Container>, Key, Key, Compare, Container>
+class flat_set : private detail::_flat_tree_base<flat_set<Key, Compare, Container>, Key, Compare, Container>
 {
     using _super = typename flat_set::_flat_tree_base;
 
