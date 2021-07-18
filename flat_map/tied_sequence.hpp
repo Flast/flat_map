@@ -146,6 +146,12 @@ public:
 
     friend constexpr void swap(_tied_sequence_iterator& lhs, _tied_sequence_iterator& rhs) noexcept(noexcept(std::swap(lhs, rhs))) { std::swap(lhs._it, rhs._it); }
 
+    friend constexpr void iter_swap(_tied_sequence_iterator const& lhs, _tied_sequence_iterator const& rhs)
+        noexcept((std::is_nothrow_swappable_v<typename std::iterator_traits<Iterators>> && ...))
+    {
+        tuple_transform([](auto& l, auto& r) { using std::swap; swap(*l, *r); }, lhs._it, rhs._it);
+    }
+
     friend constexpr bool operator==(_tied_sequence_iterator const& lhs, _tied_sequence_iterator const& rhs) { return lhs._it == rhs._it; }
 
     friend constexpr bool operator<(_tied_sequence_iterator const& lhs, _tied_sequence_iterator const& rhs) { return lhs._it < rhs._it; }
