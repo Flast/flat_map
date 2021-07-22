@@ -84,8 +84,7 @@ public:
     void _construct_container(range_order order, iterator middle)
     {
         auto self_order = Subclass::_is_uniq ? range_order::unique_sorted : range_order::sorted;
-        [[maybe_unused]] auto itr = detail::inplace_unique_sort_merge(_container.begin(), middle, _container.end(),
-                                                                      self_order, order, _vcomp(), get_allocator());
+        auto itr = detail::inplace_unique_sort_merge(_container.begin(), middle, _container.end(), self_order, order, _vcomp(), get_allocator());
         if constexpr (Subclass::_is_uniq)
         {
             _container.erase(itr, _container.end());
