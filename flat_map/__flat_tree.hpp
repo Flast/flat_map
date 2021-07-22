@@ -84,7 +84,8 @@ public:
     void _construct_container(range_order order, iterator middle)
     {
         auto self_order = Subclass::_is_uniq ? range_order::unique_sorted : range_order::sorted;
-        auto itr = detail::inplace_unique_sort_merge(_container.begin(), middle, _container.end(), self_order, order, _vcomp(), get_allocator());
+        [[maybe_unused]] auto itr = detail::inplace_unique_sort_merge(_container.begin(), middle, _container.end(),
+                                                                      self_order, order, _vcomp(), get_allocator());
         if constexpr (Subclass::_is_uniq)
         {
             _container.erase(itr, _container.end());
@@ -117,7 +118,8 @@ public:
 
     _flat_tree_base& operator=(_flat_tree_base const& other) = default;
 
-    _flat_tree_base& operator=(_flat_tree_base&& other) noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>) = default;
+    _flat_tree_base& operator=(_flat_tree_base&& other)
+      noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>) = default;
 
     allocator_type get_allocator() const noexcept { return _container.get_allocator(); }
 
