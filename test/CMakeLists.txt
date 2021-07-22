@@ -45,6 +45,8 @@ macro(add_tests testname)
   endif()
 endmacro()
 
+add_tests(inplace_unique_sort_merge_test inplace_unique_sort_merge.cpp)
+
 add_tests(map_vector_test map_vector.cpp)
 add_tests(map_deque_test map_deque.cpp)
 

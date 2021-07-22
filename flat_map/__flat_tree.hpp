@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "flat_map/enum.hpp"
+#include "flat_map/__inplace_unique_sort_merge.hpp"
 
 namespace flat_map::detail
 {
@@ -78,26 +79,24 @@ public:
     };
 
     using detail::comparator_store<Compare>::_comp;
-
     auto _vcomp() const { return static_cast<typename Subclass::_comparator>(key_comp()); }
-    auto _veq() const
+
+    void _construct_container(range_order order, iterator middle)
     {
-        return [comp = _vcomp()](value_type const& lhs, value_type const& rhs)
+        auto self_order = Subclass::_is_uniq ? range_order::unique_sorted : range_order::sorted;
+        [[maybe_unused]] auto itr = detail::inplace_unique_sort_merge(_container.begin(), middle, _container.end(),
+                                                                      self_order, order, _vcomp(), get_allocator());
+        if constexpr (Subclass::_is_uniq)
         {
-            return !comp(lhs, rhs) && !comp(rhs, lhs);
-        };
+            _container.erase(itr, _container.end());
+        }
     }
 
     template <typename InputIterator>
     void _initialize_container(InputIterator first, InputIterator last)
     {
         _container.assign(first, last);
-        std::stable_sort(_container.begin(), _container.end(), _vcomp());
-        if constexpr (Subclass::_is_uniq)
-        {
-            auto itr = std::unique(_container.begin(), _container.end(), _veq());
-            _container.erase(itr, _container.end());
-        }
+        _construct_container(range_order::no_ordered, _container.begin());
     }
 
 public:
@@ -288,23 +287,7 @@ public:
     void insert(range_order order, InputIterator first, InputIterator last)
     {
         auto mid = _container.insert(_container.end(), first, last);
-        switch (order)
-        {
-        case range_order::no_ordered:
-        case range_order::uniqued:
-            std::stable_sort(_container.begin(), _container.end(), _vcomp());
-            break;
-
-        case range_order::sorted:
-        case range_order::unique_sorted:
-            std::inplace_merge(_container.begin(), mid, _container.end(), _vcomp());
-            break;
-        }
-        if constexpr (Subclass::_is_uniq)
-        {
-            auto itr = std::unique(_container.begin(), _container.end(), _veq());
-            _container.erase(itr, _container.end());
-        }
+        _construct_container(order, mid);
     }
 
     // extension
