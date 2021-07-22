@@ -125,7 +125,7 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
 {
     auto len1 = std::distance(first, middle);
     auto len2 = std::distance(middle, last);
-    if (len1 == 0 || len2 == 0) { return last; }
+    if (len2 == 0) { return last; }
 
     using value_type = typename std::iterator_traits<RandomAccessIterator>::value_type;
     auto buflen = std::max<std::size_t>(len1, (len2 + 1) / 2);
