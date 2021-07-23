@@ -80,3 +80,26 @@ jobs:
     - name: Run unit test
       working-directory: build
       run: ctest -j2 --output-on-failure
+  clang10:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends clang-10 cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++-10 -DCXX_STANDARD_UPTO=20 ..
+
+    - name: Build
+      working-directory: build
+      run: make -j2 unit_test
+
+    - name: Run unit test
+      working-directory: build
+      run: ctest -j2 --output-on-failure
