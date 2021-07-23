@@ -83,10 +83,9 @@ public:
 
     void _construct_container(range_order order, iterator middle)
     {
-        auto self_order = Subclass::_is_uniq ? range_order::unique_sorted : range_order::sorted;
         [[maybe_unused]] auto itr = detail::inplace_unique_sort_merge(_container.begin(), middle, _container.end(),
-                                                                      self_order, order, _vcomp(), get_allocator());
-        if constexpr (Subclass::_is_uniq)
+                                                                      Subclass::_order, order, _vcomp(), get_allocator());
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             _container.erase(itr, _container.end());
         }
@@ -175,7 +174,7 @@ public:
     template <typename V>
     auto _insert(V&& value)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             // It should be guaranteed that the value isn't changed when found
             auto [itr, found] = _find(Subclass::_key_extractor(value));
@@ -258,7 +257,7 @@ public:
     template <typename V>
     iterator _insert(const_iterator hint, V&& value)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             auto [itr, found] = _insert_point_uniq(hint, Subclass::_key_extractor(value));
             if (!found) { itr = _container.insert(itr, std::forward<V>(value)); }
@@ -296,7 +295,7 @@ public:
 
     auto insert(node_type&& node)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             if (!node.value.has_value()) { return insert_return_type{end(), false, {}}; }
             if (auto [itr, inserted] = _insert(std::move(*node.value)); inserted)
@@ -431,7 +430,7 @@ public:
     {
         // FIXME: Stateful comparator is always treated as non equivalent comparator.
         constexpr auto same_order = std::is_empty_v<key_compare> && std::is_same_v<typename Cont::key_compare, key_compare>;
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             if constexpr (same_order)
             {
@@ -494,7 +493,7 @@ public:
     template <typename K>
     std::pair<iterator, iterator> _equal_range(K const& key)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             auto [itr, found] = _find(key);
             return {itr, found ? std::next(itr) : itr};

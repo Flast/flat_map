@@ -14,4 +14,7 @@ enum class range_order
     unique_sorted,
 };
 
+template <range_order order>
+using range_order_t = std::integral_constant<range_order, order>;
+
 } // namespace flat_map

@@ -13,6 +13,20 @@
 namespace flat_map::detail
 {
 
+inline constexpr bool is_sorted(range_order order)
+{
+    switch (order)
+    {
+    default:
+    case range_order::no_ordered:
+    case range_order::uniqued:
+        return false;
+    case range_order::sorted:
+    case range_order::unique_sorted:
+        return true;
+    }
+}
+
 #ifndef FLAT_MAP_USE_NAIVE_IUSM
 
 template <typename T>
@@ -44,12 +58,14 @@ struct _temporary_buffer : _buffer_span<T>
     }
 };
 
-// Both of [first1, last1) and [first2, last2) should satisfy `desire`.
-template <typename ForwardIterator, typename Compare, typename T>
+// Both of [first1, last1) and [first2, last2) should satisfy `Desire`.
+template <range_order Desire, typename ForwardIterator, typename Compare, typename T>
 inline ForwardIterator
 _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIterator first2, ForwardIterator last2,
-                      range_order desire, Compare const& comp, _buffer_span<T> buffer)
+                      Compare const& comp, _buffer_span<T> buffer)
 {
+    static_assert(is_sorted(Desire));
+
     buffer = buffer.subbuf(std::distance(first1, last1));
     std::uninitialized_move(first1, last1, buffer.begin());
 
@@ -62,7 +78,7 @@ _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIter
         }
         else
         {
-            if (desire == range_order::unique_sorted && !comp(*itr, *first2)) { ++first2; }
+            if (Desire == range_order::unique_sorted && !comp(*itr, *first2)) { ++first2; }
             *first1++ = std::move(*itr++);
         }
     }
@@ -81,11 +97,12 @@ _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIter
     return first1;
 }
 
-template <typename RandomAccessIterator, typename Compare, typename T>
+template <range_order Desire, typename RandomAccessIterator, typename Compare, typename T>
 inline RandomAccessIterator
-_stable_unique_sort(RandomAccessIterator first, RandomAccessIterator last,
-                    range_order desire, Compare const& comp, _buffer_span<T> buffer)
+_stable_unique_sort(RandomAccessIterator first, RandomAccessIterator last, Compare const& comp, _buffer_span<T> buffer)
 {
+    static_assert(is_sorted(Desire));
+
     auto len = std::distance(first, last);
     switch (len)
     {
@@ -100,29 +117,31 @@ _stable_unique_sort(RandomAccessIterator first, RandomAccessIterator last,
             iter_swap(first, std::next(first));
             return last;
         }
-        return desire == range_order::unique_sorted ? std::next(first) : last;
+        return Desire == range_order::unique_sorted ? std::next(first) : last;
     }
 
     // TODO: use insertion sort for short range
 
     auto mid = std::next(first, len / 2);
-    auto left = _stable_unique_sort(first, mid, desire, comp, buffer);
-    auto right = _stable_unique_sort(mid, last, desire, comp, buffer);
-    return _inplace_unique_merge(first, left, mid, right, desire, comp, buffer);
+    auto left = _stable_unique_sort<Desire>(first, mid, comp, buffer);
+    auto right = _stable_unique_sort<Desire>(mid, last, comp, buffer);
+    return _inplace_unique_merge<Desire>(first, left, mid, right, comp, buffer);
 }
 
 // Specialized algorithm for compbining std::inplace_merge, std::stable_sort, and std::unique.
 //
 // Pre-requisite
-// - [first, middle) is already sorted and uniqued (if need), i.e. should satisfy `desire`
+// - [first, middle) is already sorted and uniqued (if need), i.e. should satisfy `Desire`
 //
 // Return value
 //  Past the end iterator of merged range
-template <typename RandomAccessIterator, typename Compare, typename Allocator>
+template <typename RandomAccessIterator, range_order Desire, typename Compare, typename Allocator>
 inline RandomAccessIterator
 inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
-                          range_order desire, range_order order, Compare comp, Allocator alloc)
+                          range_order_t<Desire>, range_order order, Compare comp, Allocator alloc)
 {
+    static_assert(is_sorted(Desire));
+
     auto len1 = std::distance(first, middle);
     auto len2 = std::distance(middle, last);
     if (len2 == 0) { return last; }
@@ -136,18 +155,18 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
     {
     case range_order::no_ordered:
     case range_order::uniqued:
-        last = _stable_unique_sort(middle, last, desire, std::ref(comp), buffer);
+        last = _stable_unique_sort<Desire>(middle, last, std::ref(comp), buffer);
         if (true) ; else
 
     case range_order::sorted:
-        if (desire == range_order::unique_sorted)
+        if constexpr (Desire == range_order::unique_sorted)
         {
             last = std::unique(middle, last, [&comp](auto& l, auto& r) { return !comp(l, r) && !comp(r, l); });
         }
         [[gnu::fallthrough]];
 
     case range_order::unique_sorted:
-        itr = _inplace_unique_merge(first, middle, middle, last, desire, comp, buffer);
+        itr = _inplace_unique_merge<Desire>(first, middle, middle, last, comp, buffer);
         break;
     }
 
@@ -156,11 +175,13 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
 
 #else // FLAT_MAP_USE_NAIVE_IUSM
 
-template <typename RandomAccessIterator, typename Compare, typename Allocator>
+template <typename RandomAccessIterator, range_order Desire, typename Compare, typename Allocator>
 inline RandomAccessIterator
 inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
-                          range_order desire, range_order order, Compare comp, [[maybe_unused]] Allocator alloc)
+                          range_order_t<Desire>, range_order order, Compare comp, [[maybe_unused]] Allocator alloc)
 {
+    static_assert(is_sorted(Desire));
+
     switch (order)
     {
     case range_order::no_ordered:
@@ -173,7 +194,7 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
         std::inplace_merge(first, middle, last, std::ref(comp));
         break;
     }
-    switch (desire)
+    switch (Desire)
     {
     case range_order::no_ordered:
     case range_order::uniqued:
