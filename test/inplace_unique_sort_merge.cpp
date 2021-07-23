@@ -21,9 +21,18 @@ struct key_value_pair
 {
     int key;
     int value;
-    key_value_pair() : key_value_pair(0) {}
+    key_value_pair() : key_value_pair(-1) {}
     key_value_pair(int v) : key_value_pair(v, v) {}
     key_value_pair(int key, int value) : key(key), value(value) {}
+    key_value_pair(key_value_pair const&) = default;
+    key_value_pair(key_value_pair&& other) : key(other.key), value(other.value) { other = key_value_pair(-1); }
+    key_value_pair& operator=(key_value_pair const&) = default;
+    key_value_pair& operator=(key_value_pair&& other)
+    {
+        *this = other;
+        other = static_cast<key_value_pair const&>(key_value_pair(-1));
+        return *this;
+    }
     bool operator==(key_value_pair const& other) const { return key == other.key && value == other.value; }
     bool operator<(key_value_pair const& other) const { return key < other.key; }
 };
