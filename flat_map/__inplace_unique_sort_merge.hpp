@@ -85,7 +85,7 @@ _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIter
         }
         else
         {
-            if (Desire == range_order::unique_sorted && !comp(*itr, *first2)) { ++first2; }
+            if constexpr (Desire == range_order::unique_sorted) if (!comp(*itr, *first2)) { ++first2; }
             *first1++ = std::move(*itr++);
         }
     }
@@ -117,14 +117,17 @@ _stable_unique_sort(RandomAccessIterator first, RandomAccessIterator last, Compa
     case 1:
         return last;
     case 2:
-        if (comp(*first, *std::next(first))) { return last; }
         if (comp(*std::next(first), *first))
         {
             using std::iter_swap;
             iter_swap(first, std::next(first));
             return last;
         }
-        return Desire == range_order::unique_sorted ? std::next(first) : last;
+        if constexpr (Desire == range_order::unique_sorted)
+        {
+            if (!comp(*first, *std::next(first))) { return std::next(first); }
+        }
+        return last;
     }
 
     // TODO: use insertion sort for short range
