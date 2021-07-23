@@ -15,6 +15,7 @@
 #include "flat_map/__config.hpp"
 #include "flat_map/__type_traits.hpp"
 #include "flat_map/__flat_tree.hpp"
+#include "flat_map/enum.hpp"
 
 namespace flat_map
 {
@@ -29,7 +30,7 @@ class flat_set : private detail::_flat_tree_base<flat_set<Key, Compare, Containe
     // To lookup private comparator
     friend _super;
 
-    static constexpr bool _is_uniq = true;
+    static constexpr range_order_t<range_order::unique_sorted> _order{};
 
 public:
     using key_type = typename _super::key_type;

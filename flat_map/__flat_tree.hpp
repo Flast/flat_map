@@ -93,7 +93,7 @@ public:
     {
         _container.assign(first, last);
         std::stable_sort(_container.begin(), _container.end(), _vcomp());
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             auto itr = std::unique(_container.begin(), _container.end(), _veq());
             _container.erase(itr, _container.end());
@@ -175,7 +175,7 @@ public:
     template <typename V>
     auto _insert(V&& value)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             // It should be guaranteed that the value isn't changed when found
             auto [itr, found] = _find(Subclass::_key_extractor(value));
@@ -258,7 +258,7 @@ public:
     template <typename V>
     iterator _insert(const_iterator hint, V&& value)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             auto [itr, found] = _insert_point_uniq(hint, Subclass::_key_extractor(value));
             if (!found) { itr = _container.insert(itr, std::forward<V>(value)); }
@@ -283,6 +283,7 @@ public:
     void insert(InputIterator first, InputIterator last) { insert(range_order::no_ordered, first, last); }
 
     void insert(std::initializer_list<value_type> ilist) { insert(ilist.begin(), ilist.end()); }
+
     // extension
     template <typename InputIterator>
     void insert(range_order order, InputIterator first, InputIterator last)
@@ -300,7 +301,7 @@ public:
             std::inplace_merge(_container.begin(), mid, _container.end(), _vcomp());
             break;
         }
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             auto itr = std::unique(_container.begin(), _container.end(), _veq());
             _container.erase(itr, _container.end());
@@ -312,7 +313,7 @@ public:
 
     auto insert(node_type&& node)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             if (!node.value.has_value()) { return insert_return_type{end(), false, {}}; }
             if (auto [itr, inserted] = _insert(std::move(*node.value)); inserted)
@@ -447,7 +448,7 @@ public:
     {
         // FIXME: Stateful comparator is always treated as non equivalent comparator.
         constexpr auto same_order = std::is_empty_v<key_compare> && std::is_same_v<typename Cont::key_compare, key_compare>;
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             if constexpr (same_order)
             {
@@ -510,7 +511,7 @@ public:
     template <typename K>
     std::pair<iterator, iterator> _equal_range(K const& key)
     {
-        if constexpr (Subclass::_is_uniq)
+        if constexpr (Subclass::_order == range_order::unique_sorted)
         {
             auto [itr, found] = _find(key);
             return {itr, found ? std::next(itr) : itr};
