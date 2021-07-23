@@ -104,9 +104,58 @@ _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIter
     return first1;
 }
 
-template <range_order Desire, typename RandomAccessIterator, typename Compare, typename T>
-inline RandomAccessIterator
-_stable_unique_sort(RandomAccessIterator first, RandomAccessIterator last, Compare const& comp, _buffer_span<T> buffer)
+template <typename Iterator>
+inline constexpr std::ptrdiff_t _switch_stable_sort_implementation_v = 16;
+
+template <range_order Desire, typename BidirectionalIterator, typename Compare>
+inline BidirectionalIterator
+_insertion_unique_sort(BidirectionalIterator first, BidirectionalIterator last, Compare const& comp)
+{
+    if (first == last) { return last; }
+
+    // NOTE: [first, j) is sorted range.
+    auto j = std::next(first);
+    for (auto i = std::next(first); i != last; ++i)
+    {
+        auto itr = std::find_if(std::make_reverse_iterator(j), std::make_reverse_iterator(first),
+                                [&comp, &i](auto& v) { return !comp(*i, v); });
+        if (itr.base() != j)
+        {
+            if constexpr (Desire == range_order::unique_sorted)
+            {
+                if (itr.base() != first && !comp(*itr, *i)) { continue; } // skip duplication
+                if (j != i)
+                {
+                    std::move_backward(itr.base(), j++, j);
+                    *itr.base() = std::move(*i);
+                    continue;
+                }
+            }
+            auto tmp = std::move(*i);
+            std::move_backward(itr.base(), j++, j);
+            *itr.base() = std::move(tmp);
+        }
+        else
+        {
+            if constexpr (Desire == range_order::unique_sorted)
+            {
+                if (!comp(*itr, *i)) { continue; } // skip duplication
+                if (i != j)
+                {
+                    *j++ = std::move(*i);
+                    continue;
+                }
+            }
+            ++j;
+        }
+    }
+
+    return j;
+}
+
+template <range_order Desire, typename BidirectionalIterator, typename Compare, typename T>
+inline BidirectionalIterator
+_stable_unique_sort(BidirectionalIterator first, BidirectionalIterator last, Compare const& comp, _buffer_span<T> buffer)
 {
     static_assert(is_sorted(Desire));
 
@@ -130,7 +179,10 @@ _stable_unique_sort(RandomAccessIterator first, RandomAccessIterator last, Compa
         return last;
     }
 
-    // TODO: use insertion sort for short range
+    if (len <= _switch_stable_sort_implementation_v<BidirectionalIterator>)
+    {
+        return _insertion_unique_sort<Desire>(first, last, comp);
+    }
 
     auto mid = std::next(first, len / 2);
     auto left = _stable_unique_sort<Desire>(first, mid, comp, buffer);

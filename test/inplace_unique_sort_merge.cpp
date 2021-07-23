@@ -78,11 +78,44 @@ TEST_CASE("_stable_unique_sort")
 
     _temporary_buffer<key_value_pair, std::allocator<key_value_pair>> buffer{32, std::allocator<key_value_pair>{}};
 
-    std::vector<key_value_pair> v{{1, 2}, 0, {7,2}, 2, 5, {6,2}, 4, {0,1}, {5,2}, 4, {4,1}, 1, {3,2}, 1, 2, {1,2}, 0, {5,3}, 6, {7,3}, {4,1}, {5,2}};
-    auto itr = _stable_unique_sort<range_order::unique_sorted>(v.begin(), v.end(), std::less<key_value_pair>{}, buffer);
-    REQUIRE(itr != v.end());
-    v.erase(itr, v.end());
-    REQUIRE(v == std::vector<key_value_pair>{0, {1,2}, 2, {3,2}, 4, 5, {6,2}, {7,2}});
+    SECTION("non unique")
+    {
+        std::vector<key_value_pair> v{{1, 2}, 0, {7,2}, 2, 5, {6,2}, 4, {0,1}, {5,2}, 4, {4,1}, 1, {3,2}, 1, 2, {1,2}, 0, {5,3}, 6, {7,3}, {4,1}, {5,2}};
+        auto itr = _stable_unique_sort<range_order::sorted>(v.begin(), v.end(), std::less<key_value_pair>{}, buffer);
+        REQUIRE(itr == v.end());
+        REQUIRE(v == std::vector<key_value_pair>{0, {0,1}, 0, {1,2}, 1, 1, {1,2}, 2, 2, {3,2}, 4, 4, {4,1}, {4,1}, 5, {5,2}, {5,3}, {5,2}, {6,2}, 6, {7,2}, {7,3}});
+    }
+
+    SECTION("unique")
+    {
+        std::vector<key_value_pair> v{{1, 2}, 0, {7,2}, 2, 5, {6,2}, 4, {0,1}, {5,2}, 4, {4,1}, 1, {3,2}, 1, 2, {1,2}, 0, {5,3}, 6, {7,3}, {4,1}, {5,2}};
+        auto itr = _stable_unique_sort<range_order::unique_sorted>(v.begin(), v.end(), std::less<key_value_pair>{}, buffer);
+        REQUIRE(itr != v.end());
+        v.erase(itr, v.end());
+        REQUIRE(v == std::vector<key_value_pair>{0, {1,2}, 2, {3,2}, 4, 5, {6,2}, {7,2}});
+    }
+}
+
+TEST_CASE("_insertion_unique_sort")
+{
+    using namespace flat_map::detail;
+
+    SECTION("non unique")
+    {
+        std::vector<key_value_pair> v{{1, 2}, 0, {7,2}, 2, 5, {6,2}, 4, {0,1}, {5,2}, 4, {4,1}, 1, {3,2}, 1, 2, {1,2}, 0, {5,3}, 6, {7,3}, {4,1}, {5,2}};
+        auto itr = _insertion_unique_sort<range_order::sorted>(v.begin(), v.end(), std::less<key_value_pair>{});
+        REQUIRE(itr == v.end());
+        REQUIRE(v == std::vector<key_value_pair>{0, {0,1}, 0, {1,2}, 1, 1, {1,2}, 2, 2, {3,2}, 4, 4, {4,1}, {4,1}, 5, {5,2}, {5,3}, {5,2}, {6,2}, 6, {7,2}, {7,3}});
+    }
+
+    SECTION("unique")
+    {
+        std::vector<key_value_pair> v{{1, 2}, 0, {7,2}, 2, 5, {6,2}, 4, {0,1}, {5,2}, 4, {4,1}, 1, {3,2}, 1, 2, {1,2}, 0, {5,3}, 6, {7,3}, {4,1}, {5,2}};
+        auto itr = _insertion_unique_sort<range_order::unique_sorted>(v.begin(), v.end(), std::less<key_value_pair>{});
+        REQUIRE(itr != v.end());
+        v.erase(itr, v.end());
+        REQUIRE(v == std::vector<key_value_pair>{0, {1,2}, 2, {3,2}, 4, 5, {6,2}, {7,2}});
+    }
 }
 #endif // FLAT_MAP_USE_NAIVE_IUSM
 
