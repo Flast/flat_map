@@ -66,6 +66,16 @@ _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIter
 {
     static_assert(is_sorted(Desire));
 
+    while (first1 != last1 && comp(*first1, *first2)) { ++first1; }
+    if (first1 == last1)
+    {
+        if (last1 != first2)
+        {
+            last2 = std::move(first2, last2, last1);
+        }
+        return last2;
+    }
+
     buffer = buffer.subbuf(std::distance(first1, last1));
     std::uninitialized_move(first1, last1, buffer.begin());
 
