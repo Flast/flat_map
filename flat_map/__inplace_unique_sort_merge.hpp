@@ -70,7 +70,14 @@ _inplace_unique_merge(ForwardIterator first1, ForwardIterator last1, ForwardIter
     std::uninitialized_move(first1, last1, buffer.begin());
 
     auto itr = buffer.begin();
-    while (first2 != last2 && itr != buffer.end())
+    // Checking itr first allows to merge with std::move's codition branch.
+    //  while (itr != buffer.end() && first2 != last2)
+    //      ...
+    //  while (itr != buffer.end()) // std::move(itr. buffer.end(), ...)
+    //  {   // jump here, or
+    //  }
+    //  // here since `itr != buffer.end()` is already evaluated by leading while loop.
+    while (itr != buffer.end() && first2 != last2)
     {
         if (comp(*first2, *itr))
         {
