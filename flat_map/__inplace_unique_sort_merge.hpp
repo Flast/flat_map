@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -121,46 +122,60 @@ template <range_order Desire, typename BidirectionalIterator, typename Compare>
 inline BidirectionalIterator
 _insertion_unique_sort(BidirectionalIterator first, BidirectionalIterator last, Compare const& comp)
 {
-    if (first == last) { return last; }
+    // This algorithm assumes that the range is longer than 2.
+    assert(std::distance(first, last) > 2);
 
-    // NOTE: [first, j) is sorted range.
+    // NOTE: [first, i) is sorted range, and [j, last) is not processed yet.
     auto j = std::next(first);
-    for (auto i = std::next(first); i != last; ++i)
+    auto i = j++;
+
+    if (comp(*i, *first))
     {
-        auto itr = std::find_if(std::make_reverse_iterator(j), std::make_reverse_iterator(first),
-                                [&comp, &i](auto& v) { return !comp(*i, v); });
-        if (itr.base() != j)
+        using std::iter_swap;
+        iter_swap(first, i++);
+    }
+    else
+    {
+        if constexpr (Desire == range_order::sorted) { ++i; }
+        else if (comp(*first, *i)) { ++i; }
+    }
+
+    for ( ; j != last; ++j)
+    {
+        auto k = std::find_if(std::make_reverse_iterator(i), std::make_reverse_iterator(first),
+                              [&comp, &j](auto& v) { return !comp(*j, v); });
+        if (k.base() != i)
         {
             if constexpr (Desire == range_order::unique_sorted)
             {
-                if (itr.base() != first && !comp(*itr, *i)) { continue; } // skip duplication
-                if (j != i)
+                if (k.base() != first && !comp(*k, *j)) { continue; } // skip duplication
+                if (i != j)
                 {
-                    std::move_backward(itr.base(), j++, j);
-                    *itr.base() = std::move(*i);
+                    std::move_backward(k.base(), i++, i);
+                    *k.base() = std::move(*j);
                     continue;
                 }
             }
-            auto tmp = std::move(*i);
-            std::move_backward(itr.base(), j++, j);
-            *itr.base() = std::move(tmp);
+            auto tmp = std::move(*j);
+            std::move_backward(k.base(), i++, i);
+            *k.base() = std::move(tmp);
         }
         else
         {
             if constexpr (Desire == range_order::unique_sorted)
             {
-                if (!comp(*itr, *i)) { continue; } // skip duplication
+                if (!comp(*k, *j)) { continue; } // skip duplication
                 if (i != j)
                 {
-                    *j++ = std::move(*i);
+                    *i++ = std::move(*j);
                     continue;
                 }
             }
-            ++j;
+            ++i;
         }
     }
 
-    return j;
+    return i;
 }
 
 template <range_order Desire, typename BidirectionalIterator, typename Compare, typename T>
