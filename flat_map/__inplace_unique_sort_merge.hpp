@@ -28,8 +28,6 @@ inline constexpr bool is_sorted(range_order order)
     }
 }
 
-#ifndef FLAT_MAP_USE_NAIVE_IUSM
-
 template <typename T>
 struct _buffer_span
 {
@@ -222,10 +220,10 @@ _stable_unique_sort(BidirectionalIterator first, BidirectionalIterator last, Com
 //
 // Return value
 //  Past the end iterator of merged range
-template <typename RandomAccessIterator, range_order Desire, typename Compare, typename Allocator>
+template <range_order Desire, typename RandomAccessIterator, typename Compare, typename Allocator>
 inline RandomAccessIterator
-inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
-                          range_order_t<Desire>, range_order order, Compare comp, Allocator alloc)
+_inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
+                           range_order order, Compare const& comp, Allocator alloc)
 {
     static_assert(is_sorted(Desire));
 
@@ -260,12 +258,10 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
     return itr;
 }
 
-#else // FLAT_MAP_USE_NAIVE_IUSM
-
-template <typename RandomAccessIterator, range_order Desire, typename Compare, typename Allocator>
+template <range_order Desire, typename RandomAccessIterator, typename Compare>
 inline RandomAccessIterator
-inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
-                          range_order_t<Desire>, range_order order, Compare comp, [[maybe_unused]] Allocator alloc)
+_inplace_unique_sort_merge_naive(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
+                                 range_order order, Compare comp)
 {
     static_assert(is_sorted(Desire));
 
@@ -295,6 +291,17 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
     }
 }
 
+template <typename RandomAccessIterator, range_order Desire, typename Compare, typename Allocator>
+inline RandomAccessIterator
+inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middle, RandomAccessIterator last,
+                          range_order_t<Desire>, range_order order, Compare comp, [[maybe_unused]] Allocator alloc)
+{
+    static_assert(is_sorted(Desire));
+#ifndef FLAT_MAP_USE_NAIVE_IUSM
+    return _inplace_unique_sort_merge<Desire>(first, middle, last, order, comp, std::move(alloc));
+#else // FLAT_MAP_USE_NAIVE_IUSM
+    return _inplace_unique_sort_merge_naive<Desire>(first, middle, last1, order, comp);
 #endif // FLAT_MAP_USE_NAIVE_IUSM
+}
 
 } // namespace flat_map::detail

@@ -13,8 +13,7 @@ template <range_order Desire, typename Container>
 auto do_algorithm(Container& cont, typename Container::iterator mid, range_order order)
 {
     auto comp = std::less<typename Container::value_type>{};
-    return flat_map::detail::inplace_unique_sort_merge(cont.begin(), mid, cont.end(),
-                                                       flat_map::range_order_t<Desire>{}, order, comp, cont.get_allocator());
+    return flat_map::detail::_inplace_unique_sort_merge<Desire>(cont.begin(), mid, cont.end(), order, comp, cont.get_allocator());
 };
 
 struct key_value_pair
@@ -43,7 +42,6 @@ std::ostream& operator<<(std::ostream& ostr, key_value_pair const& kvp)
     return ostr;
 }
 
-#ifndef FLAT_MAP_USE_NAIVE_IUSM
 TEST_CASE("_inplace_unique_merge")
 {
     using namespace flat_map::detail;
@@ -117,7 +115,6 @@ TEST_CASE("_insertion_unique_sort")
         REQUIRE(v == std::vector<key_value_pair>{0, {1,2}, 2, {3,2}, 4, 5, {6,2}, {7,2}});
     }
 }
-#endif // FLAT_MAP_USE_NAIVE_IUSM
 
 TEST_CASE("inplace_merge", "[inplace_merge]")
 {
