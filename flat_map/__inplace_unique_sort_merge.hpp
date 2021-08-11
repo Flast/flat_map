@@ -235,27 +235,25 @@ _inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator midd
     auto buflen = std::max<std::size_t>(len1, (len2 + 1) / 2);
     _temporary_buffer<value_type, Allocator> buffer{buflen, std::move(alloc)};
 
-    RandomAccessIterator itr;
     switch (order)
     {
     case range_order::no_ordered:
     case range_order::uniqued:
-        last = _stable_unique_sort<Desire>(middle, last, std::ref(comp), buffer);
-        if (true) ; else
+        last = _stable_unique_sort<Desire>(middle, last, comp, buffer);
+        break;
 
     case range_order::sorted:
         if constexpr (Desire == range_order::unique_sorted)
         {
             last = std::unique(middle, last, [&comp](auto& l, auto& r) { return !comp(l, r) && !comp(r, l); });
         }
-        [[gnu::fallthrough]];
+        break;
 
     case range_order::unique_sorted:
-        itr = _inplace_unique_merge<Desire>(first, middle, middle, last, comp, buffer);
         break;
     }
 
-    return itr;
+    return _inplace_unique_merge<Desire>(first, middle, middle, last, comp, buffer);
 }
 
 template <range_order Desire, typename RandomAccessIterator, typename Compare>
