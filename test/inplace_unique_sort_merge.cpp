@@ -113,6 +113,15 @@ TEST_CASE("_insertion_unique_sort")
         v.erase(itr, v.end());
         REQUIRE(v == std::vector<key_value_pair>{0, {1,2}, 2, {3,2}, 4, 5, {6,2}, {7,2}});
     }
+
+    SECTION("regression: flat_map<deque> with GCC")
+    {
+        std::deque<key_value_pair> d{{6,7}, {4,5}, {2,3}, {2,5}, {0,1}};
+        auto itr = _insertion_unique_sort<range_order::unique_sorted>(d.begin(), d.end(), std::less<key_value_pair>{});
+        REQUIRE(itr != d.end());
+        d.erase(itr, d.end());
+        REQUIRE(d == std::deque<key_value_pair>{{0,1}, {2,3}, {4,5}, {6,7}});
+    }
 }
 
 TEST_CASE("inplace_merge", "[inplace_merge]")
@@ -208,5 +217,14 @@ TEST_CASE("w/ stable_sort,unique", "[inplace_merge][stable_sort][unique]")
         REQUIRE(itr != v.end());
         v.erase(itr, v.end());
         REQUIRE(v == std::vector<key_value_pair>{0, 1, {2,3}, 4, {5,2}, {6,7}});
+    }
+
+    SECTION("regression: flat_map<deque> with GCC")
+    {
+        std::deque<key_value_pair> d{{6,7}, {4,5}, {2,3}, {2,5}, {0,1}};
+        auto itr = do_algorithm<range_order::unique_sorted>(d, d.begin(), range_order::no_ordered);
+        REQUIRE(itr != d.end());
+        d.erase(itr, d.end());
+        REQUIRE(d == std::deque<key_value_pair>{{0,1}, {2,3}, {4,5}, {6,7}});
     }
 }
