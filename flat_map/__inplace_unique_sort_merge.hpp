@@ -149,13 +149,15 @@ _insertion_unique_sort(BidirectionalIterator first, BidirectionalIterator last, 
                 if (k.base() != first && !comp(*k, *j)) { continue; } // skip duplication
                 if (i != j)
                 {
-                    std::move_backward(k.base(), i++, i);
+                    auto n = i++;
+                    std::move_backward(k.base(), n, i);
                     *k.base() = std::move(*j);
                     continue;
                 }
             }
             auto tmp = std::move(*j);
-            std::move_backward(k.base(), i++, i);
+            auto n = i++;
+            std::move_backward(k.base(), n, i);
             *k.base() = std::move(tmp);
         }
         else
