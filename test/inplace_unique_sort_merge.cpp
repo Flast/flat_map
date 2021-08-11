@@ -14,7 +14,7 @@ auto do_algorithm(Container& cont, typename Container::iterator mid, range_order
 {
     auto comp = std::less<typename Container::value_type>{};
     return flat_map::detail::_inplace_unique_sort_merge<Desire>(cont.begin(), mid, cont.end(), order, comp, cont.get_allocator());
-};
+}
 
 struct key_value_pair
 {
