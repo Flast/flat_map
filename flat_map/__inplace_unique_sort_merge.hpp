@@ -300,7 +300,7 @@ inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator middl
 #ifndef FLAT_MAP_USE_NAIVE_IUSM
     return _inplace_unique_sort_merge<Desire>(first, middle, last, order, comp, std::move(alloc));
 #else // FLAT_MAP_USE_NAIVE_IUSM
-    return _inplace_unique_sort_merge_naive<Desire>(first, middle, last1, order, comp);
+    return _inplace_unique_sort_merge_naive<Desire>(first, middle, last, order, comp);
 #endif // FLAT_MAP_USE_NAIVE_IUSM
 }
 
