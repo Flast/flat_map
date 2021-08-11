@@ -56,7 +56,6 @@ TEST_CASE("_inplace_unique_merge")
         REQUIRE(last != v.end());
         v.erase(last, v.end());
         REQUIRE(v == std::vector<key_value_pair>{{1,2}, 1, {2,3}, 2, {2,1}, 2, 3, {3,5}, 3, {3,6}, 3, 4, 4, {4,1}, {5,1}, 5, 5, 6, {6,1}});
-        std::cout << std::endl;
     }
 
     SECTION("unique")
