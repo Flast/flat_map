@@ -46,7 +46,7 @@ TEST_CASE("_inplace_unique_merge")
 {
     using namespace flat_map::detail;
 
-    _temporary_buffer<key_value_pair, std::allocator<key_value_pair>> buffer{32, std::allocator<key_value_pair>{}};
+    _temporary_buffer buffer{32, std::allocator<key_value_pair>{}};
 
     SECTION("non unique")
     {
@@ -73,7 +73,7 @@ TEST_CASE("_stable_unique_sort")
 {
     using namespace flat_map::detail;
 
-    _temporary_buffer<key_value_pair, std::allocator<key_value_pair>> buffer{32, std::allocator<key_value_pair>{}};
+    _temporary_buffer buffer{32, std::allocator<key_value_pair>{}};
 
     SECTION("non unique")
     {
