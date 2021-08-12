@@ -40,13 +40,13 @@ struct _buffer_span
     auto subbuf(std::size_t n) { return _buffer_span{_ptr, std::min(n, _len)}; }
 };
 
-template <typename T, typename Allocator>
-struct _temporary_buffer : _buffer_span<T>
+template <typename Allocator>
+struct _temporary_buffer : _buffer_span<typename std::allocator_traits<Allocator>::value_type>
 {
     Allocator _alloc;
 
     _temporary_buffer(std::size_t n, Allocator alloc)
-      : _buffer_span<T>{alloc.allocate(n), n}, _alloc{std::move(alloc)} { }
+      : _temporary_buffer::_buffer_span{alloc.allocate(n), n}, _alloc{std::move(alloc)} { }
 
     _temporary_buffer(_temporary_buffer const&) = delete;
     _temporary_buffer(_temporary_buffer&&) = delete;
@@ -235,7 +235,7 @@ _inplace_unique_sort_merge(RandomAccessIterator first, RandomAccessIterator midd
 
     using value_type = typename std::iterator_traits<RandomAccessIterator>::value_type;
     auto buflen = std::max<std::size_t>(len1, (len2 + 1) / 2);
-    _temporary_buffer<value_type, Allocator> buffer{buflen, std::move(alloc)};
+    _temporary_buffer buffer{buflen, std::move(alloc)};
 
     switch (order)
     {
