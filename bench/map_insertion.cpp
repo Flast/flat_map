@@ -13,6 +13,8 @@ static void BM_range_insertion(benchmark::State& state)
 {
     for (auto _ : state)
     {
+        C fm;
+
         state.PauseTiming();
         std::vector<std::pair<int, int>> v(state.range(0));
         for (auto& [k, v] : v)
@@ -20,9 +22,14 @@ static void BM_range_insertion(benchmark::State& state)
             k = std::uniform_int_distribution<int>{}(rng_state);
             v = std::uniform_int_distribution<int>{}(rng_state);
         }
+        fm = C(v.begin(), v.end());
+        for (auto& [k, v] : v)
+        {
+            k = std::uniform_int_distribution<int>{}(rng_state);
+            v = std::uniform_int_distribution<int>{}(rng_state);
+        }
         state.ResumeTiming();
 
-        C fm;
         fm.insert(v.begin(), v.end());
         benchmark::DoNotOptimize(fm.begin());
         benchmark::ClobberMemory();
@@ -38,8 +45,16 @@ static void BM_sorted_range_insertion(benchmark::State& state)
 {
     for (auto _ : state)
     {
+        C fm;
+
         state.PauseTiming();
         std::vector<std::pair<int, int>> v(state.range(0));
+        for (auto& [k, v] : v)
+        {
+            k = std::uniform_int_distribution<int>{}(rng_state);
+            v = std::uniform_int_distribution<int>{}(rng_state);
+        }
+        fm = C(v.begin(), v.end());
         for (auto& [k, v] : v)
         {
             k = std::uniform_int_distribution<int>{}(rng_state);
@@ -48,7 +63,6 @@ static void BM_sorted_range_insertion(benchmark::State& state)
         std::sort(v.begin(), v.end(), [](auto& lhs, auto& rhs) { return lhs.first < rhs.first; });
         state.ResumeTiming();
 
-        C fm;
         fm.insert(v.begin(), v.end());
         benchmark::DoNotOptimize(fm.begin());
         benchmark::ClobberMemory();
@@ -64,8 +78,16 @@ static void BM_insert_sorted(benchmark::State& state)
 {
     for (auto _ : state)
     {
+        C fm;
+
         state.PauseTiming();
         std::vector<std::pair<int, int>> v(state.range(0));
+        for (auto& [k, v] : v)
+        {
+            k = std::uniform_int_distribution<int>{}(rng_state);
+            v = std::uniform_int_distribution<int>{}(rng_state);
+        }
+        fm = C(v.begin(), v.end());
         for (auto& [k, v] : v)
         {
             k = std::uniform_int_distribution<int>{}(rng_state);
@@ -74,7 +96,6 @@ static void BM_insert_sorted(benchmark::State& state)
         std::sort(v.begin(), v.end(), [](auto& lhs, auto& rhs) { return lhs.first < rhs.first; });
         state.ResumeTiming();
 
-        C fm;
         fm.insert(flat_map::range_order::sorted, v.begin(), v.end());
         benchmark::DoNotOptimize(fm.begin());
         benchmark::ClobberMemory();
