@@ -140,31 +140,29 @@ _insertion_unique_sort(BidirectionalIterator first, BidirectionalIterator last, 
 
     for ( ; j != last; ++j)
     {
-        auto k = std::find_if(std::make_reverse_iterator(i), std::make_reverse_iterator(first),
-                              [&comp, &j](auto& v) { return !comp(*j, v); });
-        if (k.base() != i)
+        if (auto k = std::upper_bound(first, i, *j, std::ref(comp)); k != i)
         {
             if constexpr (Desire == range_order::unique_sorted)
             {
-                if (k.base() != first && !comp(*k, *j)) { continue; } // skip duplication
+                if (k != first && !comp(*std::prev(k), *j)) { continue; } // skip duplication
                 if (i != j)
                 {
                     auto n = i++;
-                    std::move_backward(k.base(), n, i);
-                    *k.base() = std::move(*j);
+                    std::move_backward(k, n, i);
+                    *k = std::move(*j);
                     continue;
                 }
             }
             auto tmp = std::move(*j);
             auto n = i++;
-            std::move_backward(k.base(), n, i);
-            *k.base() = std::move(tmp);
+            std::move_backward(k, n, i);
+            *k = std::move(tmp);
         }
         else
         {
             if constexpr (Desire == range_order::unique_sorted)
             {
-                if (!comp(*k, *j)) { continue; } // skip duplication
+                if (!comp(*std::prev(k), *j)) { continue; } // skip duplication
                 if (i != j)
                 {
                     *i++ = std::move(*j);
