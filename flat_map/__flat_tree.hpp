@@ -387,87 +387,75 @@ public:
         return {};
     }
 
-    // Specialization for same order with stateless comparator
+    // FIXME: Stateful comparator is always treated as non equivalent comparator.
     template <typename Cont>
-    void _merge_ordered_uniq(Cont& source, std::false_type /* multimap */)
-    {
-        auto first = source.begin();
-        if (empty()) { goto out; }
-        for (auto itr = begin(); first != source.end(); )
-        {
-            while (value_comp()(*itr, *first)) { if (++itr == end()) { goto out; } }
-            if (value_comp()(*first, *itr))
-            {
-                itr = std::next(_container.insert(itr, std::move(*first)));
-                first = source.erase(first);
-            }
-            else
-            {
-                ++first;
-            }
-        }
-    out:
-        _container.insert(end(), std::make_move_iterator(first), std::make_move_iterator(source.end())); // insert remainings
-        source.erase(first, source.end());
-    }
-
-    template <typename Cont>
-    void _merge_ordered_uniq(Cont& source, std::true_type /* multimap */)
-    {
-        auto itr = begin();
-        for (auto first = source.begin(); first != source.end(); )
-        {
-            while (itr != end() && value_comp()(*itr, *first)) { ++itr; }
-            if (itr == end() || value_comp()(*first, *itr))
-            {
-                itr = _container.insert(itr, std::move(*first));
-                first = source.erase(first);
-                while (first != source.end() && !value_comp()(*itr, *first)) { ++first; } // skip duplicated
-                ++itr;
-            }
-            else
-            {
-                ++first;
-            }
-        }
-    }
+    static constexpr bool _same_order_v = std::is_empty_v<key_compare> && std::is_same_v<typename Cont::key_compare, key_compare>;
 
     template <typename Cont, typename Cond>
-    void _merge_unordered_uniq(Cont& source, Cond multimap)
+    iterator _move_distinct_elements(Cont& source, Cond multimap)
     {
-        for (auto first = source.begin(); first != source.end(); )
+        [[maybe_unused]] auto const comp = source.value_comp();
+
+        auto const len = _container.size();
+        auto first = _container.begin();
+        for (auto itr = source.begin(); itr != source.end(); )
         {
-            auto [itr, inserted] = _insert(*first);
-            first = inserted ? source.erase(first) : std::next(first);
-            if constexpr (multimap)
+            auto const& key = Subclass::_key_extractor(*itr);
+            auto const mid = std::next(_container.begin(), len);
+            auto lb = std::lower_bound(first, mid, key, _vcomp());
+            [[maybe_unused]] auto const dist = std::distance(_container.begin(), lb);
+            if (lb == mid || _vcomp()(key, *lb))
             {
-                auto comp = source.value_comp();
-                while (first != source.end() && !comp(*itr, *first)) { ++first; } // skip duplicated
+                auto tmp = std::move(*itr);
+                itr = source.erase(itr);
+                if constexpr (multimap)
+                {
+                    while (itr != source.end() && !comp(tmp, *itr)) { ++itr; }
+                }
+                _container.emplace(_container.end(), std::move(tmp));
             }
+            else
+            {
+                ++itr;
+            }
+            if constexpr (_same_order_v<Cont>) { first = std::next(_container.begin(), dist); }
         }
+        return std::next(_container.begin(), len);;
     }
 
     template <typename Cont, typename Cond>
     void _merge(Cont& source, [[maybe_unused]] Cond multimap)
     {
-        // FIXME: Stateful comparator is always treated as non equivalent comparator.
-        constexpr auto same_order = std::is_empty_v<key_compare> && std::is_same_v<typename Cont::key_compare, key_compare>;
+        if constexpr (concepts::Reservable<Container>)
+        {
+            auto const require = size() + source.size();
+            auto const opt_cap = (~0ull >> __builtin_clzll(require - 1)) + 1;
+            _container.reserve(opt_cap);
+        }
+
+        iterator mid;
         if constexpr (Subclass::_order == range_order::unique_sorted)
         {
-            if constexpr (same_order)
+            mid = _move_distinct_elements(source, multimap);
+            if constexpr (!_same_order_v<Cont>)
             {
-                _merge_ordered_uniq(source, multimap);
-            }
-            else
-            {
-                _merge_unordered_uniq(source, multimap);
+                std::sort(mid, _container.end(), _vcomp());
             }
         }
         else
         {
-            constexpr auto order = same_order ? range_order::sorted : range_order::no_ordered;
-            insert(order, std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
-            source.clear();
+            mid = _container.insert(_container.end(), std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
+            if constexpr (!_same_order_v<Cont>)
+            {
+                std::stable_sort(mid, _container.end(), _vcomp());
+            }
+        }
+
+        std::inplace_merge(_container.begin(), mid, _container.end(), _vcomp());
+
+        if constexpr (Subclass::_order != range_order::unique_sorted)
+        {
+            source.clear(); // clear at last for cache awareness
         }
     }
 
