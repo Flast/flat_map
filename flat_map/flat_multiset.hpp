@@ -53,7 +53,8 @@ public:
 private:
     using _comparator = value_compare;
 
-    static auto& _key_extractor(value_type const& value) { return value; }
+    template <typename V>
+    static auto& _key_extractor(V const& value) { return value; }
 
 public:
     flat_multiset() = default;
