@@ -86,7 +86,8 @@ private:
         }
     };
 
-    static auto& _key_extractor(value_type const& value) { return std::get<0>(value); }
+    template <typename V>
+    static auto& _key_extractor(V const& value) { return std::get<0>(value); }
 
 public:
     flat_map() = default;
