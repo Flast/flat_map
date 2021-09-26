@@ -420,7 +420,7 @@ public:
             }
             if constexpr (_same_order_v<Cont>) { first = std::next(_container.begin(), dist); }
         }
-        return std::next(_container.begin(), len);;
+        return std::next(_container.begin(), len);
     }
 
     template <typename Cont, typename Cond>
