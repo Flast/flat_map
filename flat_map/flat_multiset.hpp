@@ -99,6 +99,24 @@ public:
         this->_initialize_container(init.begin(), init.end());
     }
 
+    explicit flat_multiset(range_order order, Container const& cont)
+      : _super{order, cont} { }
+
+    explicit flat_multiset(range_order order, Container const& cont, Compare const& comp, allocator_type const& alloc = allocator_type())
+      : _super{order, Container{cont, alloc}, comp} { }
+
+    explicit flat_multiset(range_order order, Container const& cont, allocator_type const& alloc)
+      : _super{order, Container{cont, alloc}} { }
+
+    explicit flat_multiset(range_order order, Container&& cont)
+      : _super{order, std::move(cont)} { }
+
+    explicit flat_multiset(range_order order, Container&& cont, Compare const& comp, allocator_type const& alloc = allocator_type())
+      : _super{order, Container{std::move(cont), alloc}, comp} { }
+
+    explicit flat_multiset(range_order order, Container&& cont, allocator_type const& alloc)
+      : _super{order, Container{std::move(cont), alloc}} { }
+
     flat_multiset& operator=(flat_multiset const& other) = default;
 
     flat_multiset& operator=(flat_multiset&& other) noexcept(std::is_nothrow_move_assignable_v<_super>)
