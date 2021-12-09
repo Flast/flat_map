@@ -101,6 +101,22 @@ public:
         }
     }
 
+    void _sort_container(range_order order)
+    {
+        if (order == range_order::no_ordered || order == range_order::uniqued)
+        {
+            std::stable_sort(_container.begin(), _container.end(), _vcomp());
+        }
+        if constexpr (Subclass::_order == range_order::unique_sorted)
+        {
+            if (order == range_order::no_ordered || order == range_order::sorted)
+            {
+                auto itr = std::unique(_container.begin(), _container.end(), _veq());
+                _container.erase(itr, _container.end());
+            }
+        }
+    }
+
 public:
     _flat_tree_base() = default;
 
@@ -117,6 +133,18 @@ public:
     _flat_tree_base(_flat_tree_base&& other) = default;
     _flat_tree_base(_flat_tree_base&& other, allocator_type const& alloc)
       : detail::comparator_store<Compare>{std::move(other._comp())}, _container{std::move(other._container), alloc} { }
+
+    explicit _flat_tree_base(range_order order, Container cont)
+      : _container{std::move(cont)}
+    {
+        _sort_container(order);
+    }
+
+    explicit _flat_tree_base(range_order order, Container cont, Compare const& comp)
+      : detail::comparator_store<Compare>{comp}, _container{std::move(cont)}
+    {
+        _sort_container(order);
+    }
 
     _flat_tree_base& operator=(_flat_tree_base const& other) = default;
 
