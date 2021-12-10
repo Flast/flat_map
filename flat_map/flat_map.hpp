@@ -169,6 +169,7 @@ public:
     }
 
     using _super::get_allocator;
+    using _super::base;
 
     mapped_type const& at(key_type const& key) const
     {

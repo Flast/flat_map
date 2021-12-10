@@ -166,6 +166,7 @@ public:
     }
 
     using _super::get_allocator;
+    using _super::base;
 
     using _super::begin;
     using _super::cbegin;
