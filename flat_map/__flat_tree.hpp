@@ -152,6 +152,10 @@ public:
 
     allocator_type get_allocator() const noexcept { return _container.get_allocator(); }
 
+    auto& base() & noexcept { return _container; }
+    auto base() && noexcept { return std::move(_container); }
+    auto const& base() const& noexcept { return _container; }
+
     iterator begin() noexcept { return _container.begin(); }
     const_iterator begin() const noexcept { return _container.begin(); }
     const_iterator cbegin() const noexcept { return _container.cbegin(); }
