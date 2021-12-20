@@ -1,0 +1,37 @@
+name: infer
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  infer:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: srz-zumix/setup-infer@v1
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends g++ cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: infer compile -- cmake -DCMAKE_BUILD_TYPE=Debug -DCXX_STANDARD_UPTO=20 ..
+
+    - name: Run infer
+      working-directory: build
+      run: infer run -- make -j2 unit_test
+
+    - name: Report infer
+      uses: srz-zumix/reviewdog-action-infer@v1
+      with:
+        reporter: github-pr-review
