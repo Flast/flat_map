@@ -9,7 +9,7 @@ on:
       - master
   schedule:
     - cron: '38 7 * * 6'
-    
+
 jobs:
   asan:
     runs-on: ubuntu-20.04
