@@ -34,4 +34,5 @@ jobs:
     - name: Report infer
       uses: srz-zumix/reviewdog-action-infer@v1
       with:
+        report_path: ./build/infer-out
         reporter: github-pr-review
