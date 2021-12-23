@@ -1,0 +1,22 @@
+name: cppcheck
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends cppcheck
+
+    - name: Run cppcheck
+      run: cppcheck -j2 --language=c++ --enable=all .
