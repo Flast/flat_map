@@ -119,9 +119,11 @@ public:
         tuple_transform([](auto& l, auto& r) { using std::swap; swap(*l, *r); }, lhs._it, rhs._it);
     }
 
-    friend constexpr bool operator==(tied_sequence_iterator const& lhs, tied_sequence_iterator const& rhs) { return lhs._it == rhs._it; }
+    template <typename... LIterators, typename... RIterators>
+    friend constexpr bool operator==(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs);
 
-    friend constexpr bool operator<(tied_sequence_iterator const& lhs, tied_sequence_iterator const& rhs) { return lhs._it < rhs._it; }
+    template <typename... LIterators, typename... RIterators>
+    friend constexpr bool operator<(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs);
 };
 
 template <typename... Iterators>
@@ -142,26 +144,38 @@ constexpr auto operator-(tied_sequence_iterator<Iterators...> lhs, typename tied
     return lhs -= n;
 }
 
-template <typename... Iterators>
-constexpr bool operator!=(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
+template <typename... LIterators, typename... RIterators>
+constexpr bool operator==(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+{
+    return lhs._it == rhs._it;
+}
+
+template <typename... LIterators, typename... RIterators>
+constexpr bool operator!=(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
 {
     return !(lhs == rhs);
 }
 
-template <typename... Iterators>
-constexpr bool operator>(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
+template <typename... LIterators, typename... RIterators>
+constexpr bool operator<(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+{
+    return lhs._it < rhs._it;
+}
+
+template <typename... LIterators, typename... RIterators>
+constexpr bool operator>(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
 {
     return rhs < lhs;
 }
 
-template <typename... Iterators>
-constexpr bool operator<=(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
+template <typename... LIterators, typename... RIterators>
+constexpr bool operator<=(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
 {
     return !(lhs > rhs);
 }
 
-template <typename... Iterators>
-constexpr bool operator>=(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
+template <typename... LIterators, typename... RIterators>
+constexpr bool operator>=(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
 {
     return !(lhs < rhs);
 }
