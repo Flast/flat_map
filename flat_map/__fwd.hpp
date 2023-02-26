@@ -39,6 +39,3 @@ template <typename Key, typename Compare, typename Container> class flat_set;
 template <typename Key, typename Compare, typename Container> class flat_multiset;
 template <typename... Sequences> class tied_sequence;
 } // namespace flat_map
-
-#undef FLATMAP_BEGIN_STD
-#undef FLATMAP_END_STD

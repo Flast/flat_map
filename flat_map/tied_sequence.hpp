@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -12,8 +12,8 @@
 #include <utility>
 
 #include "flat_map/__config.hpp"
-#include "flat_map/__fwd.hpp"
 #include "flat_map/__memory.hpp"
+#include "flat_map/__tuple.hpp"
 #include "flat_map/__type_traits.hpp"
 
 namespace flat_map
@@ -21,39 +21,6 @@ namespace flat_map
 
 namespace detail
 {
-
-template <std::size_t... N, typename F, typename T>
-constexpr auto tuple_transform_impl(std::index_sequence<N...>, F f, T&& t)
-{
-    return f(std::get<N>(std::forward<T>(t))...);
-}
-
-template <std::size_t N, typename F, typename... T>
-constexpr auto tuple_transform_impl2(F& f, T&&... t)
-{
-    return f(std::get<N>(std::forward<T>(t))...);
-}
-
-template <std::size_t... N, typename F, typename... T>
-constexpr auto tuple_transform_impl(std::index_sequence<N...>, F f, T&&... t)
-{
-    if constexpr (std::is_void_v<decltype(tuple_transform_impl2<0>(f, std::forward<T>(t)...))>)
-    {
-        (tuple_transform_impl2<N>(f, std::forward<T>(t)...), ...);
-    }
-    else
-    {
-        return std::tuple{tuple_transform_impl2<N>(f, std::forward<T>(t)...)...};
-    }
-}
-
-template <typename F, typename Head, typename... Tail>
-constexpr auto tuple_transform(F f, Head&& head, Tail&&... tail)
-{
-    static_assert(((std::tuple_size_v<remove_cvref_t<Head>> == std::tuple_size_v<remove_cvref_t<Tail>>) && ...));
-    using indices_t = std::make_index_sequence<std::tuple_size_v<remove_cvref_t<Head>>>;
-    return tuple_transform_impl(indices_t{}, std::move(f), std::forward<Head>(head), std::forward<Tail>(tail)...);
-}
 
 template <typename... Iterators>
 class _tied_sequence_iterator
