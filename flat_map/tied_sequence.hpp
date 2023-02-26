@@ -23,10 +23,10 @@ namespace detail
 {
 
 template <typename... Iterators>
-class tied_sequence_iterator
+class zip_iterator
 {
     template <typename... Itr>
-    friend class tied_sequence_iterator;
+    friend class zip_iterator;
 
     template <typename... Sequences>
     friend class ::flat_map::tied_sequence;
@@ -41,25 +41,25 @@ public:
     using iterator_category = std::common_type_t<typename std::iterator_traits<Iterators>::iterator_category...>;
 
 public:
-    tied_sequence_iterator() = default;
+    zip_iterator() = default;
 
-    tied_sequence_iterator(std::tuple<Iterators...> itrs) : _it{itrs} { }
-
-    template <typename... Itrs>
-    tied_sequence_iterator(tied_sequence_iterator<Itrs...> other) : _it{std::move(other._it)} { }
-
-    tied_sequence_iterator(tied_sequence_iterator const&) = default;
-    tied_sequence_iterator(tied_sequence_iterator&&) = default;
+    zip_iterator(std::tuple<Iterators...> itrs) : _it{itrs} { }
 
     template <typename... Itrs>
-    tied_sequence_iterator& operator=(tied_sequence_iterator<Itrs...> other)
+    zip_iterator(zip_iterator<Itrs...> other) : _it{std::move(other._it)} { }
+
+    zip_iterator(zip_iterator const&) = default;
+    zip_iterator(zip_iterator&&) = default;
+
+    template <typename... Itrs>
+    zip_iterator& operator=(zip_iterator<Itrs...> other)
     {
         _it = std::move(other._it);
         return *this;
     }
 
-    tied_sequence_iterator& operator=(tied_sequence_iterator const&) = default;
-    tied_sequence_iterator& operator=(tied_sequence_iterator&&) = default;
+    zip_iterator& operator=(zip_iterator const&) = default;
+    zip_iterator& operator=(zip_iterator&&) = default;
 
     template <std::size_t N>
     constexpr auto base() const { return std::get<N>(_it); }
@@ -69,39 +69,39 @@ public:
     // XXX: operator-> requires returning "raw pointer" or call op-> recursively until getting "raw pointer".
     // constexpr pointer operator->() const;
 
-    constexpr tied_sequence_iterator& operator++()
+    constexpr zip_iterator& operator++()
     {
         tuple_transform([](auto&... it) { (++it, ...); }, _it);
         return *this;
     }
 
-    constexpr tied_sequence_iterator operator++(int)
+    constexpr zip_iterator operator++(int)
     {
         auto copy = *this;
         operator++();
         return copy;
     }
 
-    constexpr tied_sequence_iterator& operator--()
+    constexpr zip_iterator& operator--()
     {
         tuple_transform([](auto&... it) { (--it, ...); }, _it);
         return *this;
     }
 
-    constexpr tied_sequence_iterator operator--(int)
+    constexpr zip_iterator operator--(int)
     {
         auto copy = *this;
         operator--();
         return copy;
     }
 
-    constexpr tied_sequence_iterator& operator+=(difference_type n)
+    constexpr zip_iterator& operator+=(difference_type n)
     {
         tuple_transform([n](auto&... it) { ((it += n), ...); }, _it);
         return *this;
     }
 
-    constexpr tied_sequence_iterator& operator-=(difference_type n)
+    constexpr zip_iterator& operator-=(difference_type n)
     {
         tuple_transform([n](auto&... it) { ((it -= n), ...); }, _it);
         return *this;
@@ -109,79 +109,79 @@ public:
 
     constexpr decltype(auto) operator[](difference_type n) const { return *(*this + n); }
 
-    constexpr difference_type operator-(tied_sequence_iterator const& other) const { return std::get<0>(_it) - std::get<0>(other._it); }
+    constexpr difference_type operator-(zip_iterator const& other) const { return std::get<0>(_it) - std::get<0>(other._it); }
 
-    friend constexpr void swap(tied_sequence_iterator& lhs, tied_sequence_iterator& rhs) noexcept(noexcept(std::swap(lhs, rhs))) { std::swap(lhs._it, rhs._it); }
+    friend constexpr void swap(zip_iterator& lhs, zip_iterator& rhs) noexcept(noexcept(std::swap(lhs, rhs))) { std::swap(lhs._it, rhs._it); }
 
-    friend constexpr void iter_swap(tied_sequence_iterator const& lhs, tied_sequence_iterator const& rhs)
+    friend constexpr void iter_swap(zip_iterator const& lhs, zip_iterator const& rhs)
         noexcept((std::is_nothrow_swappable_v<typename std::iterator_traits<Iterators>> && ...))
     {
         tuple_transform([](auto& l, auto& r) { using std::swap; swap(*l, *r); }, lhs._it, rhs._it);
     }
 
     template <typename... LIterators, typename... RIterators>
-    friend constexpr bool operator==(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs);
+    friend constexpr bool operator==(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs);
 
     template <typename... LIterators, typename... RIterators>
-    friend constexpr bool operator<(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs);
+    friend constexpr bool operator<(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs);
 };
 
 template <typename... Iterators>
-constexpr auto operator+(tied_sequence_iterator<Iterators...> lhs, typename tied_sequence_iterator<Iterators...>::difference_type n)
+constexpr auto operator+(zip_iterator<Iterators...> lhs, typename zip_iterator<Iterators...>::difference_type n)
 {
     return lhs += n;
 }
 
 template <typename... Iterators>
-constexpr auto operator+(typename tied_sequence_iterator<Iterators...>::difference_type n, tied_sequence_iterator<Iterators...> rhs)
+constexpr auto operator+(typename zip_iterator<Iterators...>::difference_type n, zip_iterator<Iterators...> rhs)
 {
     return rhs += n;
 }
 
 template <typename... Iterators>
-constexpr auto operator-(tied_sequence_iterator<Iterators...> lhs, typename tied_sequence_iterator<Iterators...>::difference_type n)
+constexpr auto operator-(zip_iterator<Iterators...> lhs, typename zip_iterator<Iterators...>::difference_type n)
 {
     return lhs -= n;
 }
 
 template <typename... LIterators, typename... RIterators>
-constexpr bool operator==(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+constexpr bool operator==(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs)
 {
     return lhs._it == rhs._it;
 }
 
 template <typename... LIterators, typename... RIterators>
-constexpr bool operator!=(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+constexpr bool operator!=(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs)
 {
     return !(lhs == rhs);
 }
 
 template <typename... LIterators, typename... RIterators>
-constexpr bool operator<(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+constexpr bool operator<(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs)
 {
     return lhs._it < rhs._it;
 }
 
 template <typename... LIterators, typename... RIterators>
-constexpr bool operator>(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+constexpr bool operator>(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs)
 {
     return rhs < lhs;
 }
 
 template <typename... LIterators, typename... RIterators>
-constexpr bool operator<=(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+constexpr bool operator<=(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs)
 {
     return !(lhs > rhs);
 }
 
 template <typename... LIterators, typename... RIterators>
-constexpr bool operator>=(tied_sequence_iterator<LIterators...> const& lhs, tied_sequence_iterator<RIterators...> const& rhs)
+constexpr bool operator>=(zip_iterator<LIterators...> const& lhs, zip_iterator<RIterators...> const& rhs)
 {
     return !(lhs < rhs);
 }
 
 template <std::size_t N, typename Iterator>
-class extracting_iterator
+class unzip_iterator
 {
     Iterator _base;
 
@@ -193,76 +193,76 @@ public:
     using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 
 public:
-    constexpr extracting_iterator() = default;
-    explicit constexpr extracting_iterator(Iterator itr) : _base(itr) { }
+    constexpr unzip_iterator() = default;
+    explicit constexpr unzip_iterator(Iterator itr) : _base(itr) { }
 
     constexpr reference operator*() const { return std::get<N>(*_base); }
     constexpr pointer operator->() const { return &std::get<N>(*_base); }
 
-    constexpr extracting_iterator& operator++() { ++_base; return *this; }
-    constexpr extracting_iterator operator++(int) { return _base++; }
+    constexpr unzip_iterator& operator++() { ++_base; return *this; }
+    constexpr unzip_iterator operator++(int) { return _base++; }
 
-    constexpr extracting_iterator& operator--() { --_base; return *this; }
-    constexpr extracting_iterator operator--(int) { return _base--; }
+    constexpr unzip_iterator& operator--() { --_base; return *this; }
+    constexpr unzip_iterator operator--(int) { return _base--; }
 
-    constexpr extracting_iterator& operator+=(difference_type n) { _base += n; return *this; }
-    constexpr extracting_iterator& operator-=(difference_type n) { _base -= n; return *this; }
+    constexpr unzip_iterator& operator+=(difference_type n) { _base += n; return *this; }
+    constexpr unzip_iterator& operator-=(difference_type n) { _base -= n; return *this; }
 
     constexpr decltype(auto) operator[](difference_type n) const { return *(*this + n); }
 
-    constexpr difference_type operator-(extracting_iterator const& other) const { return _base - other._base; }
+    constexpr difference_type operator-(unzip_iterator const& other) const { return _base - other._base; }
 
-    friend constexpr void swap(extracting_iterator& lhs, extracting_iterator& rhs) noexcept(std::is_nothrow_swappable_v<Iterator>)
+    friend constexpr void swap(unzip_iterator& lhs, unzip_iterator& rhs) noexcept(std::is_nothrow_swappable_v<Iterator>)
     {
         using std::swap;
         return swap(lhs._base, rhs._base);
     }
 
-    friend constexpr bool operator==(extracting_iterator const& lhs, extracting_iterator const& rhs) { return lhs._base == rhs._base; }
-    friend constexpr bool operator<(extracting_iterator const& lhs, extracting_iterator const& rhs) { return lhs._base < rhs._base(); }
+    friend constexpr bool operator==(unzip_iterator const& lhs, unzip_iterator const& rhs) { return lhs._base == rhs._base; }
+    friend constexpr bool operator<(unzip_iterator const& lhs, unzip_iterator const& rhs) { return lhs._base < rhs._base(); }
 };
 
 template <std::size_t N, typename Iterator>
-constexpr auto extractor(Iterator itr) { return extracting_iterator<N, Iterator>{itr}; }
+constexpr auto unzip(Iterator itr) { return unzip_iterator<N, Iterator>{itr}; }
 
 template <std::size_t N, typename Iterator>
-constexpr auto operator+(extracting_iterator<N, Iterator> lhs, typename extracting_iterator<N, Iterator>::difference_type n)
+constexpr auto operator+(unzip_iterator<N, Iterator> lhs, typename unzip_iterator<N, Iterator>::difference_type n)
 {
     return lhs += n;
 }
 
 template <std::size_t N, typename Iterator>
-constexpr auto operator+(typename extracting_iterator<N, Iterator>::difference_type n, extracting_iterator<N, Iterator> rhs)
+constexpr auto operator+(typename unzip_iterator<N, Iterator>::difference_type n, unzip_iterator<N, Iterator> rhs)
 {
     return rhs += n;
 }
 
 template <std::size_t N, typename Iterator>
-constexpr auto operator-(extracting_iterator<N, Iterator> lhs, typename extracting_iterator<N, Iterator>::difference_type n)
+constexpr auto operator-(unzip_iterator<N, Iterator> lhs, typename unzip_iterator<N, Iterator>::difference_type n)
 {
     return lhs -= n;
 }
 
 template <std::size_t N, typename Iterator>
-constexpr bool operator!=(extracting_iterator<N, Iterator> const& lhs, extracting_iterator<N, Iterator> const& rhs)
+constexpr bool operator!=(unzip_iterator<N, Iterator> const& lhs, unzip_iterator<N, Iterator> const& rhs)
 {
     return !(lhs == rhs);
 }
 
 template <std::size_t N, typename Iterator>
-constexpr bool operator>(extracting_iterator<N, Iterator> const& lhs, extracting_iterator<N, Iterator> const& rhs)
+constexpr bool operator>(unzip_iterator<N, Iterator> const& lhs, unzip_iterator<N, Iterator> const& rhs)
 {
     return rhs < lhs;
 }
 
 template <std::size_t N, typename Iterator>
-constexpr bool operator<=(extracting_iterator<N, Iterator> const& lhs, extracting_iterator<N, Iterator> const& rhs)
+constexpr bool operator<=(unzip_iterator<N, Iterator> const& lhs, unzip_iterator<N, Iterator> const& rhs)
 {
     return !(lhs > rhs);
 }
 
 template <std::size_t N, typename Iterator>
-constexpr bool operator>=(extracting_iterator<N, Iterator> const& lhs, extracting_iterator<N, Iterator> const& rhs)
+constexpr bool operator>=(unzip_iterator<N, Iterator> const& lhs, unzip_iterator<N, Iterator> const& rhs)
 {
     return !(lhs < rhs);
 }
@@ -283,8 +283,8 @@ public:
     using const_reference = std::tuple<typename Sequences::const_reference...>;
     using pointer = std::tuple<typename Sequences::pointer...>;
     using const_pointer = std::tuple<typename Sequences::const_pointer...>;
-    using iterator = detail::tied_sequence_iterator<typename Sequences::iterator...>;
-    using const_iterator = detail::tied_sequence_iterator<typename Sequences::const_iterator...>;
+    using iterator = detail::zip_iterator<typename Sequences::iterator...>;
+    using const_iterator = detail::zip_iterator<typename Sequences::const_iterator...>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -306,7 +306,7 @@ private:
 
     template <typename ForwardIterator, std::size_t... N>
     constexpr tied_sequence(std::index_sequence<N...>, std::forward_iterator_tag, ForwardIterator first, ForwardIterator last, typename Sequences::allocator_type const&... alloc)
-      : _seq{Sequences(detail::extractor<N>(first), detail::extractor<N>(last), alloc)...} { }
+      : _seq{Sequences(detail::unzip<N>(first), detail::unzip<N>(last), alloc)...} { }
 
 public:
     constexpr tied_sequence() noexcept((std::is_nothrow_default_constructible_v<Sequences> && ... && true))
@@ -396,7 +396,7 @@ private:
     template <typename ForwardIterator, std::size_t... N>
     constexpr void _assign(ForwardIterator first, ForwardIterator last, std::index_sequence<N...>, std::forward_iterator_tag)
     {
-        detail::tuple_transform([&](auto&... c) { (c.assign(detail::extractor<N>(first), detail::extractor<N>(last)), ...); }, _seq);
+        detail::tuple_transform([&](auto&... c) { (c.assign(detail::unzip<N>(first), detail::unzip<N>(last)), ...); }, _seq);
     }
 
 public:
@@ -491,7 +491,7 @@ private:
     template <typename ForwardIterator, std::size_t... N>
     constexpr iterator _insert(const_iterator pos, ForwardIterator first, ForwardIterator last, std::index_sequence<N...>, std::forward_iterator_tag)
     {
-        return detail::tuple_transform([&](auto&... c) { return std::tuple{c.insert(std::get<N>(pos._it), detail::extractor<N>(first), detail::extractor<N>(last))...}; }, _seq);
+        return detail::tuple_transform([&](auto&... c) { return std::tuple{c.insert(std::get<N>(pos._it), detail::unzip<N>(first), detail::unzip<N>(last))...}; }, _seq);
     }
 
 public:
