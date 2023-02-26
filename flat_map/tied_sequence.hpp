@@ -23,10 +23,10 @@ namespace detail
 {
 
 template <typename... Iterators>
-class _tied_sequence_iterator
+class tied_sequence_iterator
 {
     template <typename... Itr>
-    friend class _tied_sequence_iterator;
+    friend class tied_sequence_iterator;
 
     template <typename... Sequences>
     friend class ::flat_map::tied_sequence;
@@ -41,25 +41,25 @@ public:
     using iterator_category = std::common_type_t<typename std::iterator_traits<Iterators>::iterator_category...>;
 
 public:
-    _tied_sequence_iterator() = default;
+    tied_sequence_iterator() = default;
 
-    _tied_sequence_iterator(std::tuple<Iterators...> itrs) : _it{itrs} { }
-
-    template <typename... Itrs>
-    _tied_sequence_iterator(_tied_sequence_iterator<Itrs...> other) : _it{std::move(other._it)} { }
-
-    _tied_sequence_iterator(_tied_sequence_iterator const&) = default;
-    _tied_sequence_iterator(_tied_sequence_iterator&&) = default;
+    tied_sequence_iterator(std::tuple<Iterators...> itrs) : _it{itrs} { }
 
     template <typename... Itrs>
-    _tied_sequence_iterator& operator=(_tied_sequence_iterator<Itrs...> other)
+    tied_sequence_iterator(tied_sequence_iterator<Itrs...> other) : _it{std::move(other._it)} { }
+
+    tied_sequence_iterator(tied_sequence_iterator const&) = default;
+    tied_sequence_iterator(tied_sequence_iterator&&) = default;
+
+    template <typename... Itrs>
+    tied_sequence_iterator& operator=(tied_sequence_iterator<Itrs...> other)
     {
         _it = std::move(other._it);
         return *this;
     }
 
-    _tied_sequence_iterator& operator=(_tied_sequence_iterator const&) = default;
-    _tied_sequence_iterator& operator=(_tied_sequence_iterator&&) = default;
+    tied_sequence_iterator& operator=(tied_sequence_iterator const&) = default;
+    tied_sequence_iterator& operator=(tied_sequence_iterator&&) = default;
 
     template <std::size_t N>
     constexpr auto base() const { return std::get<N>(_it); }
@@ -69,39 +69,39 @@ public:
     // XXX: operator-> requires returning "raw pointer" or call op-> recursively until getting "raw pointer".
     // constexpr pointer operator->() const;
 
-    constexpr _tied_sequence_iterator& operator++()
+    constexpr tied_sequence_iterator& operator++()
     {
         tuple_transform([](auto&... it) { (++it, ...); }, _it);
         return *this;
     }
 
-    constexpr _tied_sequence_iterator operator++(int)
+    constexpr tied_sequence_iterator operator++(int)
     {
         auto copy = *this;
         operator++();
         return copy;
     }
 
-    constexpr _tied_sequence_iterator& operator--()
+    constexpr tied_sequence_iterator& operator--()
     {
         tuple_transform([](auto&... it) { (--it, ...); }, _it);
         return *this;
     }
 
-    constexpr _tied_sequence_iterator operator--(int)
+    constexpr tied_sequence_iterator operator--(int)
     {
         auto copy = *this;
         operator--();
         return copy;
     }
 
-    constexpr _tied_sequence_iterator& operator+=(difference_type n)
+    constexpr tied_sequence_iterator& operator+=(difference_type n)
     {
         tuple_transform([n](auto&... it) { ((it += n), ...); }, _it);
         return *this;
     }
 
-    constexpr _tied_sequence_iterator& operator-=(difference_type n)
+    constexpr tied_sequence_iterator& operator-=(difference_type n)
     {
         tuple_transform([n](auto&... it) { ((it -= n), ...); }, _it);
         return *this;
@@ -109,59 +109,59 @@ public:
 
     constexpr decltype(auto) operator[](difference_type n) const { return *(*this + n); }
 
-    constexpr difference_type operator-(_tied_sequence_iterator const& other) const { return std::get<0>(_it) - std::get<0>(other._it); }
+    constexpr difference_type operator-(tied_sequence_iterator const& other) const { return std::get<0>(_it) - std::get<0>(other._it); }
 
-    friend constexpr void swap(_tied_sequence_iterator& lhs, _tied_sequence_iterator& rhs) noexcept(noexcept(std::swap(lhs, rhs))) { std::swap(lhs._it, rhs._it); }
+    friend constexpr void swap(tied_sequence_iterator& lhs, tied_sequence_iterator& rhs) noexcept(noexcept(std::swap(lhs, rhs))) { std::swap(lhs._it, rhs._it); }
 
-    friend constexpr void iter_swap(_tied_sequence_iterator const& lhs, _tied_sequence_iterator const& rhs)
+    friend constexpr void iter_swap(tied_sequence_iterator const& lhs, tied_sequence_iterator const& rhs)
         noexcept((std::is_nothrow_swappable_v<typename std::iterator_traits<Iterators>> && ...))
     {
         tuple_transform([](auto& l, auto& r) { using std::swap; swap(*l, *r); }, lhs._it, rhs._it);
     }
 
-    friend constexpr bool operator==(_tied_sequence_iterator const& lhs, _tied_sequence_iterator const& rhs) { return lhs._it == rhs._it; }
+    friend constexpr bool operator==(tied_sequence_iterator const& lhs, tied_sequence_iterator const& rhs) { return lhs._it == rhs._it; }
 
-    friend constexpr bool operator<(_tied_sequence_iterator const& lhs, _tied_sequence_iterator const& rhs) { return lhs._it < rhs._it; }
+    friend constexpr bool operator<(tied_sequence_iterator const& lhs, tied_sequence_iterator const& rhs) { return lhs._it < rhs._it; }
 };
 
 template <typename... Iterators>
-constexpr auto operator+(_tied_sequence_iterator<Iterators...> lhs, typename _tied_sequence_iterator<Iterators...>::difference_type n)
+constexpr auto operator+(tied_sequence_iterator<Iterators...> lhs, typename tied_sequence_iterator<Iterators...>::difference_type n)
 {
     return lhs += n;
 }
 
 template <typename... Iterators>
-constexpr auto operator+(typename _tied_sequence_iterator<Iterators...>::difference_type n, _tied_sequence_iterator<Iterators...> rhs)
+constexpr auto operator+(typename tied_sequence_iterator<Iterators...>::difference_type n, tied_sequence_iterator<Iterators...> rhs)
 {
     return rhs += n;
 }
 
 template <typename... Iterators>
-constexpr auto operator-(_tied_sequence_iterator<Iterators...> lhs, typename _tied_sequence_iterator<Iterators...>::difference_type n)
+constexpr auto operator-(tied_sequence_iterator<Iterators...> lhs, typename tied_sequence_iterator<Iterators...>::difference_type n)
 {
     return lhs -= n;
 }
 
 template <typename... Iterators>
-constexpr bool operator!=(_tied_sequence_iterator<Iterators...> const& lhs, _tied_sequence_iterator<Iterators...> const& rhs)
+constexpr bool operator!=(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
 {
     return !(lhs == rhs);
 }
 
 template <typename... Iterators>
-constexpr bool operator>(_tied_sequence_iterator<Iterators...> const& lhs, _tied_sequence_iterator<Iterators...> const& rhs)
+constexpr bool operator>(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
 {
     return rhs < lhs;
 }
 
 template <typename... Iterators>
-constexpr bool operator<=(_tied_sequence_iterator<Iterators...> const& lhs, _tied_sequence_iterator<Iterators...> const& rhs)
+constexpr bool operator<=(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
 {
     return !(lhs > rhs);
 }
 
 template <typename... Iterators>
-constexpr bool operator>=(_tied_sequence_iterator<Iterators...> const& lhs, _tied_sequence_iterator<Iterators...> const& rhs)
+constexpr bool operator>=(tied_sequence_iterator<Iterators...> const& lhs, tied_sequence_iterator<Iterators...> const& rhs)
 {
     return !(lhs < rhs);
 }
@@ -269,8 +269,8 @@ public:
     using const_reference = std::tuple<typename Sequences::const_reference...>;
     using pointer = std::tuple<typename Sequences::pointer...>;
     using const_pointer = std::tuple<typename Sequences::const_pointer...>;
-    using iterator = detail::_tied_sequence_iterator<typename Sequences::iterator...>;
-    using const_iterator = detail::_tied_sequence_iterator<typename Sequences::const_iterator...>;
+    using iterator = detail::tied_sequence_iterator<typename Sequences::iterator...>;
+    using const_iterator = detail::tied_sequence_iterator<typename Sequences::const_iterator...>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
