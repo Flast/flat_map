@@ -152,7 +152,7 @@ public:
 
     mapped_type const& at(key_type const& key) const
     {
-        if (auto [itr, found] = this->_find(key); found) { return itr->second; }
+        if (auto [itr, found] = this->_find(key); found) { return std::get<1>(*itr); }
         throw std::out_of_range("no such key");
     }
 
@@ -161,8 +161,8 @@ public:
         return const_cast<mapped_type&>(const_cast<flat_map const*>(this)->at(key));
     }
 
-    mapped_type& operator[](key_type const& key) { return try_emplace(key).first->second; }
-    mapped_type& operator[](key_type&& key) { return try_emplace(std::move(key)).first->second; }
+    mapped_type& operator[](key_type const& key) { return std::get<1>(*try_emplace(key).first); }
+    mapped_type& operator[](key_type&& key) { return std::get<1>(*try_emplace(std::move(key)).first); }
 
     using _super::begin;
     using _super::cbegin;
@@ -190,7 +190,7 @@ private:
         static_assert(std::is_assignable_v<mapped_type&, M&&>);
         auto [itr, found] = this->_find(key);
         if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
-        else { itr->second = std::forward<M>(obj); }
+        else { std::get<1>(*itr) = std::forward<M>(obj); }
         return {itr, !found};
     }
 
@@ -200,7 +200,7 @@ private:
         static_assert(std::is_assignable_v<mapped_type&, M&&>);
         auto [itr, found] = this->_insert_point_uniq(hint, key);
         if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
-        else { itr->second = std::forward<M>(obj); }
+        else { std::get<1>(*itr) = std::forward<M>(obj); }
         return itr;
     }
 
