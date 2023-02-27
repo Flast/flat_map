@@ -189,21 +189,22 @@ public:
     using difference_type = typename std::iterator_traits<Iterator>::difference_type;
     using value_type = std::tuple_element_t<N, typename std::iterator_traits<Iterator>::value_type>;
     using pointer = detail::copy_cv_t<value_type, typename std::iterator_traits<Iterator>::pointer>*;
-    using reference = detail::copy_cv_t<value_type, std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>>&;
+    // using reference = detail::copy_cv_t<value_type, std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>>&;
+    using reference = decltype(std::get<N>(*std::declval<Iterator>()));
     using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 
 public:
     constexpr unzip_iterator() = default;
     explicit constexpr unzip_iterator(Iterator itr) : _base(itr) { }
 
-    constexpr reference operator*() const { return std::get<N>(*_base); }
+    constexpr reference operator*() const { return std::forward<reference>(std::get<N>(*_base)); }
     constexpr pointer operator->() const { return &std::get<N>(*_base); }
 
     constexpr unzip_iterator& operator++() { ++_base; return *this; }
-    constexpr unzip_iterator operator++(int) { return _base++; }
+    constexpr unzip_iterator operator++(int) { return unzip_iterator{_base++}; }
 
     constexpr unzip_iterator& operator--() { --_base; return *this; }
-    constexpr unzip_iterator operator--(int) { return _base--; }
+    constexpr unzip_iterator operator--(int) { return unzip_iterator{_base--}; }
 
     constexpr unzip_iterator& operator+=(difference_type n) { _base += n; return *this; }
     constexpr unzip_iterator& operator-=(difference_type n) { _base -= n; return *this; }
@@ -219,7 +220,7 @@ public:
     }
 
     friend constexpr bool operator==(unzip_iterator const& lhs, unzip_iterator const& rhs) { return lhs._base == rhs._base; }
-    friend constexpr bool operator<(unzip_iterator const& lhs, unzip_iterator const& rhs) { return lhs._base < rhs._base(); }
+    friend constexpr bool operator<(unzip_iterator const& lhs, unzip_iterator const& rhs) { return lhs._base < rhs._base; }
 };
 
 template <std::size_t N, typename Iterator>
