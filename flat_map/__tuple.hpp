@@ -12,12 +12,6 @@
 namespace flat_map::detail
 {
 
-template <std::size_t... N, typename F, typename T>
-constexpr auto tuple_transform_impl(std::index_sequence<N...>, F f, T&& t)
-{
-    return f(std::get<N>(std::forward<T>(t))...);
-}
-
 template <std::size_t N, typename F, typename... T>
 constexpr auto tuple_transform_impl2(F& f, T&&... t)
 {
@@ -43,6 +37,26 @@ constexpr auto tuple_transform(F f, Head&& head, Tail&&... tail)
     static_assert(((std::tuple_size_v<remove_cvref_t<Head>> == std::tuple_size_v<remove_cvref_t<Tail>>) && ...));
     using indices_t = std::make_index_sequence<std::tuple_size_v<remove_cvref_t<Head>>>;
     return tuple_transform_impl(indices_t{}, std::move(f), std::forward<Head>(head), std::forward<Tail>(tail)...);
+}
+
+template <std::size_t... N, typename F, typename Tuple>
+constexpr auto tuple_reduction_impl(std::index_sequence<N...>, F f, Tuple&& tuple)
+{
+    if constexpr (std::is_lvalue_reference_v<Tuple>)
+    {
+        return f(std::get<N>(tuple)...);
+    }
+    else
+    {
+        return f(std::move(std::get<N>(tuple))...);
+    }
+}
+
+template <typename F, typename Tuple>
+constexpr auto tuple_reduction(F f, Tuple&& tuple)
+{
+    using indices_t = std::make_index_sequence<std::tuple_size_v<remove_cvref_t<Tuple>>>;
+    return tuple_reduction_impl(indices_t{}, std::move(f), std::forward<Tuple>(tuple));
 }
 
 #ifdef __cpp_lib_ranges_zip

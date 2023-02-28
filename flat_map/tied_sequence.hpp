@@ -64,14 +64,19 @@ public:
     template <std::size_t N>
     constexpr auto base() const { return std::get<N>(_it); }
 
-    constexpr reference operator*() const { return tuple_transform([](auto... it) { return std::tie(*it...); }, _it); }
+private:
+    template <std::size_t... N>
+    constexpr reference _dereference(std::index_sequence<N...>) const { return std::tie(*std::get<N>(_it)...); }
+
+public:
+    constexpr reference operator*() const { return _dereference(std::index_sequence_for<Iterators...>{}); }
 
     // XXX: operator-> requires returning "raw pointer" or call op-> recursively until getting "raw pointer".
     // constexpr pointer operator->() const;
 
     constexpr zip_iterator& operator++()
     {
-        tuple_transform([](auto&... it) { (++it, ...); }, _it);
+        tuple_reduction([](auto&... it) { (++it, ...); }, _it);
         return *this;
     }
 
@@ -84,7 +89,7 @@ public:
 
     constexpr zip_iterator& operator--()
     {
-        tuple_transform([](auto&... it) { (--it, ...); }, _it);
+        tuple_reduction([](auto&... it) { (--it, ...); }, _it);
         return *this;
     }
 
@@ -97,13 +102,13 @@ public:
 
     constexpr zip_iterator& operator+=(difference_type n)
     {
-        tuple_transform([n](auto&... it) { ((it += n), ...); }, _it);
+        tuple_reduction([n](auto&... it) { ((it += n), ...); }, _it);
         return *this;
     }
 
     constexpr zip_iterator& operator-=(difference_type n)
     {
-        tuple_transform([n](auto&... it) { ((it -= n), ...); }, _it);
+        tuple_reduction([n](auto&... it) { ((it -= n), ...); }, _it);
         return *this;
     }
 
@@ -391,13 +396,18 @@ private:
     constexpr void _assign(InputIterator, InputIterator, std::index_sequence<N...>, std::input_iterator_tag)
     {
         // TODO
-        static_assert(sizeof(InputIterator) && false, "not impleneted yet");
+        static_assert(sizeof(InputIterator) && false, "not implemented yet");
     }
 
     template <typename ForwardIterator, std::size_t... N>
     constexpr void _assign(ForwardIterator first, ForwardIterator last, std::index_sequence<N...>, std::forward_iterator_tag)
     {
-        detail::tuple_transform([&](auto&... c) { (c.assign(detail::unzip<N>(first), detail::unzip<N>(last)), ...); }, _seq);
+        detail::tuple_transform(
+            [](auto& c, auto first, auto last) { c.assign(first, last); },
+            _seq,
+            std::tuple{detail::unzip<N>(first)...},
+            std::tuple{detail::unzip<N>(last)...}
+        );
     }
 
 public:
@@ -430,16 +440,16 @@ public:
 
     constexpr pointer data() noexcept((static_cast<void>(sizeof(std::declval<Sequences>().data())), ..., true))
     {
-        return detail::tuple_transform([](auto&... c) { return std::tuple{c.data()...}; }, _seq);
+        return detail::tuple_transform([](auto& c) { return c.data(); }, _seq);
     }
 
     constexpr const_pointer data() const noexcept(noexcept(std::declval<tied_sequence*>()->data())) { return const_cast<tied_sequence*>(this)->data(); }
 
-    constexpr iterator begin() noexcept { return detail::tuple_transform([](auto&... c) { return std::tuple{c.begin()...}; }, _seq); }
-    constexpr const_iterator begin() const noexcept { return detail::tuple_transform([](auto&... c) { return std::tuple{c.begin()...}; }, _seq); }
+    constexpr iterator begin() noexcept { return detail::tuple_transform([](auto& c) { return c.begin(); }, _seq); }
+    constexpr const_iterator begin() const noexcept { return detail::tuple_transform([](auto& c) { return c.begin(); }, _seq); }
     constexpr const_iterator cbegin() const noexcept { return begin(); }
-    constexpr iterator end() noexcept { return detail::tuple_transform([](auto&... c) { return std::tuple{c.end()...}; }, _seq); }
-    constexpr const_iterator end() const noexcept { return detail::tuple_transform([](auto&... c) { return std::tuple{c.end()...}; }, _seq); }
+    constexpr iterator end() noexcept { return detail::tuple_transform([](auto& c) { return c.end(); }, _seq); }
+    constexpr const_iterator end() const noexcept { return detail::tuple_transform([](auto& c) { return c.end(); }, _seq); }
     constexpr const_iterator cend() const noexcept { return end(); }
     constexpr reverse_iterator rbegin() noexcept { return reverse_iterator{end()}; }
     constexpr const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator{end()}; }
@@ -451,20 +461,18 @@ public:
     [[nodiscard]] constexpr bool empty() const noexcept { return std::get<0>(_seq).empty(); }
     constexpr size_t size() const noexcept { return std::get<0>(_seq).size(); }
 
-    constexpr size_t max_size() const noexcept
-    {
-        return detail::tuple_transform([](auto&... c) { return std::min({c.max_size()...}); }, _seq);
-    }
+public:
+    constexpr size_t max_size() const noexcept { return detail::tuple_reduction([](auto&&... c) { return std::min({c.max_size()...}); }, _seq); }
 
 #if 0 // TODO
-    constexpr void reserve(size_type new_cap) { detail::tuple_transform([new_cap](auto&... c) { c.reserve(new_cap); }, _seq); }
+    constexpr void reserve(size_type new_cap) { detail::tuple_reduction([new_cap](auto&... c) { (c.reserve(new_cap), ...); }, _seq); }
 
-    constexpr size_type capacity() const noexcept { return detail::tuple_transform([](auto&... c) { return std::min({c.capacity()...}); }, _seq); }
+    constexpr size_type capacity() const noexcept { return detail::tuple_reduction([](auto&... c) { return std::min({c.capacity()...}); }, _seq); }
 
-    constexpr void shrink_to_fit() noexcept { detail::tuple_transform([](auto&... c) { (c.shrink_to_fit(), ...); }, _seq); }
+    constexpr void shrink_to_fit() noexcept { detail::tuple_reduction([](auto&... c) { (c.shrink_to_fit(), ...); }, _seq); }
 #endif
 
-    constexpr void clear() noexcept { detail::tuple_transform([](auto&... c) { (c.clear(), ...); }, _seq); }
+    constexpr void clear() noexcept { detail::tuple_reduction([](auto&... c) { (c.clear(), ...); }, _seq); }
 
     constexpr iterator insert(const_iterator pos, value_type const& value)
     {
@@ -489,14 +497,20 @@ private:
     constexpr iterator _insert(const_iterator, InputIterator, InputIterator, std::index_sequence<N...>, std::input_iterator_tag)
     {
         // TODO
-        static_assert(sizeof(InputIterator) && false, "not impleneted yet");
+        static_assert(sizeof(InputIterator) && false, "not implemented yet");
     }
 
     template <typename ForwardIterator, std::size_t... N>
     constexpr iterator _insert(const_iterator pos, ForwardIterator first, ForwardIterator last, std::index_sequence<N...>, std::forward_iterator_tag)
     {
         // FIXME: exception neutral impl
-        return detail::tuple_transform([&](auto&... c) { return std::tuple{c.insert(std::get<N>(pos._it), detail::unzip<N>(first), detail::unzip<N>(last))...}; }, _seq);
+        return detail::tuple_transform(
+            [](auto& c, auto pos, auto first, auto last) { return c.insert(pos, first, last); },
+            _seq,
+            pos._it,
+            std::tuple{detail::unzip<N>(first)...},
+            std::tuple{detail::unzip<N>(last)...}
+        );
     }
 
     template <typename Container, typename Iterator, std::size_t... N, typename... Args>
@@ -553,9 +567,9 @@ public:
         return back();
     }
 
-    constexpr void pop_back() { detail::tuple_transform([](auto&... c) { (c.pop_back(), ...); }, _seq); }
+    constexpr void pop_back() { detail::tuple_reduction([](auto&... c) { (c.pop_back(), ...); }, _seq); }
 
-    constexpr void resize(size_type count) { detail::tuple_transform([count](auto&... c) { (c.resize(count), ...); }, _seq); }
+    constexpr void resize(size_type count) { detail::tuple_reduction([count](auto&... c) { (c.resize(count), ...); }, _seq); }
 
     constexpr void resize(size_type count, value_type const& value)
     {
