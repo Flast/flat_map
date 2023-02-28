@@ -35,9 +35,9 @@ class zip_iterator
 
 public:
     using difference_type = std::ptrdiff_t;
-    using value_type = std::tuple<typename std::iterator_traits<Iterators>::value_type...>;
-    using pointer = std::tuple<typename std::iterator_traits<Iterators>::pointer...>;
-    using reference = std::tuple<typename std::iterator_traits<Iterators>::reference...>;
+    using value_type = tuple<typename std::iterator_traits<Iterators>::value_type...>;
+    using pointer = tuple<typename std::iterator_traits<Iterators>::pointer...>;
+    using reference = tuple<typename std::iterator_traits<Iterators>::reference...>;
     using iterator_category = std::common_type_t<typename std::iterator_traits<Iterators>::iterator_category...>;
 
 public:
