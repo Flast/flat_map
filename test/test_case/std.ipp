@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #include <catch2/catch.hpp>
@@ -28,9 +28,9 @@ TEST_CASE("merge", "[merge]")
 
         STD_CONTAINER<int, int> m =
         {
-            MAKE_PAIR(1, 2),
-            MAKE_PAIR(4, 9),
-            MAKE_PAIR(7, 8),
+            MAKE_STD_PAIR(1, 2),
+            MAKE_STD_PAIR(4, 9),
+            MAKE_STD_PAIR(7, 8),
         };
 
         fm.merge(m);
@@ -58,7 +58,7 @@ TEST_CASE("merge", "[merge]")
 
         REQUIRE(fm == ans);
 #if !MULTI_CONTAINER
-        REQUIRE(m == STD_CONTAINER<int, int>{MAKE_PAIR(4, 9)});
+        REQUIRE(m == STD_CONTAINER<int, int>{MAKE_STD_PAIR(4, 9)});
 #endif
     }
 
@@ -74,9 +74,9 @@ TEST_CASE("merge", "[merge]")
 
         STD_CONTAINER<int, int, std::greater<int>> m =
         {
-            MAKE_PAIR(1, 2),
-            MAKE_PAIR(4, 9),
-            MAKE_PAIR(7, 8),
+            MAKE_STD_PAIR(1, 2),
+            MAKE_STD_PAIR(4, 9),
+            MAKE_STD_PAIR(7, 8),
         };
 
         fm.merge(m);
@@ -104,7 +104,7 @@ TEST_CASE("merge", "[merge]")
 
         REQUIRE(fm == ans);
 #if !MULTI_CONTAINER
-        REQUIRE(m == STD_CONTAINER<int, int, std::greater<int>>{MAKE_PAIR(4, 9)});
+        REQUIRE(m == STD_CONTAINER<int, int, std::greater<int>>{MAKE_STD_PAIR(4, 9)});
 #endif
     }
 

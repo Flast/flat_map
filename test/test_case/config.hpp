@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -88,6 +88,12 @@ template <typename T1, typename T2>
 auto MAKE_PAIR(T1 t1, [[maybe_unused]] T2 t2)
 {
     return typename CONTAINER<PAIR<T1, T2>>::value_type{PAIR_PARAM(t1, t2)};
+}
+
+template <typename T1, typename T2>
+auto MAKE_STD_PAIR(T1 t1, [[maybe_unused]] T2 t2)
+{
+    return PAIR<T1, T2>{PAIR_PARAM(t1, t2)};
 }
 
 template <typename T1, typename T2>
