@@ -1,11 +1,333 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #include <catch2/catch.hpp>
 #include <stdexcept>
+#include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "flat_map/tied_sequence.hpp"
+
+TEST_CASE("zip_iterator", "[iterator]")
+{
+    std::vector<int> vi{1, 2, 3};
+    std::vector<float> vf{1.1f, 2.2f, 3.3f};
+
+    SECTION("construct")
+    {
+        [[maybe_unused]] flat_map::detail::zip_iterator i{std::make_tuple(vi.begin(), vf.begin())};
+        static_assert(std::is_same_v<decltype(i)::value_type, flat_map::detail::tuple<int, float>>);
+    }
+
+    SECTION("base")
+    {
+        flat_map::detail::zip_iterator i{std::make_tuple(vi.begin(), vf.begin())};
+        REQUIRE(i.base<0>() == vi.begin());
+        REQUIRE(i.base<1>() == vf.begin());
+    }
+
+    SECTION("comparison")
+    {
+        flat_map::detail::zip_iterator b{std::make_tuple(vi.begin(), vf.begin())};
+        flat_map::detail::zip_iterator e{std::make_tuple(vi.end(), vf.end())};
+
+        REQUIRE      (b == b);
+        REQUIRE_FALSE(b == e);
+
+        REQUIRE_FALSE(b != b);
+        REQUIRE      (b != e);
+
+        REQUIRE_FALSE(b <  b);
+        REQUIRE      (b <  e);
+
+        REQUIRE      (b <= b);
+        REQUIRE      (b <= e);
+
+        REQUIRE_FALSE(b >  b);
+        REQUIRE_FALSE(b >  e);
+
+        REQUIRE      (b >= b);
+        REQUIRE_FALSE(b >= e);
+    }
+
+    SECTION("left const comparison")
+    {
+        flat_map::detail::zip_iterator b{std::make_tuple(vi.begin(), vf.begin())};
+        flat_map::detail::zip_iterator e{std::make_tuple(vi.cend(), vf.cend())};
+
+        REQUIRE      (b == b);
+        REQUIRE_FALSE(b == e);
+
+        REQUIRE_FALSE(b != b);
+        REQUIRE      (b != e);
+
+        REQUIRE_FALSE(b <  b);
+        REQUIRE      (b <  e);
+
+        REQUIRE      (b <= b);
+        REQUIRE      (b <= e);
+
+        REQUIRE_FALSE(b >  b);
+        REQUIRE_FALSE(b >  e);
+
+        REQUIRE      (b >= b);
+        REQUIRE_FALSE(b >= e);
+    }
+
+    SECTION("right const comparison")
+    {
+        flat_map::detail::zip_iterator b{std::make_tuple(vi.cbegin(), vf.cbegin())};
+        flat_map::detail::zip_iterator e{std::make_tuple(vi.end(), vf.end())};
+
+        REQUIRE      (b == b);
+        REQUIRE_FALSE(b == e);
+
+        REQUIRE_FALSE(b != b);
+        REQUIRE      (b != e);
+
+        REQUIRE_FALSE(b <  b);
+        REQUIRE      (b <  e);
+
+        REQUIRE      (b <= b);
+        REQUIRE      (b <= e);
+
+        REQUIRE_FALSE(b >  b);
+        REQUIRE_FALSE(b >  e);
+
+        REQUIRE      (b >= b);
+        REQUIRE_FALSE(b >= e);
+    }
+
+    SECTION("const comparison")
+    {
+        flat_map::detail::zip_iterator b{std::make_tuple(vi.cbegin(), vf.cbegin())};
+        flat_map::detail::zip_iterator e{std::make_tuple(vi.cend(), vf.cend())};
+
+        REQUIRE      (b == b);
+        REQUIRE_FALSE(b == e);
+
+        REQUIRE_FALSE(b != b);
+        REQUIRE      (b != e);
+
+        REQUIRE_FALSE(b <  b);
+        REQUIRE      (b <  e);
+
+        REQUIRE      (b <= b);
+        REQUIRE      (b <= e);
+
+        REQUIRE_FALSE(b >  b);
+        REQUIRE_FALSE(b >  e);
+
+        REQUIRE      (b >= b);
+        REQUIRE_FALSE(b >= e);
+    }
+
+    SECTION("forward/backward")
+    {
+        flat_map::detail::zip_iterator i{std::make_tuple(vi.begin(), vf.begin())};
+        flat_map::detail::zip_iterator n{std::make_tuple(vi.begin() + 1, vf.begin() + 1)};
+
+        REQUIRE((i + 1) == n);
+        REQUIRE(i == (n - 1));
+
+        REQUIRE((i++) == (n - 1));
+        REQUIRE((i--) == n);
+
+        REQUIRE((++i) == n);
+        REQUIRE((--i) == (n - 1));
+
+        REQUIRE((i += 1) == n);
+        REQUIRE((i -= 1) == (n - 1));
+    }
+
+    SECTION("dereference")
+    {
+        flat_map::detail::zip_iterator b{std::make_tuple(vi.begin(), vf.begin())};
+        static_assert(std::is_same_v<decltype(b)::reference, flat_map::detail::tuple<int&, float&>>);
+
+        decltype(b)::reference r = *b;
+        auto& [i, f] = r;
+
+        REQUIRE(i == 1);
+        REQUIRE(f == 1.1f);
+
+        REQUIRE(&i == &vi[0]);
+        REQUIRE(&f == &vf[0]);
+    }
+
+    SECTION("swap")
+    {
+        flat_map::detail::zip_iterator b{std::make_tuple(vi.cbegin(), vf.cbegin())};
+        flat_map::detail::zip_iterator e{std::make_tuple(vi.cend(), vf.cend())};
+
+        swap(b, e);
+
+        REQUIRE(b.base<0>() == vi.cend());
+        REQUIRE(b.base<1>() == vf.cend());
+        REQUIRE(e.base<0>() == vi.cbegin());
+        REQUIRE(e.base<1>() == vf.cbegin());
+    }
+
+    SECTION("iter_swap")
+    {
+        auto vvi = vi;
+        auto vvf = vf;
+        flat_map::detail::zip_iterator b{std::make_tuple(vvi.begin(), vvf.begin())};
+        flat_map::detail::zip_iterator n{std::make_tuple(vvi.begin() + 1, vvf.begin() + 1)};
+
+        iter_swap(b, n);
+
+        REQUIRE(b.base<0>() == vvi.begin());
+        REQUIRE(b.base<1>() == vvf.begin());
+        REQUIRE(n.base<0>() == (vvi.begin() + 1));
+        REQUIRE(n.base<1>() == (vvf.begin() + 1));
+
+        REQUIRE(*b.base<0>() == 2);
+        REQUIRE(*b.base<1>() == 2.2f);
+        REQUIRE(*n.base<0>() == 1);
+        REQUIRE(*n.base<1>() == 1.1f);
+    }
+
+    SECTION("value swap")
+    {
+        auto vvi = vi;
+        auto vvf = vf;
+        flat_map::detail::zip_iterator b{std::make_tuple(vvi.begin(), vvf.begin())};
+        flat_map::detail::zip_iterator n{std::make_tuple(vvi.begin() + 1, vvf.begin() + 1)};
+
+        swap(*b, *n);
+
+        REQUIRE(b.base<0>() == vvi.begin());
+        REQUIRE(b.base<1>() == vvf.begin());
+        REQUIRE(n.base<0>() == (vvi.begin() + 1));
+        REQUIRE(n.base<1>() == (vvf.begin() + 1));
+
+        REQUIRE(*b.base<0>() == 2);
+        REQUIRE(*b.base<1>() == 2.2f);
+        REQUIRE(*n.base<0>() == 1);
+        REQUIRE(*n.base<1>() == 1.1f);
+    }
+}
+
+TEST_CASE("unzip_iterator", "[iterator]")
+{
+    std::vector<int> vi{1, 2, 3};
+    std::vector<float> vf{1.1f, 2.2f, 3.3f};
+
+    flat_map::detail::zip_iterator b{std::make_tuple(vi.begin(), vf.begin())};
+    flat_map::detail::zip_iterator n{std::make_tuple(vi.begin() + 1, vf.begin() + 1)};
+
+    SECTION("construct")
+    {
+        [[maybe_unused]] auto ex0 = flat_map::detail::unzip<0>(b);
+        [[maybe_unused]] auto ex1 = flat_map::detail::unzip<1>(b);
+        [[maybe_unused]] decltype(ex0) d;
+        static_assert(std::is_same_v<decltype(ex0)::value_type, int>);
+        static_assert(std::is_same_v<decltype(ex1)::value_type, float>);
+    }
+
+    SECTION("comparison")
+    {
+        auto b0 = flat_map::detail::unzip<0>(b);
+        auto n0 = flat_map::detail::unzip<0>(n);
+
+        REQUIRE      (b0 == b0);
+        REQUIRE_FALSE(b0 == n0);
+
+        REQUIRE_FALSE(b0 != b0);
+        REQUIRE      (b0 != n0);
+
+        REQUIRE_FALSE(b0 <  b0);
+        REQUIRE      (b0 <  n0);
+
+        REQUIRE      (b0 <= b0);
+        REQUIRE      (b0 <= n0);
+
+        REQUIRE_FALSE(b0 >  b0);
+        REQUIRE_FALSE(b0 >  n0);
+
+        REQUIRE      (b0 >= b0);
+        REQUIRE_FALSE(b0 >= n0);
+    }
+
+    SECTION("forward/backward")
+    {
+        auto b0 = flat_map::detail::unzip<0>(b);
+        auto n0 = flat_map::detail::unzip<0>(n);
+
+        REQUIRE((b0 + 1) == n0);
+        REQUIRE(b0 == (n0 - 1));
+
+        REQUIRE((b0++) == (n0 - 1));
+        REQUIRE((b0--) == n0);
+
+        REQUIRE((++b0) == n0);
+        REQUIRE((--b0) == (n0 - 1));
+
+        REQUIRE((b0 += 1) == n0);
+        REQUIRE((b0 -= 1) == (n0 - 1));
+    }
+
+    SECTION("dereference")
+    {
+        auto b0 = flat_map::detail::unzip<0>(b);
+        auto b1 = flat_map::detail::unzip<1>(b);
+        static_assert(std::is_same_v<decltype(b0)::reference, int&>);
+        static_assert(std::is_same_v<decltype(b1)::reference, float&>);
+
+        auto& i0 = *b0;
+        auto& f1 = *b1;
+
+        REQUIRE(i0 == 1);
+        REQUIRE(f1 == 1.1f);
+
+        REQUIRE(&i0 == &vi[0]);
+        REQUIRE(&f1 == &vf[0]);
+    }
+
+    SECTION("dereference std::map with move")
+    {
+        std::map<int, float> m{{1, 1.1f}};
+        auto b0 = flat_map::detail::unzip<0>(std::make_move_iterator(m.begin()));
+        auto b1 = flat_map::detail::unzip<1>(std::make_move_iterator(m.begin()));
+        const int&& i = *b0;
+        float&& f = *b1;
+        REQUIRE(i == 1);
+        REQUIRE(f == 1.1f);
+    }
+
+    SECTION("swap")
+    {
+        auto l0 = flat_map::detail::unzip<0>(b);
+        auto r0 = flat_map::detail::unzip<0>(n);
+
+        swap(l0, r0);
+
+        REQUIRE(&*l0 == (vi.data() + 1));
+        REQUIRE(&*r0 == vi.data());
+    }
+
+    SECTION("value swap")
+    {
+        using std::swap;
+
+        auto vvi = vi;
+        auto vvf = vf;
+        flat_map::detail::zip_iterator b{std::make_tuple(vvi.begin(), vvf.begin())};
+        flat_map::detail::zip_iterator n{std::make_tuple(vvi.begin() + 1, vvf.begin() + 1)};
+        auto b0 = flat_map::detail::unzip<0>(b);
+        auto n0 = flat_map::detail::unzip<0>(n);
+
+        swap(*b0, *n0);
+
+        REQUIRE(&*b0 == vvi.data());
+        REQUIRE(&*n0 == (vvi.data() + 1));
+
+        REQUIRE(*b0 == 2);
+        REQUIRE(*n0 == 1);
+    }
+}
 
 TEST_CASE("construction", "[construction]")
 {
