@@ -70,6 +70,90 @@ TEST_CASE("construction", "[construction]")
         REQUIRE(itr == fm.end());
     }
 
+    SECTION("pre constructed container")
+    {
+        CONTAINER<PAIR<int, int>> c =
+        {
+            MAKE_PAIR(6, 7),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 5),
+            MAKE_PAIR(0, 1),
+        };
+
+        FLAT_CONTAINER<int, int> fm{flat_map::range_order::no_ordered, c};
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+#if MULTI_CONTAINER
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
+#endif
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("pre sorted container")
+    {
+        CONTAINER<PAIR<int, int>> c =
+        {
+            MAKE_PAIR(0, 1),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 5),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(6, 7),
+        };
+
+        FLAT_CONTAINER<int, int> fm{flat_map::range_order::sorted, c};
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+#if MULTI_CONTAINER
+        REQUIRE(*itr++ == MAKE_PAIR(2, 5));
+#endif
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("pre uniqued container")
+    {
+        CONTAINER<PAIR<int, int>> c =
+        {
+            MAKE_PAIR(6, 7),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(0, 1),
+        };
+
+        FLAT_CONTAINER<int, int> fm{flat_map::range_order::uniqued, c};
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("pre unique_sorted container")
+    {
+        CONTAINER<PAIR<int, int>> c =
+        {
+            MAKE_PAIR(0, 1),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(6, 7),
+        };
+
+        FLAT_CONTAINER<int, int> fm{flat_map::range_order::unique_sorted, c};
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
     SECTION("copy construction")
     {
         FLAT_CONTAINER<int, int> fm =
@@ -179,6 +263,81 @@ TEST_CASE("assignment", "[assignment]")
         REQUIRE(*itr++ == MAKE_PAIR(4, 5));
         REQUIRE(*itr++ == MAKE_PAIR(6, 7));
         REQUIRE(itr == move.end());
+    }
+}
+
+TEST_CASE("base", "[base]")
+{
+    SECTION("glvalue")
+    {
+        FLAT_CONTAINER<int, int> fm =
+        {
+            MAKE_PAIR(6, 7),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(0, 1),
+        };
+
+        auto& c = fm.base();
+
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+
+        itr = c.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("const glvalue")
+    {
+        FLAT_CONTAINER<int, int> const fm =
+        {
+            MAKE_PAIR(6, 7),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(0, 1),
+        };
+
+        auto& c = fm.base();
+
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+
+        itr = c.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("prvalue")
+    {
+        auto&& c = FLAT_CONTAINER<int, int>
+        {
+            MAKE_PAIR(6, 7),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(0, 1),
+        }.base();
+
+        auto itr = c.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+        REQUIRE(*itr++ == MAKE_PAIR(2, 3));
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == c.end());
     }
 }
 

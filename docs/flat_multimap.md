@@ -11,7 +11,7 @@ class flat_multimap;
 ```
 
 **Requirements**
-- `Container` should meets [*Container*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
+- `Container` should meet [*Container*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
 
 **Complexity**
 - `N` denotes number of elements that stored in the container.
@@ -111,6 +111,27 @@ Construct from init.
 
 **Complexity**
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
+
+```cpp
+explicit flat_multimap(range_order order, Container const& cont);
+explicit flat_multimap(range_order order, Container const& cont, Compare const& comp, allocator_type const& alloc = allocator_type());
+explicit flat_multimap(range_order order, Container const& cont, allocator_type const& alloc);
+explicit flat_multimap(range_order order, Container&& cont);
+explicit flat_multimap(range_order order, Container&& cont, Compare const& comp, allocator_type const& alloc = allocator_type());
+explicit flat_multimap(range_order order, Container&& cont, allocator_type const& alloc);
+```
+
+**Complexity**
+For non sorted range, amortized `O(E logE)` if enough additional memory is available, otherwise amortized `O(E log E^2)`.
+For sorted range `O(1)`.
+
+```cpp
+Container& base() &;
+Container const& base() const&;
+Container base() &&;
+```
+
+Refer underlying container.
 
 ## Assignments
 
@@ -350,7 +371,7 @@ If the `order` is `range_order::sorted` or `range_order::unique_sorted`, the ran
 
 **Complexity**
 For non sorted range, amortized `O((N+E) log(N+E))` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E)^2)`.
-For sorted range, amortized `O(N+E)` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E))`
+For sorted range, amortized `O(N+E)` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E))`.
 
 **Invalidation**
 Same as `Container::insert`.

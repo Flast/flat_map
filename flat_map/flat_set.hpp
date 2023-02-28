@@ -15,6 +15,7 @@
 #include "flat_map/__config.hpp"
 #include "flat_map/__type_traits.hpp"
 #include "flat_map/__flat_tree.hpp"
+#include "flat_map/enum.hpp"
 
 namespace flat_map
 {
@@ -29,7 +30,7 @@ class flat_set : private detail::_flat_tree_base<flat_set<Key, Compare, Containe
     // To lookup private comparator
     friend _super;
 
-    static constexpr bool _is_uniq = true;
+    static constexpr range_order_t<range_order::unique_sorted> _order{};
 
 public:
     using key_type = typename _super::key_type;
@@ -53,7 +54,8 @@ public:
 private:
     using _comparator = value_compare;
 
-    static auto& _key_extractor(value_type const& value) { return value; }
+    template <typename V>
+    static auto& _key_extractor(V const& value) { return value; }
 
 public:
     flat_set() = default;
@@ -98,10 +100,28 @@ public:
         this->_initialize_container(init.begin(), init.end());
     }
 
+    explicit flat_set(range_order order, Container const& cont)
+      : _super{order, cont} { }
+
+    explicit flat_set(range_order order, Container const& cont, Compare const& comp, allocator_type const& alloc = allocator_type())
+      : _super{order, Container{cont, alloc}, comp} { }
+
+    explicit flat_set(range_order order, Container const& cont, allocator_type const& alloc)
+      : _super{order, Container{cont, alloc}} { }
+
+    explicit flat_set(range_order order, Container&& cont)
+      : _super{order, std::move(cont)} { }
+
+    explicit flat_set(range_order order, Container&& cont, Compare const& comp, allocator_type const& alloc = allocator_type())
+      : _super{order, Container{std::move(cont), alloc}, comp} { }
+
+    explicit flat_set(range_order order, Container&& cont, allocator_type const& alloc)
+      : _super{order, Container{std::move(cont), alloc}} { }
+
     flat_set& operator=(flat_set const& other) = default;
 
     flat_set& operator=(flat_set&& other) noexcept(std::is_nothrow_move_assignable_v<_super>)
-#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
+#if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10))
     {
         _super::operator=(std::move(other));
         return *this;
@@ -117,6 +137,7 @@ public:
     }
 
     using _super::get_allocator;
+    using _super::base;
 
     using _super::begin;
     using _super::cbegin;
