@@ -12,7 +12,7 @@ on:
 
 jobs:
   asan:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
 
     - name: Configure cmake
       working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=address -DCXX_STANDARD_UPTO=20 ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=address -DCXX_STANDARD_UPTO=23 ..
 
     - name: Build
       working-directory: build
@@ -36,7 +36,7 @@ jobs:
       run: ctest -j2 --output-on-failure
 
   ubsan:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -49,7 +49,7 @@ jobs:
 
     - name: Configure cmake
       working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=undefined -DCXX_STANDARD_UPTO=20 ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=undefined -DCXX_STANDARD_UPTO=23 ..
 
     - name: Build
       working-directory: build
@@ -60,7 +60,7 @@ jobs:
       run: ctest -j2 --output-on-failure
 
   gcc10:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -82,21 +82,94 @@ jobs:
     - name: Run unit test
       working-directory: build
       run: ctest -j2 --output-on-failure
-  clang10:
-    runs-on: ubuntu-20.04
+
+  gcc11:
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
 
     - name: Install prerequisites
-      run: sudo apt-get install --no-install-recommends clang-10 cmake
+      run: sudo apt-get install --no-install-recommends g++ cmake
 
     - name: Prepare for build
       run: mkdir build
 
     - name: Configure cmake
       working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++-10 -DCXX_STANDARD_UPTO=20 ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++ -DCXX_STANDARD_UPTO=23 ..
+
+    - name: Build
+      working-directory: build
+      run: make -j2 unit_test
+
+    - name: Run unit test
+      working-directory: build
+      run: ctest -j2 --output-on-failure
+
+  gcc12:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends g++-12 cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++-12 -DCXX_STANDARD_UPTO=23 ..
+
+    - name: Build
+      working-directory: build
+      run: make -j2 unit_test
+
+    - name: Run unit test
+      working-directory: build
+      run: ctest -j2 --output-on-failure
+
+  clang13:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends clang-13 cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++-13 -DCXX_STANDARD_UPTO=23 ..
+
+    - name: Build
+      working-directory: build
+      run: make -j2 unit_test
+
+    - name: Run unit test
+      working-directory: build
+      run: ctest -j2 --output-on-failure
+
+  clang14:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install prerequisites
+      run: sudo apt-get install --no-install-recommends clang-14 cmake
+
+    - name: Prepare for build
+      run: mkdir build
+
+    - name: Configure cmake
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++-14 -DCXX_STANDARD_UPTO=23 ..
 
     - name: Build
       working-directory: build
