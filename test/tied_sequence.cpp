@@ -1,7 +1,8 @@
 // Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <map>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
