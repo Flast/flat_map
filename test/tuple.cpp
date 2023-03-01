@@ -45,13 +45,13 @@ TEST_CASE("construction", "[construction]")
 
     SECTION("copy construction")
     {
-        tuple st{42, unique_type{0xdeadbeefu}};
+        tuple t{42, unique_type{0xdeadbeefu}};
 
-        tuple copy = st;
+        tuple copy = t;
 
-        REQUIRE(std::get<0>(st) == 42);
+        REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(copy) == 42);
-        REQUIRE(std::get<1>(st).value == 0xdeadbeefu);
+        REQUIRE(std::get<1>(t).value == 0xdeadbeefu);
         REQUIRE(std::get<1>(copy).value == 0xdeadbeefu);
     }
 
@@ -69,13 +69,13 @@ TEST_CASE("construction", "[construction]")
 
     SECTION("move construction")
     {
-        tuple st{42, unique_type{0xdeadbeefu}};
+        tuple t{42, unique_type{0xdeadbeefu}};
 
-        tuple move = std::move(st);
+        tuple move = std::move(t);
 
-        REQUIRE(std::get<0>(st) == 42);
+        REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(move) == 42);
-        REQUIRE(std::get<1>(st).value == 42);
+        REQUIRE(std::get<1>(t).value == 0);
         REQUIRE(std::get<1>(move).value == 0xdeadbeefu);
     }
 
@@ -83,7 +83,7 @@ TEST_CASE("construction", "[construction]")
     {
         std::tuple t{42, unique_type{0xdeadbeefu}};
 
-        [[maybe_unused]] tuple move = std::move(t);
+        tuple move = std::move(t);
 
         REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(move) == 42);
@@ -96,14 +96,14 @@ TEST_CASE("assignment", "[assignment]")
 {
     SECTION("copy assignment")
     {
-        tuple st{42, unique_type{0xdeadbeefu}};
+        tuple t{42, unique_type{0xdeadbeefu}};
         tuple copy;
 
-        copy = st;
+        copy = t;
 
-        REQUIRE(std::get<0>(st) == 42);
+        REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(copy) == 42);
-        REQUIRE(std::get<1>(st).value == 0xdeadbeefu);
+        REQUIRE(std::get<1>(t).value == 0xdeadbeefu);
         REQUIRE(std::get<1>(copy).value == 0xdeadbeefu);
     }
 
@@ -122,14 +122,14 @@ TEST_CASE("assignment", "[assignment]")
 
     SECTION("move assignment")
     {
-        tuple st{42, unique_type{0xdeadbeefu}};
+        tuple t{42, unique_type{0xdeadbeefu}};
         tuple move;
 
-        move = std::move(st);
+        move = std::move(t);
 
-        REQUIRE(std::get<0>(st) == 42);
+        REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(move) == 42);
-        REQUIRE(std::get<1>(st).value == 0);
+        REQUIRE(std::get<1>(t).value == 0);
         REQUIRE(std::get<1>(move).value == 0xdeadbeefu);
     }
 
@@ -151,17 +151,17 @@ TEST_CASE("assignment with reference", "[assignment]")
 {
     SECTION("copy assignment")
     {
-        tuple st{42, unique_type{0xdeadbeefu}};
+        tuple t{42, unique_type{0xdeadbeefu}};
 
         int i = 72;
         unique_type u;
         rtuple copy{i, u};
 
-        copy = st;
+        copy = t;
 
-        REQUIRE(std::get<0>(st) == 42);
+        REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(copy) == 42);
-        REQUIRE(std::get<1>(st).value == 0xdeadbeefu);
+        REQUIRE(std::get<1>(t).value == 0xdeadbeefu);
         REQUIRE(std::get<1>(copy).value == 0xdeadbeefu);
     }
 
@@ -183,17 +183,17 @@ TEST_CASE("assignment with reference", "[assignment]")
 
     SECTION("move assignment")
     {
-        tuple st{42, unique_type{0xdeadbeefu}};
+        tuple t{42, unique_type{0xdeadbeefu}};
 
         int i = 72;
         unique_type u;
         tuple move{i, u};
 
-        move = std::move(st);
+        move = std::move(t);
 
-        REQUIRE(std::get<0>(st) == 42);
+        REQUIRE(std::get<0>(t) == 42);
         REQUIRE(std::get<0>(move) == 42);
-        REQUIRE(std::get<1>(st).value == 0);
+        REQUIRE(std::get<1>(t).value == 0);
         REQUIRE(std::get<1>(move).value == 0xdeadbeefu);
     }
 
@@ -215,27 +215,11 @@ TEST_CASE("assignment with reference", "[assignment]")
 
     SECTION("copy assignment by reference")
     {
-        int i = 42;
-        unique_type u{0xdeadbeefu};
-        rtuple st{i, u};
+        tuple t{42, unique_type{0xdeadbeefu}};
 
-        tuple copy{72, unique_type{}};
-
-        copy = st;
-
-        REQUIRE(std::get<0>(st) == 42);
-        REQUIRE(std::get<0>(copy) == 42);
-        REQUIRE(std::get<1>(st).value == 0xdeadbeefu);
-        REQUIRE(std::get<1>(copy).value == 0xdeadbeefu);
-    }
-
-    SECTION("copy assignment from std::tuple by reference")
-    {
-        int i = 42;
-        unique_type u{0xdeadbeefu};
-        rtuple t{i, u};
-
-        std::tuple copy{72, unique_type{}};
+        int i = 72;
+        unique_type u{};
+        rtuple copy{i, u};
 
         copy = t;
 
@@ -243,31 +227,35 @@ TEST_CASE("assignment with reference", "[assignment]")
         REQUIRE(std::get<0>(copy) == 42);
         REQUIRE(std::get<1>(t).value == 0xdeadbeefu);
         REQUIRE(std::get<1>(copy).value == 0xdeadbeefu);
+        REQUIRE(i == 42);
+        REQUIRE(u.value == 0xdeadbeefu);
+    }
+
+    SECTION("copy assignment from std::tuple by reference")
+    {
+        std::tuple t{42, unique_type{0xdeadbeefu}};
+
+        int i = 72;
+        unique_type u{};
+        rtuple copy{i, u};
+
+        copy = t;
+
+        REQUIRE(std::get<0>(t) == 42);
+        REQUIRE(std::get<0>(copy) == 42);
+        REQUIRE(std::get<1>(t).value == 0xdeadbeefu);
+        REQUIRE(std::get<1>(copy).value == 0xdeadbeefu);
+        REQUIRE(i == 42);
+        REQUIRE(u.value == 0xdeadbeefu);
     }
 
     SECTION("move assignment by reference")
     {
-        int i = 42;
-        unique_type u{0xdeadbeefu};
-        tuple move{i, u};
+        tuple t{42, unique_type{0xdeadbeefu}};
 
-        tuple st{72, unique_type{}};
-
-        move = std::move(st);
-
-        REQUIRE(std::get<0>(st) == 42);
-        REQUIRE(std::get<0>(move) == 42);
-        REQUIRE(std::get<1>(st).value == 0);
-        REQUIRE(std::get<1>(move).value == 0xdeadbeefu);
-    }
-
-    SECTION("move assignment from std::tuple by reference")
-    {
-        int i = 42;
-        unique_type u{0xdeadbeefu};
-        tuple move{i, u};
-
-        std::tuple t{72, unique_type{}};
+        int i = 72;
+        unique_type u{};
+        rtuple move{i, u};
 
         move = std::move(t);
 
@@ -275,5 +263,25 @@ TEST_CASE("assignment with reference", "[assignment]")
         REQUIRE(std::get<0>(move) == 42);
         REQUIRE(std::get<1>(t).value == 0);
         REQUIRE(std::get<1>(move).value == 0xdeadbeefu);
+        REQUIRE(i == 42);
+        REQUIRE(u.value == 0xdeadbeefu);
+    }
+
+    SECTION("move assignment from std::tuple by reference")
+    {
+        std::tuple t{42, unique_type{0xdeadbeefu}};
+
+        int i = 72;
+        unique_type u{};
+        rtuple move{i, u};
+
+        move = std::move(t);
+
+        REQUIRE(std::get<0>(t) == 42);
+        REQUIRE(std::get<0>(move) == 42);
+        REQUIRE(std::get<1>(t).value == 0);
+        REQUIRE(std::get<1>(move).value == 0xdeadbeefu);
+        REQUIRE(i == 42);
+        REQUIRE(u.value == 0xdeadbeefu);
     }
 }
