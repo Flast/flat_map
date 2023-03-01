@@ -1,7 +1,7 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <functional>
 #include <iterator>
 #include <vector>
