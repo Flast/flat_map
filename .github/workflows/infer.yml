@@ -10,7 +10,7 @@ on:
 
 jobs:
   infer:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
 
     - name: Configure cmake
       working-directory: build
-      run: infer compile -- cmake -DCMAKE_BUILD_TYPE=Debug -DCXX_STANDARD_UPTO=20 ..
+      run: infer compile -- cmake -DCMAKE_BUILD_TYPE=Debug -DCXX_STANDARD_UPTO=23 ..
 
     - name: Run infer
       working-directory: build
