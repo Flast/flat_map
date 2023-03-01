@@ -9,7 +9,11 @@
 
 #if FLAT_MAP
 
+#include <map>
 #include <utility>
+
+#include "flat_map/flat_map.hpp"
+#include "flat_map/flat_multimap.hpp"
 
 #define FLAT_UNIQ_CONTAINER_KEY flat_map::flat_map
 #define FLAT_MULTI_CONTAINER_KEY flat_map::flat_multimap
@@ -29,6 +33,11 @@ template <typename Key, typename T, typename Compare = std::less<Key>>
 using STD_MULTI_CONTAINER = std::multimap<Key, T, Compare>;
 
 #else // FLAT_MAP
+
+#include <set>
+
+#include "flat_map/flat_set.hpp"
+#include "flat_map/flat_multiset.hpp"
 
 #define FLAT_UNIQ_CONTAINER_KEY flat_map::flat_set
 #define FLAT_MULTI_CONTAINER_KEY flat_map::flat_multiset

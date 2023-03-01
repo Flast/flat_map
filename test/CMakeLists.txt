@@ -28,8 +28,8 @@ set_target_properties(unit_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAU
 
 macro(add_unit_test testname)
   add_catch2_test(${testname} ${ARGN})
-  target_link_libraries(${testname} requirements)
-  target_link_libraries(${testname} flat_map)
+  target_link_libraries(${testname} PRIVATE requirements)
+  target_link_libraries(${testname} PRIVATE flat_map)
   add_dependencies(unit_test ${testname})
 endmacro()
 
