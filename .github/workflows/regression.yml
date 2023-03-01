@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install prerequisites
       run: sudo apt-get install --no-install-recommends g++ cmake
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install prerequisites
       run: sudo apt-get install --no-install-recommends g++ cmake
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install prerequisites
       run: sudo apt-get install --no-install-recommends g++-10 cmake
@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install prerequisites
       run: sudo apt-get install --no-install-recommends clang-10 cmake
