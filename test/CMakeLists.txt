@@ -46,8 +46,10 @@ macro(add_tests testname)
 endmacro()
 
 add_unit_test(tuple_17 tuple.cpp) # for C++17
-add_unit_test(tuple_20 tuple.cpp) # for C++20
-set_property(TARGET tuple_20 PROPERTY CXX_STANDARD 20)
+if(CXX_STANDARD_UPTO GREATER_EQUAL 20)
+  add_unit_test(tuple_20 tuple.cpp) # for C++20
+  set_property(TARGET tuple_20 PROPERTY CXX_STANDARD 20)
+endif()
 add_tests(tied_sequence_test tied_sequence.cpp)
 
 add_tests(map_vector_test map_vector.cpp)
