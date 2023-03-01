@@ -18,14 +18,14 @@ jobs:
     - uses: srz-zumix/setup-infer@v1
 
     - name: Install prerequisites
-      run: sudo apt-get install --no-install-recommends g++ cmake
+      run: sudo apt-get install --no-install-recommends cmake
 
     - name: Prepare for build
       run: mkdir build
 
     - name: Configure cmake
       working-directory: build
-      run: infer compile -- cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++ -DCXX_STANDARD_UPTO=23 ..
+      run: infer compile -- cmake -DCMAKE_BUILD_TYPE=Debug -DCXX_STANDARD_UPTO=20 ..
 
     - name: Run infer
       working-directory: build
