@@ -1,18 +1,9 @@
 // Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
-#include <catch2/catch_all.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "config.hpp"
-#if FLAT_MAP
-#include <map>
-#include "flat_map/flat_map.hpp"
-#include "flat_map/flat_multimap.hpp"
-#else
-#include <set>
-#include "flat_map/flat_set.hpp"
-#include "flat_map/flat_multiset.hpp"
-#endif
 
 TEST_CASE("merge", "[merge]")
 {
