@@ -6,6 +6,7 @@
 #include <tuple>
 #include <utility>
 
+#include "flat_map/__config.hpp"
 #include "flat_map/__fwd.hpp"
 #include "flat_map/__type_traits.hpp"
 
@@ -59,9 +60,8 @@ constexpr auto tuple_reduction(F f, Tuple&& tuple)
     return tuple_reduction_impl(indices_t{}, std::move(f), std::forward<Tuple>(tuple));
 }
 
-#ifdef __cpp_lib_ranges_zip
+#ifndef FLAT_MAP_ZIP_NON_STD_TUPLE
 
-// C++23 zip support (P2321)
 template <typename... T>
 using tuple = std::tuple<T...>;
 
@@ -152,7 +152,7 @@ constexpr void swap(tuple<T...> const& lhs, tuple<T...> const& rhs) noexcept(noe
 
 } // namespace flat_map::detail
 
-#ifndef __cpp_lib_ranges_zip
+#ifdef FLAT_MAP_ZIP_NON_STD_TUPLE
 FLATMAP_BEGIN_STD
 
 template <typename... T>
