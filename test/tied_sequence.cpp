@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "flat_map/tied_sequence.hpp"
+#include "test_case/catch2_tuple.hpp"
 
 TEST_CASE("zip_iterator", "[iterator]")
 {
