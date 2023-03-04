@@ -438,7 +438,7 @@ public:
             [[maybe_unused]] auto const dist = std::distance(_container.begin(), lb);
             if (lb == mid || _vcomp()(key, *lb))
             {
-                auto tmp = std::move(*itr);
+                typename std::iterator_traits<typename Cont::iterator>::value_type tmp = std::move(*itr);
                 itr = source.erase(itr);
                 if constexpr (multimap)
                 {
@@ -451,6 +451,7 @@ public:
                 ++itr;
             }
             if constexpr (_same_order_v<Cont>) { first = std::next(_container.begin(), dist); }
+            else if constexpr (!concepts::Reservable<Container>) { first = _container.begin(); }
         }
         return std::next(_container.begin(), len);
     }
