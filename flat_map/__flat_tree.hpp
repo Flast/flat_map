@@ -451,6 +451,7 @@ public:
                 ++itr;
             }
             if constexpr (_same_order_v<Cont>) { first = std::next(_container.begin(), dist); }
+            else if constexpr (!concepts::Reservable<Container>) { first = _container.begin(); }
         }
         return std::next(_container.begin(), len);
     }
