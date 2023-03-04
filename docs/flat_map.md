@@ -86,7 +86,7 @@ flat_map(InputIterator first, InputIterator last, allocator_type const& alloc);
 Construct container from `[first, last)`.
 
 **Pre requirements**
-`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 **Complexity**
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
@@ -370,6 +370,9 @@ void insert(std::initializer_list<value_type> ilist);
 
 Range insertion. Same effect as `insert(range_order::no_ordered, first, last)` and `insert(range_order::no_ordered, ilist)` respectively.
 
+**Pre requirements**
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+
 ```cpp
 insert_return_type insert(node_type&& node)
 
@@ -398,7 +401,7 @@ void insert(range_order order, std::initializer_list<value_type> ilist);
 Range insertion with ordered or non-ordered range.
 
 **Pre requirements**
-`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator).
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 If the `order` is `range_order::sorted` or `range_order::unique_sorted`, the ranges should be sorted in `Compare` order, otherwise the behaviour is undefined.
 
 **Complexity**
@@ -829,6 +832,9 @@ flat_map(std::initializer_list<std::pair<Key, T>>, Allocator)
 
 Where the exposition only type aliases are defined as
 
+**Pre requirements**
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+
 ```cpp
 template <typename InputIterator>
 using iter_key_t = std::remove_const_t<typename std::iterator_traits<InputIterator>::value_type::first_type>;
@@ -846,3 +852,5 @@ using iter_to_container_t = std::vector<std::pair<iter_key_t<InputIterator>, ite
 First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
 Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
 
+**Pre requirements**
+`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
