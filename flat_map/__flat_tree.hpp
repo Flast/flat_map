@@ -438,7 +438,7 @@ public:
             [[maybe_unused]] auto const dist = std::distance(_container.begin(), lb);
             if (lb == mid || _vcomp()(key, *lb))
             {
-                auto tmp = std::move(*itr);
+                typename std::iterator_traits<typename Cont::iterator>::value_type tmp = std::move(*itr);
                 itr = source.erase(itr);
                 if constexpr (multimap)
                 {
