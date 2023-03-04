@@ -2,6 +2,7 @@
 // This software is released under the MIT License, see LICENSE.
 
 #include <catch2/catch_test_macros.hpp>
+#include <deque>
 #include <map>
 #include <stdexcept>
 #include <tuple>
@@ -1075,5 +1076,13 @@ TEST_CASE("remove erase", "[erase]")
         REQUIRE(ts[0] == std::tuple{0, 1});
         REQUIRE(ts[1] == std::tuple{4, 5});
         REQUIRE(ts[2] == std::tuple{6, 7});
+    }
+}
+
+TEST_CASE("non contiguous", "[contiguous]")
+{
+    SECTION("construct")
+    {
+        [[maybe_unused]] flat_map::tied_sequence<std::deque<int>, std::deque<int>> ts;
     }
 }
