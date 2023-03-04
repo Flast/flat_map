@@ -315,7 +315,7 @@ private:
       : _seq{Sequences(detail::unzip<N>(first), detail::unzip<N>(last), alloc)...} { }
 
 public:
-    constexpr tied_sequence() noexcept((std::is_nothrow_default_constructible_v<Sequences> && ... && true))
+    constexpr tied_sequence() noexcept((std::is_nothrow_default_constructible_v<Sequences> && ...))
 #if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
     {}
 #else
@@ -378,7 +378,7 @@ public:
     constexpr tied_sequence& operator=(tied_sequence const& other) = default;
     constexpr tied_sequence& operator=(tied_sequence&& other)
       noexcept(((std::allocator_traits<typename Sequences::allocator_type>::propagate_on_container_move_assignment::value
-              || std::allocator_traits<typename Sequences::allocator_type>::is_always_equal::value) && ... && true)) = default;
+              || std::allocator_traits<typename Sequences::allocator_type>::is_always_equal::value) && ...)) = default;
 
     constexpr tied_sequence& operator=(std::initializer_list<value_type> ilist)
     {
@@ -578,7 +578,7 @@ public:
 
     constexpr void swap(tied_sequence& other)
       noexcept(((std::allocator_traits<typename Sequences::allocator_type>::propagate_on_container_swap::value
-              || std::allocator_traits<typename Sequences::allocator_type>::is_always_equal::value) && ... && true))
+              || std::allocator_traits<typename Sequences::allocator_type>::is_always_equal::value) && ...))
     {
         detail::tuple_transform([](auto& lhs, auto& rhs) { using std::swap; swap(lhs, rhs); }, _seq, other._seq);
     }
