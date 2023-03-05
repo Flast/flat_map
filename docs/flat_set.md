@@ -10,9 +10,11 @@ class flat_set;
 ```
 
 **Requirements**
+
 - `Container` should meet [*Container*](https://en.cppreference.com/w/cpp/named_req/Container), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
 
 **Complexity**
+
 - `N` denotes number of elements that stored in the container.
 - `M` denotes number of elements that shifted by insert/erase.
 - `E` denotes number of target elements that inserted or erased.
@@ -63,9 +65,11 @@ flat_set(InputIterator first, InputIterator last, allocator_type const& alloc);
 Construct container from `[first, last)`.
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 **Complexity**
+
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ```cpp
@@ -93,6 +97,7 @@ flat_set(std::initializer_list<value_type> init, allocator_type const& alloc);
 Construct from init.
 
 **Complexity**
+
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ```cpp
@@ -105,6 +110,7 @@ explicit flat_set(range_order order, Container&& cont, allocator_type const& all
 ```
 
 **Complexity**
+
 For non sorted range, amortized `O(E logE)` if enough additional memory is available, otherwise amortized `O(E log E^2)`.
 For sorted, and uniqued range `O(1)`, otherwise `O(E)`.
 
@@ -131,6 +137,7 @@ flat_set& operator=(flat_set&& other) noexcept(/* see below */);
 Move entire elements from other.
 
 **Exceptions**
+
 No except only if it meets all of
 - `std::is_nothrow_move_assignable_v<Container> == true` and
 - `std::is_nothrow_move_assignable_v<Compare> == true`
@@ -140,6 +147,7 @@ flat_set& operator=(std::initializer_list<value_type> ilist);
 ```
 
 **Complexity**
+
 `O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
 
 ## Iterators
@@ -225,6 +233,7 @@ void reserve(size_type new_cap);
 This function is provided only if `Container::reserve()` is provided.
 
 **Postcondition**
+
 - `capacity() == new_cap`
 
 ### capacity
@@ -244,9 +253,11 @@ void shrink_to_fit();
 This function is provided only if `Container::shrink_to_fit()` is provided.
 
 **Postcondition**
+
 - `capacity() == size()`
 
 **Complexity**
+
 `O(N)`.
 
 ## Modifiers
@@ -260,9 +271,11 @@ void clear();
 Clear container.
 
 **Postcondition**
+
 - `size() == 0`
 
 **Invalidation**
+
 Invalidates every interators and references.
 
 ### insert
@@ -281,12 +294,15 @@ Insert a `value`.
 The second form only participants in overload resolution if `std::is_constructible_v<value_type, V&&> == true`.
 
 **Return value**
+
 An iterator to inserted value or the element which has same key, `bool` denotes whether the insertion is succeeded.
 
 **Complexity**
+
 Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
 
 **Invalidation**
+
 Same as `Container::insert`.
 
 ```cpp
@@ -304,12 +320,15 @@ The `hint` is used for looking up insertion point.
 The second form only participants in overload resolution if `std::is_constructible_v<value_type, V&&> == true`.
 
 **Return value**
+
 An iterator to inserted value or the element which has same key.
 
 **Complexity**
+
 Amortized `O(M)` for insertion, `O(1)` for searching insertion point with valid `hint` otherwise `O(log(N))`.
 
 **Invalidation**
+
 Same as `Container::insert`.
 
 ```cpp
@@ -322,6 +341,7 @@ void insert(std::initializer_list<value_type> ilist);
 Range insertion. Same effect as `insert(range_order::no_ordered, first, last)` and `insert(range_order::no_ordered, ilist)` respectively.
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 ```cpp
@@ -334,12 +354,15 @@ Insert `node`.
 The `hint` is used in same way as other `insert()`.
 
 **Return value**
+
 An iterator to inserted value or the element which has same key.
 
 **Complexity**
+
 Amortized `O(M)` for insertion, `O(log(N))` for searching insertion point.
 
 **Invalidation**
+
 Same as `Container::insert`.
 
 ```cpp
@@ -352,14 +375,17 @@ void insert(range_order order, std::initializer_list<value_type> ilist);
 Range insertion with ordered or non-ordered range.
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 If the `order` is `range_order::sorted` or `range_order::unique_sorted`, the ranges should be sorted in `Compare` order, otherwise the behaviour is undefined.
 
 **Complexity**
+
 For non sorted range, amortized `O((N+E) log(N+E))` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E)^2)`.
 For sorted range, amortized `O(N+E)` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E))`.
 
 **Invalidation**
+
 Same as `Container::insert`.
 
 ### emplace
@@ -390,13 +416,16 @@ size_type erase(key_type const& key)
 ```
 
 **Return value**
+
 An iterator that next to erased elements.
 
 **Complexity**
+
 `O(M)`in first and second form.
 `O(M)` for erasing, `O(log(N))` for searching target element in third form.
 
 **Invalidation**
+
 Same as `Container::erase`.
 
 ### swap
@@ -408,6 +437,7 @@ void swap(flat_set& other) noexcept(/* see below */);
 Swap elements, allocator, and comparator.
 
 **Exceptions**
+
 No except only if it meets all of
 - `std::allocator_traits<allocator_type>::is_always_equal::value` and
 - `std::is_nothrow_swappable<Compare>::value`
@@ -424,12 +454,15 @@ Extract an element and returns it.
 Unlike `std::set::extract`, move element.
 
 **Pre requirements**
+
 `position` should be valid dereferenceable iterator in first form.
 
 **Return value**
+
 Extracted node handle.
 
 **Complexity**
+
 `O(M)` in first form.
 `O(M)` for extraction, `O(log(N))` for searching target element in second form.
 
@@ -464,6 +497,7 @@ void merge(flat_multiset<key_type, Comp, Cont>&& source);
 Merge `source` container into self.
 
 **Complexity**
+
 Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise `O(E log(N))`.
 
 ## Lookup
@@ -482,6 +516,7 @@ Count number of elements.
 The second form is only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
+
 `O(log(N))`.
 
 ### find
@@ -503,6 +538,7 @@ Find an element.
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
+
 `O(log(N))`.
 
 ### contains
@@ -517,6 +553,7 @@ bool contains(K const& key) const;
 The second form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
+
 `O(log(N))`.
 
 ### equal_range
@@ -538,6 +575,7 @@ Returns a range that contains elements with specified key.
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
+
 `O(log(N))`.
 
 ### lower_bound
@@ -559,6 +597,7 @@ Returns an iterator that points to first element which is *not less* than specif
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
+
 `O(log(N))`.
 
 ### upper_bound
@@ -580,6 +619,7 @@ Returns an iterator that points to first element which is *greater* than specifi
 The third and fourth form are only participants in overload resolution if the `Compare::is_transparent` is valid.
 
 **Complexity**
+
 `O(log(N))`.
 
 ## Observers
@@ -600,6 +640,7 @@ bool operator==(flat_set<Key, Compare, Container> const& lhs, flat_set<Key, Comp
 ```
 
 **Complexity**
+
 `O(N)`.
 
 ### operator!=
@@ -610,9 +651,11 @@ bool operator!=(flat_set<Key, Compare, Container> const& lhs, flat_set<Key, Comp
 ```
 
 **Complexity**
+
 `O(N)`.
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -625,9 +668,11 @@ bool operator<(flat_set<Key, Compare, Container> const& lhs, flat_set<Key, Compa
 ```
 
 **Complexity**
+
 `O(N)`.
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -640,9 +685,11 @@ bool operator<=(flat_set<Key, Compare, Container> const& lhs, flat_set<Key, Comp
 ```
 
 **Complexity**
+
 `O(N)`.
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -655,9 +702,11 @@ bool operator>(flat_set<Key, Compare, Container> const& lhs, flat_set<Key, Compa
 ```
 
 **Complexity**
+
 `O(N)`.
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -670,9 +719,11 @@ bool operator>=(flat_set<Key, Compare, Container> const& lhs, flat_set<Key, Comp
 ```
 
 **Complexity**
+
 `O(N)`.
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -685,12 +736,15 @@ template <typename Key, typename Compare, typename Container>
 ```
 
 **Return value**
+
 `std::lexicographical_compare_three_way(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())`
 
 **Complexity**
+
 `O(N)`.
 
 **Standard**
+
 This function is defined only if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -703,6 +757,7 @@ void swap(flat_set<Key, Compare, Container>& lhs, flat_set<Key, Compare, Contain
 ```
 
 **Exceptions**
+
 No except only if `noexcept(lhs.swap(rhs))` is true.
 
 ### erase_if
@@ -715,9 +770,11 @@ std::size_t erase_if(flat_set<Key, Compare, Container>& c, Pred pred);
 Erase every elements which `pred` returned true.
 
 **Return value**
+
 Number of erased elements.
 
 **Complexity**
+
 `O(N)`.
 
 ## Deduction guides
@@ -747,6 +804,7 @@ flat_set(std::initializer_list<Key>, Allocator)
 Where the exposition only type aliases are defined as
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 ```cpp
@@ -758,4 +816,5 @@ First and second form are participants in overload resolution only if `Compare` 
 Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
