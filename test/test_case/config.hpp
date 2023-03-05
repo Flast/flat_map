@@ -98,3 +98,27 @@ auto MAKE_PAIR(T1 t1, [[maybe_unused]] T2 t2)
 {
     return typename CONTAINER<PAIR<T1, T2>>::value_type{PAIR_PARAM(t1, t2)};
 }
+
+template <typename T1, typename T2>
+auto MAKE_STD_PAIR(T1 t1, [[maybe_unused]] T2 t2)
+{
+    return PAIR<T1, T2>{PAIR_PARAM(t1, t2)};
+}
+
+template <typename T1, typename T2>
+std::tuple<T1*, T2*> to_pointer_tuple(std::tuple<T1&, T2&> t)
+{
+    return std::tuple{&std::get<0>(t), &std::get<1>(t)};
+}
+
+template <typename T1, typename T2>
+std::tuple<T1*, T2*> to_pointer_tuple(std::tuple<T1, T2>& t)
+{
+    return std::tuple{&std::get<0>(t), &std::get<1>(t)};
+}
+
+template <typename T>
+T* to_pointer_tuple(T& t)
+{
+    return &t;
+}

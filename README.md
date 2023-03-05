@@ -16,6 +16,7 @@ It compliants C++17/20 standard associative container requirements except comple
   - [flat\_set](./docs/flat\_set.md)
   - [flat\_multimap](./docs/flat\_multimap.md)
   - [flat\_multiset](./docs/flat\_multiset.md)
+  - [tied\_sequence](./docs/tied\_sequence.md)
 
 ## Other implementations
 

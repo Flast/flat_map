@@ -59,7 +59,7 @@ public:
         value_compare(Compare c) : c{std::move(c)} { }
 
     public:
-        bool operator()(value_type const& lhs, value_type const& rhs) const
+        bool operator()(const_reference lhs, const_reference rhs) const
         {
             return c(std::get<0>(lhs), std::get<0>(rhs));
         }
@@ -73,14 +73,14 @@ private:
 
         using value_compare::operator();
 
-        template <typename K>
-        auto operator()(value_type const& lhs, K const& rhs) const
+        template <typename K, typename = std::enable_if_t<!std::is_convertible_v<K, value_type>>>
+        auto operator()(const_reference lhs, K const& rhs) const
         {
             return this->c(std::get<0>(lhs), rhs);
         }
 
-        template <typename K>
-        auto operator()(K const& lhs, value_type const& rhs) const
+        template <typename K, typename = std::enable_if_t<!std::is_convertible_v<K, value_type>>>
+        auto operator()(K const& lhs, const_reference rhs) const
         {
             return this->c(lhs, std::get<0>(rhs));
         }
@@ -173,7 +173,7 @@ public:
 
     mapped_type const& at(key_type const& key) const
     {
-        if (auto [itr, found] = this->_find(key); found) { return itr->second; }
+        if (auto [itr, found] = this->_find(key); found) { return std::get<1>(*itr); }
         throw std::out_of_range("no such key");
     }
 
@@ -182,8 +182,8 @@ public:
         return const_cast<mapped_type&>(const_cast<flat_map const*>(this)->at(key));
     }
 
-    mapped_type& operator[](key_type const& key) { return try_emplace(key).first->second; }
-    mapped_type& operator[](key_type&& key) { return try_emplace(std::move(key)).first->second; }
+    mapped_type& operator[](key_type const& key) { return std::get<1>(*try_emplace(key).first); }
+    mapped_type& operator[](key_type&& key) { return std::get<1>(*try_emplace(std::move(key)).first); }
 
     using _super::begin;
     using _super::cbegin;
@@ -211,7 +211,7 @@ private:
         static_assert(std::is_assignable_v<mapped_type&, M&&>);
         auto [itr, found] = this->_find(key);
         if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
-        else { itr->second = std::forward<M>(obj); }
+        else { std::get<1>(*itr) = std::forward<M>(obj); }
         return {itr, !found};
     }
 
@@ -221,7 +221,7 @@ private:
         static_assert(std::is_assignable_v<mapped_type&, M&&>);
         auto [itr, found] = this->_insert_point_uniq(hint, key);
         if (!found) { itr = this->_container.emplace(itr, std::forward<K>(key), std::forward<M>(obj)); }
-        else { itr->second = std::forward<M>(obj); }
+        else { std::get<1>(*itr) = std::forward<M>(obj); }
         return itr;
     }
 

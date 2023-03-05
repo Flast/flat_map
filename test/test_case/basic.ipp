@@ -163,12 +163,12 @@ TEST_CASE("construction", "[construction]")
             MAKE_PAIR(2, 3),
             MAKE_PAIR(0, 1),
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         auto copy = fm;
 
-        REQUIRE(ptr == &*fm.begin());
-        REQUIRE(ptr != &*copy.begin());
+        REQUIRE(ptr == to_pointer_tuple(*fm.begin()));
+        REQUIRE(ptr != to_pointer_tuple(*copy.begin()));
         REQUIRE(copy.begin() != fm.begin());
 
         auto itr = copy.begin();
@@ -188,11 +188,11 @@ TEST_CASE("construction", "[construction]")
             MAKE_PAIR(2, 3),
             MAKE_PAIR(0, 1),
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         auto move = std::move(fm);
 
-        REQUIRE(ptr == &*move.begin());
+        REQUIRE(ptr == to_pointer_tuple(*move.begin()));
         REQUIRE(move.begin() != fm.begin());
         REQUIRE(fm.begin() == fm.end());
 
@@ -216,7 +216,7 @@ TEST_CASE("assignment", "[assignment]")
             MAKE_PAIR(2, 3),
             MAKE_PAIR(0, 1),
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         FLAT_CONTAINER<int, int> copy =
         {
@@ -224,8 +224,8 @@ TEST_CASE("assignment", "[assignment]")
         };
         copy = fm;
 
-        REQUIRE(ptr == &*fm.begin());
-        REQUIRE(ptr != &*copy.begin());
+        REQUIRE(ptr == to_pointer_tuple(*fm.begin()));
+        REQUIRE(ptr != to_pointer_tuple(*copy.begin()));
         REQUIRE(copy.begin() != fm.begin());
 
         auto itr = copy.begin();
@@ -245,7 +245,7 @@ TEST_CASE("assignment", "[assignment]")
             MAKE_PAIR(2, 3),
             MAKE_PAIR(0, 1),
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         FLAT_CONTAINER<int, int> move =
         {
@@ -253,7 +253,7 @@ TEST_CASE("assignment", "[assignment]")
         };
         move = std::move(fm);
 
-        REQUIRE(ptr == &*move.begin());
+        REQUIRE(ptr == to_pointer_tuple(*move.begin()));
         REQUIRE(move.begin() != fm.begin());
         REQUIRE(fm.begin() == fm.end());
 
@@ -1469,7 +1469,7 @@ TEST_CASE("erase_if", "[erase_if]")
         MAKE_PAIR(6, 7),
     };
 
-    auto n = erase_if(fm, [](auto& kvp) { return FIRST(kvp) < 4; });
+    auto n = erase_if(fm, [](decltype(fm)::reference kvp) { return FIRST(kvp) < 4; });
     REQUIRE(n == 2);
     REQUIRE(fm.size() == 2);
 

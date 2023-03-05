@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2023 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -20,4 +20,10 @@
 
 #if defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison)
 #   define FLAT_MAP_HAS_THREE_WAY_COMPARISON 1
+#endif
+
+
+// C++23 zip support (P2321)
+#ifndef __cpp_lib_ranges_zip
+#   define FLAT_MAP_ZIP_NON_STD_TUPLE
 #endif

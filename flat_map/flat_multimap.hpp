@@ -57,7 +57,7 @@ public:
         value_compare(Compare c) : c{std::move(c)} { }
 
     public:
-        bool operator()(value_type const& lhs, value_type const& rhs) const
+        bool operator()(const_reference lhs, const_reference rhs) const
         {
             return c(std::get<0>(lhs), std::get<0>(rhs));
         }
@@ -70,14 +70,14 @@ private:
 
         using value_compare::operator();
 
-        template <typename K>
-        auto operator()(value_type const& lhs, K const& rhs) const
+        template <typename K, typename = std::enable_if_t<!std::is_convertible_v<K, value_type>>>
+        auto operator()(const_reference lhs, K const& rhs) const
         {
             return this->c(std::get<0>(lhs), rhs);
         }
 
-        template <typename K>
-        auto operator()(K const& lhs, value_type const& rhs) const
+        template <typename K, typename = std::enable_if_t<!std::is_convertible_v<K, value_type>>>
+        auto operator()(K const& lhs, const_reference rhs) const
         {
             return this->c(lhs, std::get<0>(rhs));
         }

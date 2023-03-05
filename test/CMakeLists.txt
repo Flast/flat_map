@@ -45,11 +45,20 @@ macro(add_tests testname)
   endif()
 endmacro()
 
+add_unit_test(tuple_17 tuple.cpp) # for C++17
+if(CXX_STANDARD_UPTO GREATER_EQUAL 20)
+  add_unit_test(tuple_20 tuple.cpp) # for C++20
+  set_property(TARGET tuple_20 PROPERTY CXX_STANDARD 20)
+endif()
+add_tests(tied_sequence_test tied_sequence.cpp)
+
 add_tests(map_vector_test map_vector.cpp)
 add_tests(map_deque_test map_deque.cpp)
+add_tests(map_tie_test map_tie.cpp)
 
 add_tests(multimap_vector_test multimap_vector.cpp)
 add_tests(multimap_deque_test multimap_deque.cpp)
+add_tests(multimap_tie_test multimap_tie.cpp)
 
 add_tests(set_vector_test set_vector.cpp)
 add_tests(set_deque_test set_deque.cpp)

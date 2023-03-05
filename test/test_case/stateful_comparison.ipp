@@ -64,12 +64,12 @@ TEST_CASE("construction fp", "[construction][fp]")
             },
             less,
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         auto copy = fm;
 
-        REQUIRE(ptr == &*fm.begin());
-        REQUIRE(ptr != &*copy.begin());
+        REQUIRE(ptr == to_pointer_tuple(*fm.begin()));
+        REQUIRE(ptr != to_pointer_tuple(*copy.begin()));
         REQUIRE(copy.begin() != fm.begin());
 
         copy.emplace(PAIR_PARAM(1, 2));
@@ -95,11 +95,11 @@ TEST_CASE("construction fp", "[construction][fp]")
             },
             less,
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         auto move = std::move(fm);
 
-        REQUIRE(ptr == &*move.begin());
+        REQUIRE(ptr == to_pointer_tuple(*move.begin()));
         REQUIRE(move.begin() != fm.begin());
         REQUIRE(fm.begin() == fm.end());
 
@@ -129,7 +129,7 @@ TEST_CASE("assignment fp", "[assignment][fp]")
             },
             less,
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         FLAT_CONTAINER<int, int, bool(*)(int, int)> copy =
         {
@@ -140,8 +140,8 @@ TEST_CASE("assignment fp", "[assignment][fp]")
         };
         copy = fm;
 
-        REQUIRE(ptr == &*fm.begin());
-        REQUIRE(ptr != &*copy.begin());
+        REQUIRE(ptr == to_pointer_tuple(*fm.begin()));
+        REQUIRE(ptr != to_pointer_tuple(*copy.begin()));
         REQUIRE(copy.begin() != fm.begin());
 
         copy.emplace(PAIR_PARAM(1, 2));
@@ -167,7 +167,7 @@ TEST_CASE("assignment fp", "[assignment][fp]")
             },
             less,
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         FLAT_CONTAINER<int, int, bool(*)(int, int)> move =
         {
@@ -178,7 +178,7 @@ TEST_CASE("assignment fp", "[assignment][fp]")
         };
         move = std::move(fm);
 
-        REQUIRE(ptr == &*move.begin());
+        REQUIRE(ptr == to_pointer_tuple(*move.begin()));
         REQUIRE(move.begin() != fm.begin());
         REQUIRE(fm.begin() == fm.end());
 
@@ -295,12 +295,12 @@ TEST_CASE("construction functor", "[construction][functor]")
             },
             comp<int>{true},
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         auto copy = fm;
 
-        REQUIRE(ptr == &*fm.begin());
-        REQUIRE(ptr != &*copy.begin());
+        REQUIRE(ptr == to_pointer_tuple(*fm.begin()));
+        REQUIRE(ptr != to_pointer_tuple(*copy.begin()));
         REQUIRE(copy.begin() != fm.begin());
 
         copy.emplace(PAIR_PARAM(1, 2));
@@ -326,11 +326,11 @@ TEST_CASE("construction functor", "[construction][functor]")
             },
             comp<int>{true},
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         auto move = std::move(fm);
 
-        REQUIRE(ptr == &*move.begin());
+        REQUIRE(ptr == to_pointer_tuple(*move.begin()));
         REQUIRE(move.begin() != fm.begin());
         REQUIRE(fm.begin() == fm.end());
 
@@ -360,7 +360,7 @@ TEST_CASE("assignment functor", "[assignment][functor]")
             },
             comp<int>{true},
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         FLAT_CONTAINER<int, int, comp<int>> copy =
         {
@@ -371,8 +371,8 @@ TEST_CASE("assignment functor", "[assignment][functor]")
         };
         copy = fm;
 
-        REQUIRE(ptr == &*fm.begin());
-        REQUIRE(ptr != &*copy.begin());
+        REQUIRE(ptr == to_pointer_tuple(*fm.begin()));
+        REQUIRE(ptr != to_pointer_tuple(*copy.begin()));
         REQUIRE(copy.begin() != fm.begin());
 
         copy.emplace(PAIR_PARAM(1, 2));
@@ -398,7 +398,7 @@ TEST_CASE("assignment functor", "[assignment][functor]")
             },
             comp<int>{true},
         };
-        auto* ptr = &*fm.begin();
+        auto ptr = to_pointer_tuple(*fm.begin());
 
         FLAT_CONTAINER<int, int, comp<int>> move =
         {
@@ -409,7 +409,7 @@ TEST_CASE("assignment functor", "[assignment][functor]")
         };
         move = std::move(fm);
 
-        REQUIRE(ptr == &*move.begin());
+        REQUIRE(ptr == to_pointer_tuple(*move.begin()));
         REQUIRE(move.begin() != fm.begin());
         REQUIRE(fm.begin() == fm.end());
 
