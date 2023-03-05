@@ -8,6 +8,7 @@ class tied_sequence;
 ```
 
 **Requirements**
+
 - Each `Sequences` should meet [*Container*](https://en.cppreference.com/w/cpp/named_req/Container), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
 
 ## Member types
@@ -31,22 +32,19 @@ using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 ```cpp
 constexpr tied_sequence();
-
 constexpr explicit tied_sequence(allocator_type const&);
 ```
 
 **Exceptions**
+
 No except only if for all sequences meet all of
 - `std::is_nothrow_default_constructible_v<Sequence> == true`
 
 ```cpp
-constexpr explicit tied_sequence(typename Sequences::allocator_type const&... alloc);
+constexpr explicit tied_sequence(typename Sequences::allocator_type const&... alloc) noexcept;
 ```
 
 Construct sequences form corresponding allocator.
-
-**Exceptions**
-No except.
 
 ```cpp
 constexpr tied_sequence(size_type count, value_type const& value);
@@ -73,6 +71,7 @@ constexpr tied_sequence(InputIterator first, InputIterator last, typename Sequen
 Construct containers from `[first, last)`.
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 
@@ -116,6 +115,7 @@ constexpr tied_sequence& operator=(tied_sequence&& other);
 Move entire elements from other.
 
 **Exceptions**
+
 No except only if each sequences meet all of
 - `std::allocator_traits<typename Sequence::allocator_type>::propagate_on_container_move_assignment::value == true` and
 - `std::allocator_traits<typename Sequence::allocator_type>::is_always_equal::value == true`
@@ -125,6 +125,7 @@ constexpr tied_sequence& operator=(std::initializer_list<value_type> ilist);
 ```
 
 **Complexity**
+
 Linear.
 
 ```cpp
@@ -134,6 +135,7 @@ constexpr void assign(size_type count, value_type const& value);
 Replace with `count` copies of `value` for each sequences.
 
 **Complexity**
+
 Linear.
 
 ```cpp
@@ -144,6 +146,7 @@ constexpr void assign(InputIterator first, InputIterator last);
 Replace containers from `[first, last)`.
 
 **Pre requirements**
+
 `InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 ```cpp
@@ -187,12 +190,20 @@ constexpr reference front();
 constexpr const_reference front();
 ```
 
+**Complexity**
+
+Worse case of `Sequences`.
+
 ### back
 
 ```cpp
 constexpr reference back() { return *std::prev(end()); }
 constexpr const_reference back() const { return *std::prev(end()); }
 ```
+
+**Complexity**
+
+Worse case of `Sequences`.
 
 ### data
 
@@ -220,7 +231,7 @@ constexpr const_iterator cbegin() const noexcept;
 
 ### end
 
-```
+```cpp
 constexpr iterator end() noexcept;
 constexpr const_iterator end() const noexcept;
 ```
@@ -313,6 +324,7 @@ constexpr iterator insert(const_iterator pos, value_type&& value);
 Insert a `value`.
 
 **Exceptions Safety**
+
 Those functions doesn't guarantee exception neutrality.
 
 ```cpp
@@ -322,6 +334,7 @@ constexpr iterator insert(const_iterator pos, size_type count, value_type const&
 Insert `count` copies of `value`.
 
 **Exceptions Safety**
+
 This function doesn't guarantee exception neutrality.
 
 ```cpp
@@ -332,6 +345,7 @@ constexpr iterator insert(const_iterator pos, InputIterator first, InputIterator
 Insert values from `[first, last)`.
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ```cpp
@@ -341,6 +355,7 @@ constexpr iterator insert(const_iterator pos, std::initializer_list<value_type> 
 Insert values from ilist.
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### emplace
@@ -353,6 +368,7 @@ constexpr iterator emplace(const_iterator pos, Args&&... args);
 Equivalent to `insert(pos, value_type(std::forward<Args>(args)...))`.
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ```cpp
@@ -363,6 +379,7 @@ constexpr iterator emplace(const_iterator pos, std::piecewise_construct_t, Args&
 Insert new elements with piecewise construction.
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### erase
@@ -373,9 +390,11 @@ constexpr iterator erase(const_iterator first, const_iterator last);
 ```
 
 **Return value**
+
 An iterator that next to erased elements.
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### push\_back
@@ -386,6 +405,7 @@ constexpr void push_back(value_type&& value);
 ```
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### emplace\_back
@@ -396,9 +416,11 @@ constexpr reference emplace_back(Args&&... args);
 ```
 
 **Return value**
+
 Reference to inserted value.
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### pop\_back
@@ -408,6 +430,7 @@ constexpr void pop_back();
 ```
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### resize
@@ -418,6 +441,7 @@ constexpr void resize(size_type count, value_type const& value);
 ```
 
 **Exceptions Safety**
+
 This functions doesn't guarantee exception neutrality.
 
 ### swap
@@ -429,6 +453,7 @@ constexpr void swap(tied_sequence& other);
 Swap elements with other.
 
 **Exceptions**
+
 No except only if for all sequences meet all of
 - `std::allocator_traits<typename Sequence::allocator_type>::propagate_on_container_swap::value == true`
 - `std::allocator_traits<typename Sequence::allocator_type>::is_always_equal::value == true`
@@ -450,6 +475,7 @@ bool operator!=(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequences.
 ```
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -462,6 +488,7 @@ bool operator<(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequences..
 ```
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -474,6 +501,7 @@ bool operator<=(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequences.
 ```
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -486,6 +514,7 @@ bool operator>(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequences..
 ```
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -498,6 +527,7 @@ bool operator>=(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequences.
 ```
 
 **Standard**
+
 This function is removed if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -510,9 +540,11 @@ constexpr /* see below */ operator<=>(tied_sequence<Sequences...> const& lhs, ti
 ```
 
 **Return value**
+
 `std::lexicographical_compare_three_way(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())`
 
 **Standard**
+
 This function is defined only if
 - `__cpp_impl_three_way_comparison` is defined, and
 - `__cpp_lib_three_way_comparison` is defined.
@@ -525,6 +557,7 @@ constexpr void swap(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequen
 ```
 
 **Exceptions**
+
 No except only if `noexcept(lhs.swap(rhs))` is true.
 
 ### erase
