@@ -498,7 +498,7 @@ No except only if it meets all of
 - `std::allocator_traits<allocator_type>::is_always_equal::value` and
 - `std::is_nothrow_swappable<Compare>::value`
 
-#### extract
+### extract
 
 ```cpp
 node_type extract(const_iterator position);
