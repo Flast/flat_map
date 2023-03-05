@@ -1,7 +1,7 @@
 # tied\_sequence
 
 ```cpp
-#include <flat/tied_sequence.hpp>
+#include <flat_map/tied_sequence.hpp>
 
 template <typename... Sequences>
 class tied_sequence;
@@ -10,6 +10,23 @@ class tied_sequence;
 **Requirements**
 
 - Each `Sequences` should meet [*Container*](https://en.cppreference.com/w/cpp/named_req/Container), [*AllocatorAwareContainer*](https://en.cppreference.com/w/cpp/named_req/AllocatorAwareContainer), [*SequenceContainer*](https://en.cppreference.com/w/cpp/named_req/SequenceContainer), and [*ReversibleContainer*](https://en.cppreference.com/w/cpp/named_req/ReversibleContainer).
+
+## Example
+
+`flat_map` (and its variants), in this library, provides Array of Structure (AOS) style by default.
+Use `tied_sequence` for `Container` template parameter to achieve Structure of Array (SOA) style flat map.
+
+```cpp
+#include <flat_map/flat_map.hpp>
+#include <flat_map/tied_sequence.hpp>
+
+flat_map::flat_map<
+  /* Key */ int,
+  /* T */ HugeValueType,
+  /* Compare */ std::less<int>,
+  /* Container */ flat_map::tied_sequence<std::vector<int>, std::deque<HugeValueType>>
+> tied_map;
+```
 
 ## Member types
 
