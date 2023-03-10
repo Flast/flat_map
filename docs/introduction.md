@@ -26,6 +26,7 @@ This library distributed under MIT license, see [LICENSE](../LICENSE) for more d
 
 Followings are the library that provides same 'flat\_map' idiom.
 
-- [A standard flat\_map](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0429r0.pdf)
+- [A standard flat\_map](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p0429r9.pdf)
 - [Boost.Container - flat_(multi)map/set associative containers](https://www.boost.org/doc/html/container/non_standard_containers.html#container.non_standard_containers.flat_xxx)
 - ETL [flat\_map / flat\_multimap](https://www.etlcpp.com/flat_map.html) [flat\_set / flat\_multiset](https://www.etlcpp.com/flat_set.html)
+- chromium [base/containers library](https://chromium.googlesource.com/chromium/src/+/HEAD/base/containers/README.md#base_flat_map-and-base_flat_set)
