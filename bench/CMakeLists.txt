@@ -1,4 +1,4 @@
-include(cmake/benchmark)
+include(${PROJECT_SOURCE_DIR}/cmake/benchmark.cmake)
 
 add_custom_target(benchmark)
 set_target_properties(benchmark PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)

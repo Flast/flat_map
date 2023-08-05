@@ -21,7 +21,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(requirements INTERFACE -Werror=return-type -Werror=undefined-inline)
 endif()
 
-include(cmake/catch2)
+include(${PROJECT_SOURCE_DIR}/cmake/catch2.cmake)
 
 add_custom_target(unit_test)
 set_target_properties(unit_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
