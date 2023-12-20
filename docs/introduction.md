@@ -12,7 +12,7 @@ flat\_map is well known replacement of std::map to improve scan access performan
 ## Usage
 
 This library is header only library.
-No building and installing are not required.
+No building and installing are required.
 
 ## Thread safety
 
