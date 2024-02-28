@@ -891,11 +891,10 @@ flat_map(std::initializer_list<std::pair<Key, T>>, Allocator)
   -> flat_map<Key, T, std::less<Key>, std::vector<std::pair<Key, T>, Allocator>>;
 ```
 
+First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
+Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
+
 Where the exposition only type aliases are defined as
-
-**Pre requirements**
-
-`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 ```cpp
 template <typename InputIterator>
@@ -910,9 +909,6 @@ using iter_to_alloc_t = std::allocator<iter_key_t<InputIterator>, iter_val_t<Inp
 template <typename InputIterator, typename Allocator>
 using iter_to_container_t = std::vector<std::pair<iter_key_t<InputIterator>, iter_val_t<InputIterator>>, Allocator>;
 ```
-
-First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
-Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
 
 **Pre requirements**
 

@@ -802,19 +802,15 @@ flat_multiset(std::initializer_list<Key>, Allocator)
   -> flat_multiset<Key, std::less<Key>, std::vector<Key, Allocator>>;
 ```
 
+First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
+Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
+
 Where the exposition only type aliases are defined as
-
-**Pre requirements**
-
-`InputIterator` should meet [*InputIterator*](https://en.cppreference.com/w/cpp/named_req/InputIterator).
 
 ```cpp
 template <typename InputIterator>
 using iter_val_t = typename std::iterator_traits<InputIterator>::value_type;
 ```
-
-First and second form are participants in overload resolution only if `Compare` doesn't satisfy [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator), and `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
-Third and fourth form are participants in overload resolution only if `Allocator` satisfies [*Allocator*](https://en.cppreference.com/w/cpp/named_req/Allocator).
 
 **Pre requirements**
 
