@@ -54,7 +54,7 @@ constexpr explicit tied_sequence(allocator_type const&);
 
 **Exceptions**
 
-No except only if for all sequences meet all of
+No exception only if for all sequences meet all of
 - `std::is_nothrow_default_constructible_v<Sequence> == true`
 
 ```cpp
@@ -133,7 +133,7 @@ Move entire elements from other.
 
 **Exceptions**
 
-No except only if each sequences meet all of
+No exception only if each sequences meet all of
 - `std::allocator_traits<typename Sequence::allocator_type>::propagate_on_container_move_assignment::value == true` and
 - `std::allocator_traits<typename Sequence::allocator_type>::is_always_equal::value == true`
 
@@ -471,7 +471,7 @@ Swap elements with other.
 
 **Exceptions**
 
-No except only if for all sequences meet all of
+No exception only if for all sequences meet all of
 - `std::allocator_traits<typename Sequence::allocator_type>::propagate_on_container_swap::value == true`
 - `std::allocator_traits<typename Sequence::allocator_type>::is_always_equal::value == true`
 
@@ -575,7 +575,7 @@ constexpr void swap(tied_sequence<Sequences...> const& lhs, tied_sequence<Sequen
 
 **Exceptions**
 
-No except only if `noexcept(lhs.swap(rhs))` is true.
+No exception only if `noexcept(lhs.swap(rhs))` is true.
 
 ### erase
 

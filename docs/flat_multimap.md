@@ -156,7 +156,7 @@ Move entire elements from other.
 
 **Exceptions**
 
-No except only if it meets all of
+No exception only if it meets all of
 - `std::is_nothrow_move_assignable_v<Container> == true` and
 - `std::is_nothrow_move_assignable_v<Compare> == true`
 
@@ -456,7 +456,7 @@ Swap elements, allocator, and comparator.
 
 **Exceptions**
 
-No except only if it meets all of
+No exception only if it meets all of
 - `std::allocator_traits<allocator_type>::is_always_equal::value` and
 - `std::is_nothrow_swappable<Compare>::value`
 
@@ -777,7 +777,7 @@ void swap(flat_multimap<Key, T, Compare, Container>& lhs, flat_multimap<Key, T, 
 
 **Exceptions**
 
-No except only if `noexcept(lhs.swap(rhs))` is true.
+No exception only if `noexcept(lhs.swap(rhs))` is true.
 
 ### erase_if
 
