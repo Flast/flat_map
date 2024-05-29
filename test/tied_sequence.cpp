@@ -11,6 +11,7 @@
 
 #include "flat_map/tied_sequence.hpp"
 #include "test_case/catch2_tuple.hpp"
+#include "test_case/memory.hpp"
 
 TEST_CASE("zip_iterator", "[iterator]")
 {
@@ -1084,5 +1085,17 @@ TEST_CASE("non contiguous", "[contiguous]")
     SECTION("construct")
     {
         [[maybe_unused]] flat_map::tied_sequence<std::deque<int>, std::deque<int>> ts;
+    }
+}
+
+TEST_CASE("allocator", "[allocator]")
+{
+    SECTION("stateful allocator")
+    {
+        [[maybe_unused]] flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        {
+            stateful_allocator<int>{"state1"},
+            stateful_allocator<int>{"state2"}
+        };
     }
 }
