@@ -12,6 +12,8 @@ struct stateful_allocator : public std::allocator<T>
     template <typename U>
     struct rebind { using other = stateful_allocator<U>; };
 
+    stateful_allocator() : state{"unspecified state"} {}
+
     stateful_allocator(char const* state) : state{state} {}
 
     stateful_allocator(stateful_allocator const&) noexcept = default;

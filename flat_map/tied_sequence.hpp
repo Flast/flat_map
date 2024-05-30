@@ -1,4 +1,4 @@
-// Copyright (c) 2021,2023 Kohei Takahashi
+// Copyright (c) 2021,2023-2024 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -282,7 +282,7 @@ class tied_sequence
 
 public:
     using value_type = std::tuple<typename Sequences::value_type...>;
-    using allocator_type = detail::fake_allocator;
+    using allocator_type = detail::fake_allocator<std::tuple<typename Sequences::allocator_type...>>;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using reference = std::tuple<typename Sequences::reference...>;

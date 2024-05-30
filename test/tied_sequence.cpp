@@ -1098,4 +1098,28 @@ TEST_CASE("allocator", "[allocator]")
             stateful_allocator<int>{"state2"}
         };
     }
+
+    SECTION("allocator forwarding")
+    {
+        [[maybe_unused]] flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        {
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+    }
+
+    SECTION("nested")
+    {
+        [[maybe_unused]] flat_map::tied_sequence<flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>>> nts
+        {
+            flat_map::forward_allocator(
+                flat_map::forward_allocator(
+                    stateful_allocator<int>{"state1"},
+                    stateful_allocator<int>{"state2"}
+                )
+            )
+        };
+    }
 }
