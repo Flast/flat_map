@@ -11,10 +11,12 @@ static std::mt19937 rng_state{};
 template <typename C>
 static void BM_construct_by_iterator(benchmark::State& state)
 {
+    std::vector<std::pair<int, int>> v;
+
     for (auto _ : state)
     {
         state.PauseTiming();
-        std::vector<std::pair<int, int>> v(state.range(0));
+        v.resize(state.range(0));
         for (auto& [k, v] : v)
         {
             k = std::uniform_int_distribution<int>{}(rng_state);
