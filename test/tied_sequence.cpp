@@ -1097,6 +1097,10 @@ TEST_CASE("allocator", "[allocator]")
             stateful_allocator<int>{"state1"},
             stateful_allocator<int>{"state2"}
         };
+
+        auto alloc = ts.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
     }
 
     SECTION("allocator forwarding")

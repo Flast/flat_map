@@ -26,6 +26,9 @@ struct fake_allocator : private AllocatorTuple
     explicit fake_allocator(AllocatorTuple&& tuple)      noexcept : AllocatorTuple{std::move(tuple)} { }
     explicit fake_allocator(AllocatorTuple const& tuple) noexcept : AllocatorTuple{tuple} { }
 
+    template <typename... Allocators>
+    explicit fake_allocator(std::allocator_arg_t, Allocators&&... allocs) noexcept : AllocatorTuple{std::forward<Allocators>(allocs)...} { }
+
     template <std::size_t I> decltype(auto) get()       noexcept { return std::get<I>(static_cast<AllocatorTuple&>(*this)); }
     template <std::size_t I> decltype(auto) get() const noexcept { return std::get<I>(static_cast<AllocatorTuple&>(*this)); }
 

@@ -419,7 +419,10 @@ public:
 
     constexpr void assign(std::initializer_list<value_type> ilist) { *this = ilist; }
 
-    constexpr allocator_type get_allocator() const noexcept { return {}; }
+    constexpr allocator_type get_allocator() const noexcept
+    {
+        return std::apply([](auto&... seqs) { return allocator_type{std::allocator_arg, seqs.get_allocator()...}; }, _seq);
+    }
 
     constexpr reference at(size_type pos)
     {
