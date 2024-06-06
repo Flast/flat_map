@@ -88,7 +88,7 @@ Construct container from `[first, last)`.
 
 **Complexity**
 
-`O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
+`O(E log(E))` if enough additional memory is available, otherwise `O(E log^2(E))`.
 
 ```cpp
 flat_multimap(flat_multimap const& other);
@@ -116,7 +116,7 @@ Construct from init.
 
 **Complexity**
 
-`O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
+`O(E log(E))` if enough additional memory is available, otherwise `O(E log^2(E))`.
 
 ```cpp
 explicit flat_multimap(range_order order, Container const& cont);
@@ -129,7 +129,7 @@ explicit flat_multimap(range_order order, Container&& cont, allocator_type const
 
 **Complexity**
 
-For non sorted range, amortized `O(E logE)` if enough additional memory is available, otherwise amortized `O(E log E^2)`.
+For non sorted range, amortized `O(E log(E))` if enough additional memory is available, otherwise amortized `O(E log^2(E))`.
 For sorted range `O(1)`.
 
 ```cpp
@@ -166,7 +166,7 @@ flat_multimap& operator=(std::initializer_list<value_type> ilist);
 
 **Complexity**
 
-`O(E log(E))` if enough additional memory is available, otherwise `O(E log(E)^2)`.
+`O(E log(E))` if enough additional memory is available, otherwise `O(E log^2(E))`.
 
 ## Iterators
 
@@ -399,7 +399,7 @@ If the `order` is `range_order::sorted` or `range_order::unique_sorted`, the ran
 
 **Complexity**
 
-For non sorted range, amortized `O((N+E) log(N+E))` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E)^2)`.
+For non sorted range, amortized `O((N+E) log(N+E))` if enough additional memory is available, otherwise amortized `O((N+E) log^2(N+E))`.
 For sorted range, amortized `O(N+E)` if enough additional memory is available, otherwise amortized `O((N+E) log(N+E))`.
 
 **Invalidation**
@@ -517,7 +517,7 @@ Merge `source` container into self.
 **Complexity**
 
 <!-- Amortized `O(M E)` for insertion. `O(N+E)` for searching insertion point if `source` ordered in same order, otherwise `O(E log(N))`. -->
-Amortized `O((N+E) log(N+E)^2)`.
+Amortized `O((N+E) log^2(N+E))`.
 
 ## Lookup
 
