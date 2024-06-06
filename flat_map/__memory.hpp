@@ -22,15 +22,20 @@ struct fake_allocator : private AllocatorTuple
     using value_type = void;
 
     fake_allocator() noexcept = default;
+    fake_allocator(fake_allocator const&) = default;
+    fake_allocator(fake_allocator&&) = default;
 
-    explicit fake_allocator(AllocatorTuple&& tuple)      noexcept : AllocatorTuple{std::move(tuple)} { }
     explicit fake_allocator(AllocatorTuple const& tuple) noexcept : AllocatorTuple{tuple} { }
+    explicit fake_allocator(AllocatorTuple&& tuple)      noexcept : AllocatorTuple{std::move(tuple)} { }
 
     template <typename... Allocators>
     explicit fake_allocator(std::allocator_arg_t, Allocators&&... allocs) noexcept : AllocatorTuple{std::forward<Allocators>(allocs)...} { }
 
+    fake_allocator& operator=(fake_allocator const&) noexcept = default;
+    fake_allocator& operator=(fake_allocator&&) noexcept = default;
+
     template <std::size_t I> decltype(auto) get()       noexcept { return std::get<I>(static_cast<AllocatorTuple&>(*this)); }
-    template <std::size_t I> decltype(auto) get() const noexcept { return std::get<I>(static_cast<AllocatorTuple&>(*this)); }
+    template <std::size_t I> decltype(auto) get() const noexcept { return std::get<I>(static_cast<AllocatorTuple const&>(*this)); }
 
     [[noreturn]]
     void* allocate(std::size_t) { throw std::bad_alloc(); }
@@ -45,7 +50,7 @@ struct fake_allocator : private AllocatorTuple
 template <typename... Allocators>
 auto forward_allocator(Allocators&&... alloc)
 {
-    return detail::fake_allocator{std::tuple<Allocators...>(std::forward<Allocators>(alloc)...)};
+    return detail::fake_allocator<std::tuple<Allocators...>>{std::allocator_arg, std::forward<Allocators>(alloc)...};
 }
 
 } // namespace flat_map

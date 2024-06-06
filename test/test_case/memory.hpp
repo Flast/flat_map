@@ -19,6 +19,9 @@ struct stateful_allocator : public std::allocator<T>
     stateful_allocator(stateful_allocator const&) noexcept = default;
     stateful_allocator(stateful_allocator&&) noexcept = default;
 
+    stateful_allocator& operator=(stateful_allocator const&) noexcept = default;
+    stateful_allocator& operator=(stateful_allocator&&) noexcept = default;
+
     template <typename U>
     stateful_allocator(stateful_allocator<U> const& other) noexcept : state{other.state} { }
 

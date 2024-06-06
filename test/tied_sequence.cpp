@@ -1092,7 +1092,7 @@ TEST_CASE("allocator", "[allocator]")
 {
     SECTION("stateful allocator")
     {
-        [[maybe_unused]] flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
         {
             stateful_allocator<int>{"state1"},
             stateful_allocator<int>{"state2"}
@@ -1105,18 +1105,200 @@ TEST_CASE("allocator", "[allocator]")
 
     SECTION("allocator forwarding")
     {
-        [[maybe_unused]] flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
         {
             flat_map::forward_allocator(
                 stateful_allocator<int>{"state1"},
                 stateful_allocator<int>{"state2"}
             )
         };
+
+        auto alloc = ts.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
+    }
+
+    SECTION("allocator forwarding with count copies")
+    {
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        {
+            4, {1, 2},
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+
+        REQUIRE(ts.size() == 4);
+        REQUIRE(ts[0] == std::tuple{1, 2});
+        REQUIRE(ts[1] == std::tuple{1, 2});
+        REQUIRE(ts[2] == std::tuple{1, 2});
+        REQUIRE(ts[3] == std::tuple{1, 2});
+
+        auto alloc = ts.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
+    }
+
+    SECTION("allocator forwarding with count default-initialized")
+    {
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        {
+            4,
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+
+        REQUIRE(ts.size() == 4);
+        REQUIRE(ts[0] == std::tuple<int, int>{});
+        REQUIRE(ts[1] == std::tuple<int, int>{});
+        REQUIRE(ts[2] == std::tuple<int, int>{});
+        REQUIRE(ts[3] == std::tuple<int, int>{});
+
+        auto alloc = ts.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
+    }
+
+    SECTION("from sequence")
+    {
+        std::vector v =
+        {
+            std::tuple{0, 1},
+            std::tuple{2, 3},
+            std::tuple{4, 5},
+            std::tuple{6, 7},
+        };
+
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts
+        {
+            v.begin(), v.end(),
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+
+        REQUIRE(ts.size() == 4);
+        REQUIRE(ts[0] == std::tuple{0, 1});
+        REQUIRE(ts[1] == std::tuple{2, 3});
+        REQUIRE(ts[2] == std::tuple{4, 5});
+        REQUIRE(ts[3] == std::tuple{6, 7});
+
+        auto alloc = ts.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
+    }
+
+    SECTION("copy ctor")
+    {
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::vector<int, stateful_allocator<int>>> src
+        {
+            4, {1, 2},
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+        decltype(src) dst =
+        {
+            src,
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state3"},
+                stateful_allocator<int>{"state4"}
+            )
+        };
+
+        REQUIRE(src.begin() != dst.begin());
+        REQUIRE(src.data() != dst.data());
+        REQUIRE(src.size() == 4);
+        REQUIRE(src[0] == std::tuple{1, 2});
+        REQUIRE(src[1] == std::tuple{1, 2});
+        REQUIRE(src[2] == std::tuple{1, 2});
+        REQUIRE(src[3] == std::tuple{1, 2});
+        REQUIRE(dst.size() == 4);
+        REQUIRE(dst[0] == std::tuple{1, 2});
+        REQUIRE(dst[1] == std::tuple{1, 2});
+        REQUIRE(dst[2] == std::tuple{1, 2});
+        REQUIRE(dst[3] == std::tuple{1, 2});
+
+        auto alloc = src.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
+
+        alloc = dst.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state3");
+        REQUIRE(alloc.get<1>().state == "state4");
+    }
+
+    SECTION("move ctor")
+    {
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::vector<int, stateful_allocator<int>>> src
+        {
+            4, {1, 2},
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+        decltype(src) dst =
+        {
+            std::move(src),
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state3"},
+                stateful_allocator<int>{"state4"}
+            )
+        };
+
+        REQUIRE(src.begin() != dst.begin());
+        REQUIRE(src.empty());
+        REQUIRE(dst.size() == 4);
+        REQUIRE(dst[0] == std::tuple{1, 2});
+        REQUIRE(dst[1] == std::tuple{1, 2});
+        REQUIRE(dst[2] == std::tuple{1, 2});
+        REQUIRE(dst[3] == std::tuple{1, 2});
+
+        auto alloc = src.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
+
+        alloc = dst.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state3");
+        REQUIRE(alloc.get<1>().state == "state4");
+    }
+
+    SECTION("initializer_list")
+    {
+        flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>> ts =
+        {
+            {
+                {0, 1},
+                {2, 3},
+                {4, 5},
+                {6, 7},
+            },
+            flat_map::forward_allocator(
+                stateful_allocator<int>{"state1"},
+                stateful_allocator<int>{"state2"}
+            )
+        };
+
+        REQUIRE(ts.size() == 4);
+        REQUIRE(ts[0] == std::tuple{0, 1});
+        REQUIRE(ts[1] == std::tuple{2, 3});
+        REQUIRE(ts[2] == std::tuple{4, 5});
+        REQUIRE(ts[3] == std::tuple{6, 7});
+
+        auto alloc = ts.get_allocator();
+        REQUIRE(alloc.get<0>().state == "state1");
+        REQUIRE(alloc.get<1>().state == "state2");
     }
 
     SECTION("nested")
     {
-        [[maybe_unused]] flat_map::tied_sequence<flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>>> nts
+        flat_map::tied_sequence<flat_map::tied_sequence<std::vector<int, stateful_allocator<int>>, std::deque<int, stateful_allocator<int>>>> nts
         {
             flat_map::forward_allocator(
                 flat_map::forward_allocator(
@@ -1125,5 +1307,10 @@ TEST_CASE("allocator", "[allocator]")
                 )
             )
         };
+
+        auto out = nts.get_allocator();
+        auto in = out.get<0>();
+        REQUIRE(in.get<0>().state == "state1");
+        REQUIRE(in.get<1>().state == "state2");
     }
 }
