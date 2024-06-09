@@ -18,6 +18,8 @@ struct wrap
 template <typename T> bool operator<(T lhs, wrap<T> rhs) { return lhs < rhs.value; }
 template <typename T> bool operator<(wrap<T> lhs, T rhs) { return lhs.value < rhs; }
 
+void unused() { }
+
 TEST_CASE("construction", "[construction]")
 {
     SECTION("default construction")
