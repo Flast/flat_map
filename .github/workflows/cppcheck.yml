@@ -19,3 +19,5 @@ jobs:
         pull_request_id: ${{ github.event.pull_request.number }}
         allow_approve: false
         enable_qtcheck: false
+
+    - run: cat report.xml
