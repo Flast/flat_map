@@ -23,6 +23,7 @@ TEST_CASE("construction", "[construction]")
     SECTION("default construction")
     {
         FLAT_CONTAINER<int, int> fm;
+        int unused;
     }
 
     SECTION("iter construction")
