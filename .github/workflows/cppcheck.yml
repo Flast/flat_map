@@ -1,9 +1,6 @@
 name: cppcheck
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
@@ -13,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
-    - name: Install prerequisites
-      run: sudo apt-get install --no-install-recommends cppcheck
-
-    - name: Run cppcheck
-      run: cppcheck -j2 --language=c++ --enable=all .
+    - uses: linuxdeepin/action-cppcheck@main
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+        pull_request_id: ${{ github.event.pull_request.number }}
+        allow_approve: false
