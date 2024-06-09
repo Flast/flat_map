@@ -595,7 +595,7 @@ constexpr typename tied_sequence<Sequences...>::size_type erase_if(tied_sequence
 
 Erase every elements which `pred` returned true.
 
-### forward\_allocator
+### forward_allocator
 
 ```cpp
 template <typename... Allocators>
