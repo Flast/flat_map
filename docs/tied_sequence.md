@@ -49,7 +49,6 @@ using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 ```cpp
 constexpr tied_sequence();
-constexpr explicit tied_sequence(allocator_type const&);
 ```
 
 **Exceptions**
@@ -58,6 +57,7 @@ No exception only if for all sequences meet all of
 - `std::is_nothrow_default_constructible_v<Sequence> == true`
 
 ```cpp
+constexpr explicit tied_sequence(allocator_type const& alloc) noexcept;
 constexpr explicit tied_sequence(typename Sequences::allocator_type const&... alloc) noexcept;
 ```
 
@@ -65,10 +65,10 @@ Construct sequences form corresponding allocator.
 
 ```cpp
 constexpr tied_sequence(size_type count, value_type const& value);
-constexpr tied_sequence(size_type count, value_type const& value, allocator_type const&);
+constexpr tied_sequence(size_type count, value_type const& value, allocator_type const& alloc);
 constexpr tied_sequence(size_type count, value_type const& value, typename Sequences::allocator_type const&... alloc);
 constexpr tied_sequence(size_type count);
-constexpr tied_sequence(size_type count, allocator_type const&);
+constexpr tied_sequence(size_type count, allocator_type const& alloc);
 constexpr tied_sequence(size_type count, typename Sequences::allocator_type const&... alloc);
 ```
 
@@ -79,7 +79,7 @@ template <typename InputIterator>
 constexpr tied_sequence(InputIterator first, InputIterator last);
 
 template <typename InputIterator>
-constexpr tied_sequence(InputIterator first, InputIterator last, allocator_type const&);
+constexpr tied_sequence(InputIterator first, InputIterator last, allocator_type const& alloc);
 
 template <typename InputIterator>
 constexpr tied_sequence(InputIterator first, InputIterator last, typename Sequences::allocator_type const&... alloc);
@@ -94,7 +94,7 @@ Construct containers from `[first, last)`.
 
 ```cpp
 constexpr tied_sequence(tied_sequence const& other);
-constexpr tied_sequence(tied_sequence const& other, allocator_type const&);
+constexpr tied_sequence(tied_sequence const& other, allocator_type const& alloc);
 constexpr tied_sequence(tied_sequence const& other, typename Sequences::allocator_type const&... alloc);
 ```
 
@@ -102,7 +102,7 @@ Copy from other.
 
 ```cpp
 constexpr tied_sequence(tied_sequence&& other);
-constexpr tied_sequence(tied_sequence&& other, allocator_type const&);
+constexpr tied_sequence(tied_sequence&& other, allocator_type const& alloc);
 constexpr tied_sequence(tied_sequence&& other, typename Sequences::allocator_type const&... alloc);
 ```
 
@@ -111,7 +111,7 @@ Move entire elements from other.
 
 ```cpp
 constexpr tied_sequence(std::initializer_list<value_type> init);
-constexpr tied_sequence(std::initializer_list<value_type> init, allocator_type const&);
+constexpr tied_sequence(std::initializer_list<value_type> init, allocator_type const& alloc);
 constexpr tied_sequence(std::initializer_list<value_type> init, typename Sequences::allocator_type const&... alloc);
 ```
 
@@ -594,3 +594,12 @@ constexpr typename tied_sequence<Sequences...>::size_type erase_if(tied_sequence
 ```
 
 Erase every elements which `pred` returned true.
+
+### forward_allocator
+
+```cpp
+template <typename... Allocators>
+/* unspecified */ forward_allocator(Allocators&&... alloc);
+```
+
+Forward allocators as `tied_sequence::allocator_type`.

@@ -1,4 +1,4 @@
-// Copyright (c) 2021,2023 Kohei Takahashi
+// Copyright (c) 2021,2023-2024 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -282,7 +282,7 @@ class tied_sequence
 
 public:
     using value_type = std::tuple<typename Sequences::value_type...>;
-    using allocator_type = detail::fake_allocator;
+    using allocator_type = detail::fake_allocator<std::tuple<typename Sequences::allocator_type...>>;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using reference = std::tuple<typename Sequences::reference...>;
@@ -295,6 +295,22 @@ public:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 private:
+    template <std::size_t... N>
+    constexpr tied_sequence(std::index_sequence<N...>, allocator_type const& alloc)
+      : _seq{alloc.template get<N>()...} { }
+
+    template <std::size_t... N>
+    constexpr tied_sequence(std::index_sequence<N...>, size_type count, allocator_type const& alloc)
+      : _seq{Sequences(count, alloc.template get<N>())...} { }
+
+    template <std::size_t... N, typename T>
+    constexpr tied_sequence(std::index_sequence<N...>, size_type count, T&& value, allocator_type const& alloc)
+      : _seq{Sequences(count, std::get<N>(std::forward<T>(value)), alloc.template get<N>())...} { }
+
+    template <std::size_t... N, typename T>
+    constexpr tied_sequence(std::index_sequence<N...>, T&& value, allocator_type const& alloc)
+      : _seq{Sequences(std::get<N>(std::forward<T>(value)), alloc.template get<N>())...} { }
+
     template <std::size_t... N, typename T>
     constexpr tied_sequence(std::index_sequence<N...>, size_type count, T&& value, typename Sequences::allocator_type const&... alloc)
       : _seq{Sequences(count, std::get<N>(std::forward<T>(value)), alloc)...} { }
@@ -302,6 +318,10 @@ private:
     template <std::size_t... N, typename T>
     constexpr tied_sequence(std::index_sequence<N...>, T&& value, typename Sequences::allocator_type const&... alloc)
       : _seq{Sequences(std::get<N>(std::forward<T>(value)), alloc)...} { }
+
+    template <typename InputIterator, std::size_t... N>
+    constexpr tied_sequence(std::index_sequence<N...> indices, InputIterator first, InputIterator last, allocator_type const& alloc)
+      : tied_sequence{indices, typename std::iterator_traits<InputIterator>::iterator_category{}, first, last, alloc.template get<N>()...} { }
 
     template <typename InputIterator, std::size_t... N>
     constexpr tied_sequence(std::index_sequence<N...>, std::input_iterator_tag, InputIterator, InputIterator, typename Sequences::allocator_type const&...)
@@ -314,6 +334,10 @@ private:
     constexpr tied_sequence(std::index_sequence<N...>, std::forward_iterator_tag, ForwardIterator first, ForwardIterator last, typename Sequences::allocator_type const&... alloc)
       : _seq{Sequences(detail::unzip<N>(first), detail::unzip<N>(last), alloc)...} { }
 
+    template <std::size_t... N>
+    constexpr tied_sequence(std::index_sequence<N...>, std::initializer_list<value_type> init, allocator_type const& alloc)
+      : tied_sequence{init, alloc.template get<N>()...} { }
+
 public:
     constexpr tied_sequence() noexcept((std::is_nothrow_default_constructible_v<Sequences> && ...))
 #if FLAT_MAP_WORKAROUND(FLAT_MAP_COMPILER_GCC, < FLAT_MAP_COMPILER_VERSION(10,0,0))
@@ -322,22 +346,24 @@ public:
       = default;
 #endif
 
-    constexpr explicit tied_sequence(allocator_type const&) noexcept(std::is_nothrow_default_constructible_v<tied_sequence>) : tied_sequence() { }
+    constexpr explicit tied_sequence(allocator_type const& alloc) noexcept
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, alloc) { }
 
     constexpr explicit tied_sequence(typename Sequences::allocator_type const&... alloc) noexcept : _seq{alloc...} { }
 
     constexpr tied_sequence(size_type count, value_type const& value)
       : tied_sequence(count, value, typename Sequences::allocator_type{}...) { }
 
-    constexpr tied_sequence(size_type count, value_type const& value, allocator_type const&)
-      : tied_sequence(count, value) { }
+    constexpr tied_sequence(size_type count, value_type const& value, allocator_type const& alloc)
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, count, value, alloc) { }
 
     constexpr tied_sequence(size_type count, value_type const& value, typename Sequences::allocator_type const&... alloc)
       : tied_sequence(std::index_sequence_for<Sequences...>{}, count, value, alloc...) { }
 
     constexpr tied_sequence(size_type count) : tied_sequence(count, typename Sequences::allocator_type{}...) { }
 
-    constexpr tied_sequence(size_type count, allocator_type const&) : tied_sequence(count) { }
+    constexpr tied_sequence(size_type count, allocator_type const& alloc)
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, count, alloc) { }
 
     constexpr tied_sequence(size_type count, typename Sequences::allocator_type const&... alloc)
       : _seq{Sequences(count, alloc)...} { }
@@ -347,7 +373,8 @@ public:
       : tied_sequence(first, last, typename Sequences::allocator_type{}...) { }
 
     template <typename InputIterator>
-    constexpr tied_sequence(InputIterator first, InputIterator last, allocator_type const&) : tied_sequence(first, last) { }
+    constexpr tied_sequence(InputIterator first, InputIterator last, allocator_type const& alloc)
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, first, last, alloc) { }
 
     template <typename InputIterator>
     constexpr tied_sequence(InputIterator first, InputIterator last, typename Sequences::allocator_type const&... alloc)
@@ -355,22 +382,25 @@ public:
 
     constexpr tied_sequence(tied_sequence const&) = default;
 
-    constexpr tied_sequence(tied_sequence const& other, allocator_type const&) : tied_sequence(other) { }
+    constexpr tied_sequence(tied_sequence const& other, allocator_type const& alloc)
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, other._seq, alloc) { }
 
     constexpr tied_sequence(tied_sequence const& other, typename Sequences::allocator_type const&... alloc)
-      : tied_sequence(std::index_sequence_for<Sequences...>{}, other, alloc...) { }
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, other._seq, alloc...) { }
 
     constexpr tied_sequence(tied_sequence&&) noexcept = default;
 
-    constexpr tied_sequence(tied_sequence&& other, allocator_type const&) : tied_sequence(std::move(other)) { }
+    constexpr tied_sequence(tied_sequence&& other, allocator_type const& alloc)
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, std::move(other._seq), alloc) { }
 
     constexpr tied_sequence(tied_sequence&& other, typename Sequences::allocator_type const&... alloc)
-      : tied_sequence(std::index_sequence_for<Sequences...>{}, std::move(other), alloc...) { }
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, std::move(other._seq), alloc...) { }
 
     constexpr tied_sequence(std::initializer_list<value_type> init)
       : tied_sequence(init, typename Sequences::allocator_type{}...) { }
 
-    constexpr tied_sequence(std::initializer_list<value_type> init, allocator_type const&) : tied_sequence(init) { }
+    constexpr tied_sequence(std::initializer_list<value_type> init, allocator_type const& alloc)
+      : tied_sequence(std::index_sequence_for<Sequences...>{}, init, alloc) { }
 
     constexpr tied_sequence(std::initializer_list<value_type> init, typename Sequences::allocator_type const&... alloc)
       : tied_sequence(init.begin(), init.end(), alloc...) { }
@@ -419,7 +449,10 @@ public:
 
     constexpr void assign(std::initializer_list<value_type> ilist) { *this = ilist; }
 
-    constexpr allocator_type get_allocator() const noexcept { return {}; }
+    constexpr allocator_type get_allocator() const noexcept
+    {
+        return std::apply([](auto&... seqs) { return allocator_type{std::allocator_arg, seqs.get_allocator()...}; }, _seq);
+    }
 
     constexpr reference at(size_type pos)
     {
