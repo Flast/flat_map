@@ -137,7 +137,7 @@ Container& base() &;
 ```
 
 Refer underlying container.
-The behavior is unspecified with any base container modifications except updateing value (not key).
+The behavior is unspecified with any base container modifications except updating value (not key).
 
 ```cpp
 Container const& base() const&;
