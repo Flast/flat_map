@@ -141,11 +141,26 @@ For sorted, and uniqued range `O(1)`, otherwise `O(E)`.
 
 ```cpp
 Container& base() &;
-Container const& base() const&;
-Container base() &&;
 ```
 
 Refer underlying container.
+The behavior is unspecified with any base container modifications except updateing value (not key).
+
+```cpp
+Container const& base() const&;
+```
+
+Refer underlying container.
+
+```cpp
+Container base() &&;
+```
+
+Move every containing elements to returned sequence.
+
+**Postcondition**
+
+- `size() == 0`
 
 ## Assignments
 
