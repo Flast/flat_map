@@ -471,10 +471,7 @@ public:
     constexpr reference back() { return *std::prev(end()); }
     constexpr const_reference back() const { return *std::prev(end()); }
 
-    constexpr pointer data() noexcept((static_cast<void>(sizeof(std::declval<Sequences>().data())), ..., true))
-    {
-        return detail::tuple_transform([](auto& c) { return c.data(); }, _seq);
-    }
+    constexpr pointer data() noexcept { return detail::tuple_transform([](auto& c) { return c.data(); }, _seq); }
 
     constexpr const_pointer data() const noexcept(noexcept(std::declval<tied_sequence*>()->data())) { return const_cast<tied_sequence*>(this)->data(); }
 
@@ -497,13 +494,11 @@ public:
 public:
     constexpr size_t max_size() const noexcept { return detail::tuple_reduction([](auto&&... c) { return std::min({c.max_size()...}); }, _seq); }
 
-#if 0 // TODO
     constexpr void reserve(size_type new_cap) { detail::tuple_reduction([new_cap](auto&... c) { (c.reserve(new_cap), ...); }, _seq); }
 
     constexpr size_type capacity() const noexcept { return detail::tuple_reduction([](auto&... c) { return std::min({c.capacity()...}); }, _seq); }
 
-    constexpr void shrink_to_fit() noexcept { detail::tuple_reduction([](auto&... c) { (c.shrink_to_fit(), ...); }, _seq); }
-#endif
+    constexpr void shrink_to_fit() { detail::tuple_reduction([](auto&... c) { (c.shrink_to_fit(), ...); }, _seq); }
 
     constexpr void clear() noexcept { detail::tuple_reduction([](auto&... c) { (c.clear(), ...); }, _seq); }
 

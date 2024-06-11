@@ -650,14 +650,13 @@ TEST_CASE("capacity", "[capacity]")
         REQUIRE(ts.max_size() > 0);
     }
 
-#if 0 // TODO
     SECTION("reserve/capacity")
     {
         flat_map::tied_sequence<std::vector<int>, std::vector<int>> ts;
         REQUIRE(ts.capacity() == 0);
         REQUIRE(ts.size() == 0);
         ts.reserve(10);
-        REQUIRE(ts.capacity() == 10);
+        REQUIRE(ts.capacity() >= 10);
         REQUIRE(ts.size() == 0);
     }
 
@@ -667,14 +666,13 @@ TEST_CASE("capacity", "[capacity]")
 
         ts.reserve(10);
         ts.push_back({0, 1});
-        REQUIRE(ts.capacity() == 10);
+        REQUIRE(ts.capacity() >= 10);
         REQUIRE(ts.size() == 1);
 
         ts.shrink_to_fit();
         REQUIRE(ts.capacity() == 1);
         REQUIRE(ts.size() == 1);
     }
-#endif
 
     SECTION("clear")
     {

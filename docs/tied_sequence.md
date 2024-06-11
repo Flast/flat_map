@@ -303,12 +303,13 @@ constexpr size_t size() const noexcept;
 constexpr size_t max_size() const noexcept;
 ```
 
-<!--
 ### reserve
 
 ```cpp
 constexpr void reserve(size_type new_cap);
 ```
+
+Available only if every sequences provide `reserve()`.
 
 ### capacity
 
@@ -316,12 +317,15 @@ constexpr void reserve(size_type new_cap);
 constexpr size_type capacity() const noexcept;
 ```
 
+Available only if every sequences provide `capacity()`.
+
 ### shrink_to_fit
 
 ```cpp
-constexpr void shrink_to_fit() noexcept;
+constexpr void shrink_to_fit();
 ```
--->
+
+Available only if every sequences provide `shrink_to_fit()`.
 
 ## Modifiers
 
