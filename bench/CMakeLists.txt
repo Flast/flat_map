@@ -11,5 +11,6 @@ macro(add_bench benchname)
 endmacro()
 
 add_bench(map_construction map_construction.cpp)
+add_bench(map_copy map_copy.cpp)
 add_bench(map_insertion map_insertion.cpp)
 add_bench(map_merge map_merge.cpp)
