@@ -1,0 +1,32 @@
+name: cppcheck
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  upload-sarif:
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          sudo apt-get install -y cppcheck
+
+      - run: |
+          cppcheck --enable=all -I. --xml --suppress=missingIncludeSystem --std=c++20 --output-file=flat_map.xml .
+
+      - uses: Flast/cppcheck-sarif@master
+        with:
+          input: flat_map.xml
+          output: flat_map.sarif
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: flat_map.sarif
+          category: cppcheck
