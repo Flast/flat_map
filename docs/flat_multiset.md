@@ -245,7 +245,7 @@ size_type max_size() const noexcept;
 void reserve(size_type new_cap);
 ```
 
-This function is provided only if `Container::reserve()` is provided.
+Available only if `Container::reserve()` is provided.
 
 **Postcondition**
 
@@ -257,7 +257,7 @@ This function is provided only if `Container::reserve()` is provided.
 size_type capacity() const noexcept;
 ```
 
-This function is provided only if `Container::capacity()` is provided.
+Available only if `Container::capacity()` is provided.
 
 ### shrink_to_fit
 
@@ -265,7 +265,7 @@ This function is provided only if `Container::capacity()` is provided.
 void shrink_to_fit();
 ```
 
-This function is provided only if `Container::shrink_to_fit()` is provided.
+Available only if `Container::shrink_to_fit()` is provided.
 
 **Postcondition**
 
