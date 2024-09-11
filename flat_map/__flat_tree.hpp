@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2024 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -173,29 +173,11 @@ public:
     size_type size() const noexcept { return _container.size(); }
     size_type max_size() const noexcept { return _container.max_size(); }
     // extension
-    template <typename... ShouldBeEmpty, typename Dummy = Container>
-    std::enable_if_t<concepts::Reservable<Dummy>>
-    reserve(size_type new_cap)
-    {
-        static_assert(sizeof...(ShouldBeEmpty) == 0);
-        _container.reserve(new_cap);
-    }
+    void reserve(size_type new_cap) { _container.reserve(new_cap); }
     // extension
-    template <typename... ShouldBeEmpty, typename Dummy = Container>
-    std::enable_if_t<concepts::HasCapacity<Dummy>, size_type>
-    capacity() const noexcept
-    {
-        static_assert(sizeof...(ShouldBeEmpty) == 0);
-        return _container.capacity();
-    }
+    size_type capacity() const noexcept { return _container.capacity(); }
     // extension
-    template <typename... ShouldBeEmpty, typename Dummy = Container>
-    std::enable_if_t<concepts::Shrinkable<Dummy>>
-    shrink_to_fit()
-    {
-        static_assert(sizeof...(ShouldBeEmpty) == 0);
-        _container.shrink_to_fit();
-    }
+    void shrink_to_fit() { _container.shrink_to_fit(); }
     void clear() noexcept { return _container.clear(); }
 
     template <typename K>
