@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2024 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -26,7 +26,5 @@ template <typename T> inline constexpr bool Name = Name ## _body<T Params>::chec
 } // namespace flat_map::detail
 
 FLAT_MAP_DEFINE_CONCEPT(Reservable, T, (T c, size_t n), c.reserve(n));
-FLAT_MAP_DEFINE_CONCEPT(HasCapacity, T, (T c), c.capacity());
-FLAT_MAP_DEFINE_CONCEPT(Shrinkable, T, (T c), c.shrink_to_fit());
 
 } // namespace flat_map::concepts
