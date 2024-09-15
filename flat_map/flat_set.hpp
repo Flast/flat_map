@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Kohei Takahashi
+// Copyright (c) 2021,2024 Kohei Takahashi
 // This software is released under the MIT License, see LICENSE.
 
 #pragma once
@@ -14,7 +14,7 @@
 #include "flat_map/__fwd.hpp"
 #include "flat_map/__config.hpp"
 #include "flat_map/__type_traits.hpp"
-#include "flat_map/__flat_tree.hpp"
+#include "flat_map/__binary_flat_tree.hpp"
 #include "flat_map/enum.hpp"
 
 namespace flat_map
@@ -23,9 +23,9 @@ namespace flat_map
 template <typename Key,
           typename Compare = std::less<Key>,
           typename Container = std::vector<Key>>
-class flat_set : private detail::_flat_tree_base<flat_set<Key, Compare, Container>, Key, Compare, Container>
+class flat_set : private detail::_binary_flat_tree_base<flat_set<Key, Compare, Container>, Key, Compare, Container>
 {
-    using _super = typename flat_set::_flat_tree_base;
+    using _super = typename flat_set::_binary_flat_tree_base;
 
     // To lookup private comparator
     friend _super;

@@ -44,7 +44,7 @@ struct comparator_store<Compare, std::enable_if_t<std::is_class_v<Compare> && !s
 };
 
 template <typename Subclass, typename Key, typename Compare, typename Container>
-class _flat_tree_base : private detail::comparator_store<Compare>
+class _binary_flat_tree_base : private detail::comparator_store<Compare>
 {
 public:
     Container _container;
@@ -118,37 +118,37 @@ public:
     }
 
 public:
-    _flat_tree_base() = default;
+    _binary_flat_tree_base() = default;
 
-    explicit _flat_tree_base(Compare const& comp, allocator_type const& alloc)
+    explicit _binary_flat_tree_base(Compare const& comp, allocator_type const& alloc)
       : detail::comparator_store<Compare>{comp}, _container{alloc} { }
 
-    explicit _flat_tree_base(allocator_type const& alloc)
+    explicit _binary_flat_tree_base(allocator_type const& alloc)
       : _container{alloc} { }
 
-    _flat_tree_base(_flat_tree_base const& other) = default;
-    _flat_tree_base(_flat_tree_base const& other, allocator_type const& alloc)
+    _binary_flat_tree_base(_binary_flat_tree_base const& other) = default;
+    _binary_flat_tree_base(_binary_flat_tree_base const& other, allocator_type const& alloc)
       : detail::comparator_store<Compare>{other._comp()}, _container{other._container, alloc} { }
 
-    _flat_tree_base(_flat_tree_base&& other) = default;
-    _flat_tree_base(_flat_tree_base&& other, allocator_type const& alloc)
+    _binary_flat_tree_base(_binary_flat_tree_base&& other) = default;
+    _binary_flat_tree_base(_binary_flat_tree_base&& other, allocator_type const& alloc)
       : detail::comparator_store<Compare>{std::move(other._comp())}, _container{std::move(other._container), alloc} { }
 
-    explicit _flat_tree_base(range_order order, Container cont)
+    explicit _binary_flat_tree_base(range_order order, Container cont)
       : _container{std::move(cont)}
     {
         _sort_container(order);
     }
 
-    explicit _flat_tree_base(range_order order, Container cont, Compare const& comp)
+    explicit _binary_flat_tree_base(range_order order, Container cont, Compare const& comp)
       : detail::comparator_store<Compare>{comp}, _container{std::move(cont)}
     {
         _sort_container(order);
     }
 
-    _flat_tree_base& operator=(_flat_tree_base const& other) = default;
+    _binary_flat_tree_base& operator=(_binary_flat_tree_base const& other) = default;
 
-    _flat_tree_base& operator=(_flat_tree_base&& other) noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>) = default;
+    _binary_flat_tree_base& operator=(_binary_flat_tree_base&& other) noexcept(noexcept(_container = std::move(other._container)) && std::is_nothrow_move_assignable_v<Compare>) = default;
 
     allocator_type get_allocator() const noexcept { return _container.get_allocator(); }
 
@@ -188,7 +188,7 @@ public:
     }
 
     template <typename K>
-    std::pair<const_iterator, bool> _find(K const& key) const { return const_cast<_flat_tree_base*>(this)->_find(key); }
+    std::pair<const_iterator, bool> _find(K const& key) const { return const_cast<_binary_flat_tree_base*>(this)->_find(key); }
 
     template <typename V>
     auto _insert(V&& value)
@@ -373,7 +373,7 @@ public:
         return count;
     }
 
-    void swap(_flat_tree_base& other) noexcept(std::allocator_traits<allocator_type>::is_always_equal::value && std::is_nothrow_swappable<Compare>::value)
+    void swap(_binary_flat_tree_base& other) noexcept(std::allocator_traits<allocator_type>::is_always_equal::value && std::is_nothrow_swappable<Compare>::value)
     {
         using std::swap;
         swap(this->_comp(), other._comp());
@@ -497,7 +497,7 @@ public:
         return found ? itr : end();
     }
 
-    const_iterator find(key_type const& key) const { return const_cast<_flat_tree_base*>(this)->find(key); }
+    const_iterator find(key_type const& key) const { return const_cast<_binary_flat_tree_base*>(this)->find(key); }
 
     template <typename K>
     enable_if_transparent<K, iterator> find(K const& key)
@@ -508,7 +508,7 @@ public:
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
-    find(K const& key) const { return const_cast<_flat_tree_base*>(this)->template find<K>(key); }
+    find(K const& key) const { return const_cast<_binary_flat_tree_base*>(this)->template find<K>(key); }
 
     bool contains(key_type const& key) const { return _find(key).second; }
 
@@ -531,36 +531,36 @@ public:
 
     std::pair<iterator, iterator> equal_range(key_type const& key) { return _equal_range(key); }
 
-    std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<_flat_tree_base*>(this)->equal_range(key); }
+    std::pair<const_iterator, const_iterator> equal_range(key_type const& key) const { return const_cast<_binary_flat_tree_base*>(this)->equal_range(key); }
 
     template <typename K>
     enable_if_transparent<K, std::pair<iterator, iterator>> equal_range(K const& key) { return _equal_range(key); }
 
     template <typename K>
     enable_if_transparent<K, std::pair<const_iterator, const_iterator>>
-    equal_range(K const& key) const { return const_cast<_flat_tree_base*>(this)->template equal_range<K>(key); }
+    equal_range(K const& key) const { return const_cast<_binary_flat_tree_base*>(this)->template equal_range<K>(key); }
 
     iterator lower_bound(key_type const& key) { return std::lower_bound(begin(), end(), key, _vcomp()); }
 
-    const_iterator lower_bound(key_type const& key) const { return const_cast<_flat_tree_base*>(this)->lower_bound(key); }
+    const_iterator lower_bound(key_type const& key) const { return const_cast<_binary_flat_tree_base*>(this)->lower_bound(key); }
 
     template <typename K>
     enable_if_transparent<K, iterator> lower_bound(K const& key) { return std::lower_bound(begin(), end(), key, _vcomp()); }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
-    lower_bound(K const& key) const { return const_cast<_flat_tree_base*>(this)->template lower_bound<K>(key); }
+    lower_bound(K const& key) const { return const_cast<_binary_flat_tree_base*>(this)->template lower_bound<K>(key); }
 
     iterator upper_bound(key_type const& key) { return std::upper_bound(begin(), end(), key, _vcomp()); }
 
-    const_iterator upper_bound(key_type const& key) const { return const_cast<_flat_tree_base*>(this)->upper_bound(key); }
+    const_iterator upper_bound(key_type const& key) const { return const_cast<_binary_flat_tree_base*>(this)->upper_bound(key); }
 
     template <typename K>
     enable_if_transparent<K, iterator> upper_bound(K const& key) { return std::upper_bound(begin(), end(), key, _vcomp()); }
 
     template <typename K>
     enable_if_transparent<K, const_iterator>
-    upper_bound(K const& key) const { return const_cast<_flat_tree_base*>(this)->template upper_bound<K>(key); }
+    upper_bound(K const& key) const { return const_cast<_binary_flat_tree_base*>(this)->template upper_bound<K>(key); }
 
     key_compare key_comp() const { return this->_comp(); }
     auto value_comp() { return static_cast<typename Subclass::value_compare>(_vcomp()); }
