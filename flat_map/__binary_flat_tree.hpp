@@ -27,19 +27,19 @@ public:
     Container _container;
 
 public:
-    using key_type = Key;
-    using value_type = typename Container::value_type;
-    using size_type = std::size_t;
-    using difference_type = std::ptrdiff_t;
-    using key_compare = Compare;
-    using allocator_type = typename Container::allocator_type;
-    using reference = typename Container::reference;
-    using const_reference = typename Container::const_reference;
-    using pointer = typename Container::pointer;
-    using const_pointer = typename Container::const_pointer;
-    using iterator = typename Container::iterator;
-    using const_iterator = typename Container::const_iterator;
-    using reverse_iterator = typename Container::reverse_iterator;
+    using key_type               = Key;
+    using value_type             = typename Container::value_type;
+    using size_type              = std::size_t;
+    using difference_type        = std::ptrdiff_t;
+    using key_compare            = Compare;
+    using allocator_type         = typename Container::allocator_type;
+    using reference              = typename Container::reference;
+    using const_reference        = typename Container::const_reference;
+    using pointer                = typename Container::pointer;
+    using const_pointer          = typename Container::const_pointer;
+    using iterator               = typename Container::iterator;
+    using const_iterator         = typename Container::const_iterator;
+    using reverse_iterator       = typename Container::reverse_iterator;
     using const_reverse_iterator = typename Container::const_reverse_iterator;
     struct node_type
     {

@@ -33,22 +33,22 @@ class flat_multiset : private detail::_binary_flat_tree_base<flat_multiset<Key, 
     static constexpr range_order_t<range_order::sorted> _order{};
 
 public:
-    using key_type = typename _super::key_type;
-    using value_type = typename _super::value_type;
-    using size_type = typename _super::size_type;
-    using difference_type = typename _super::difference_type;
-    using key_compare = typename _super::key_compare;
-    using value_compare = key_compare;
-    using allocator_type = typename _super::allocator_type;
-    using reference = typename _super::reference;
-    using const_reference = typename _super::const_reference;
-    using pointer = typename _super::pointer;
-    using const_pointer = typename _super::const_pointer;
-    using iterator = typename _super::iterator;
-    using const_iterator = typename _super::const_iterator;
-    using reverse_iterator = typename _super::reverse_iterator;
+    using key_type               = typename _super::key_type;
+    using value_type             = typename _super::value_type;
+    using size_type              = typename _super::size_type;
+    using difference_type        = typename _super::difference_type;
+    using key_compare            = typename _super::key_compare;
+    using value_compare          = key_compare;
+    using allocator_type         = typename _super::allocator_type;
+    using reference              = typename _super::reference;
+    using const_reference        = typename _super::const_reference;
+    using pointer                = typename _super::pointer;
+    using const_pointer          = typename _super::const_pointer;
+    using iterator               = typename _super::iterator;
+    using const_iterator         = typename _super::const_iterator;
+    using reverse_iterator       = typename _super::reverse_iterator;
     using const_reverse_iterator = typename _super::const_reverse_iterator;
-    using node_type = typename _super::node_type;
+    using node_type              = typename _super::node_type;
 
 private:
     using _comparator = value_compare;

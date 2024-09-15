@@ -34,10 +34,10 @@ class zip_iterator
     std::tuple<Iterators...> _it;
 
 public:
-    using difference_type = std::ptrdiff_t;
-    using value_type = tuple<typename std::iterator_traits<Iterators>::value_type...>;
-    using pointer = tuple<typename std::iterator_traits<Iterators>::pointer...>;
-    using reference = tuple<typename std::iterator_traits<Iterators>::reference...>;
+    using difference_type   = std::ptrdiff_t;
+    using value_type        = tuple<typename std::iterator_traits<Iterators>::value_type...>;
+    using pointer           = tuple<typename std::iterator_traits<Iterators>::pointer...>;
+    using reference         = tuple<typename std::iterator_traits<Iterators>::reference...>;
     using iterator_category = std::common_type_t<typename std::iterator_traits<Iterators>::iterator_category...>;
 
 public:
@@ -191,11 +191,11 @@ class unzip_iterator
     Iterator _base;
 
 public:
-    using difference_type = typename std::iterator_traits<Iterator>::difference_type;
-    using value_type = std::tuple_element_t<N, typename std::iterator_traits<Iterator>::value_type>;
-    using pointer = detail::copy_cv_t<value_type, typename std::iterator_traits<Iterator>::pointer>*;
-    // using reference = detail::copy_cv_t<value_type, std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>>&;
-    using reference = decltype(std::get<N>(*std::declval<Iterator>()));
+    using difference_type   = typename std::iterator_traits<Iterator>::difference_type;
+    using value_type        = std::tuple_element_t<N, typename std::iterator_traits<Iterator>::value_type>;
+    using pointer           = detail::copy_cv_t<value_type, typename std::iterator_traits<Iterator>::pointer>*;
+    // using reference         = detail::copy_cv_t<value_type, std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>>&;
+    using reference         = decltype(std::get<N>(*std::declval<Iterator>()));
     using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
 
 public:
@@ -281,17 +281,17 @@ class tied_sequence
     std::tuple<Sequences...> _seq;
 
 public:
-    using value_type = std::tuple<typename Sequences::value_type...>;
-    using allocator_type = detail::fake_allocator<std::tuple<typename Sequences::allocator_type...>>;
-    using size_type = std::size_t;
-    using difference_type = std::ptrdiff_t;
-    using reference = std::tuple<typename Sequences::reference...>;
-    using const_reference = std::tuple<typename Sequences::const_reference...>;
-    using pointer = std::tuple<typename Sequences::pointer...>;
-    using const_pointer = std::tuple<typename Sequences::const_pointer...>;
-    using iterator = detail::zip_iterator<typename Sequences::iterator...>;
-    using const_iterator = detail::zip_iterator<typename Sequences::const_iterator...>;
-    using reverse_iterator = std::reverse_iterator<iterator>;
+    using value_type             = std::tuple<typename Sequences::value_type...>;
+    using allocator_type         = detail::fake_allocator<std::tuple<typename Sequences::allocator_type...>>;
+    using size_type              = std::size_t;
+    using difference_type        = std::ptrdiff_t;
+    using reference              = std::tuple<typename Sequences::reference...>;
+    using const_reference        = std::tuple<typename Sequences::const_reference...>;
+    using pointer                = std::tuple<typename Sequences::pointer...>;
+    using const_pointer          = std::tuple<typename Sequences::const_pointer...>;
+    using iterator               = detail::zip_iterator<typename Sequences::iterator...>;
+    using const_iterator         = detail::zip_iterator<typename Sequences::const_iterator...>;
+    using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 private:
