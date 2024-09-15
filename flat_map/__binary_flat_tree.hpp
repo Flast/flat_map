@@ -14,34 +14,11 @@
 #include <utility>
 
 #include "flat_map/__concepts.hpp"
+#include "flat_map/__comparator.hpp"
 #include "flat_map/enum.hpp"
 
 namespace flat_map::detail
 {
-
-template <typename Compare, typename = void>
-struct comparator_store
-{
-    Compare _compare;
-
-    comparator_store() = default;
-    comparator_store(Compare const& comp) : _compare{comp} {}
-    comparator_store(Compare&& comp) : _compare{std::move(comp)} {}
-
-    auto& _comp() const { return _compare; }
-    auto& _comp() { return _compare; }
-};
-
-template <typename Compare>
-struct comparator_store<Compare, std::enable_if_t<std::is_class_v<Compare> && !std::is_final_v<Compare>>> : public Compare
-{
-    comparator_store() = default;
-    comparator_store(Compare const& comp) : Compare{comp} {}
-    comparator_store(Compare&& comp) : Compare{std::move(comp)} {}
-
-    auto& _comp() const { return *static_cast<Compare const*>(this); }
-    auto& _comp() { return *static_cast<Compare*>(this); }
-};
 
 template <typename Subclass, typename Key, typename Compare, typename Container>
 class _binary_flat_tree_base : private detail::comparator_store<Compare>
