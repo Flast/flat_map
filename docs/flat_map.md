@@ -515,6 +515,8 @@ Equivalent to `insert(hint, value_type(key, std::forward<Args>(args)...))` in th
 ```cpp
 iterator erase(iterator pos);
 
+iterator erase(const_iterator pos);
+
 iterator erase(const_iterator first, const_iterator last);
 
 size_type erase(key_type const& key)

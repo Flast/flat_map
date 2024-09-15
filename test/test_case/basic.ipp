@@ -994,6 +994,64 @@ TEST_CASE("insertion", "[insertion]")
 
 TEST_CASE("erase", "[erase]")
 {
+    SECTION("erase by iterator")
+    {
+        FLAT_CONTAINER<int, int> fm =
+        {
+            MAKE_PAIR(0, 1),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 8),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(6, 7),
+        };
+
+#if MULTI_CONTAINER
+        REQUIRE(fm.erase(std::next(fm.begin())) != fm.end());
+        REQUIRE(fm.size() == 4);
+#else
+        REQUIRE(fm.erase(std::next(fm.begin())) != fm.end());
+        REQUIRE(fm.size() == 3);
+#endif
+
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+#if MULTI_CONTAINER
+        REQUIRE(*itr++ == MAKE_PAIR(2, 8));
+#endif
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
+    SECTION("erase by const_iterator")
+    {
+        FLAT_CONTAINER<int, int> fm =
+        {
+            MAKE_PAIR(0, 1),
+            MAKE_PAIR(2, 3),
+            MAKE_PAIR(2, 8),
+            MAKE_PAIR(4, 5),
+            MAKE_PAIR(6, 7),
+        };
+
+#if MULTI_CONTAINER
+        REQUIRE(fm.erase(std::next(fm.begin())) != fm.end());
+        REQUIRE(fm.size() == 4);
+#else
+        REQUIRE(fm.erase(std::next(fm.begin())) != fm.end());
+        REQUIRE(fm.size() == 3);
+#endif
+
+        auto itr = fm.begin();
+        REQUIRE(*itr++ == MAKE_PAIR(0, 1));
+#if MULTI_CONTAINER
+        REQUIRE(*itr++ == MAKE_PAIR(2, 8));
+#endif
+        REQUIRE(*itr++ == MAKE_PAIR(4, 5));
+        REQUIRE(*itr++ == MAKE_PAIR(6, 7));
+        REQUIRE(itr == fm.end());
+    }
+
     SECTION("erase by key")
     {
         FLAT_CONTAINER<int, int> fm =

@@ -340,6 +340,7 @@ public:
     iterator emplace_hint(const_iterator hint, Args&&... args) { return _insert(hint, value_type(std::forward<Args>(args)...)); }
 
     iterator erase(iterator pos) { return _container.erase(pos); }
+    iterator erase(const_iterator pos) { return _container.erase(pos); }
     iterator erase(const_iterator first, const_iterator last) { return _container.erase(first, last); }
 
     size_type erase(key_type const& key)
