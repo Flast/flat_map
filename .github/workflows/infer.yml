@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: srz-zumix/setup-infer@v1
+    - uses: srz-zumix/setup-infer@main
 
     - name: Install prerequisites
       run: sudo apt-get install --no-install-recommends cmake
